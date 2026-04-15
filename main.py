@@ -1,6 +1,12 @@
 import os
 import json
 import re
+
+# CRITICAL FIX for MoviePy 1.x crashing on modern Pillow 10+
+import PIL.Image
+if not hasattr(PIL.Image, 'ANTIALIAS'):
+    PIL.Image.ANTIALIAS = PIL.Image.LANCZOS
+
 from pipeline.script_gen import generate_script
 from pipeline.voice_gen import run_generate_voiceover
 from pipeline.visual_gen import fetch_pexels_video, fetch_pexels_image, create_placeholder_image
