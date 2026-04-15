@@ -4,6 +4,6 @@ moviepy==1.0.3
 requests
 python-dotenv
 openai
-pillow
+pillow<10.0.0
 instagrapi
 schedule
