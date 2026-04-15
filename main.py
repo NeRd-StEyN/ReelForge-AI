@@ -81,9 +81,10 @@ def main(topic):
     metadata = generate_seo_metadata(topic, script_json)
     save_metadata(metadata, "video_metadata.json")
     
-    # 6. Auto Post to Instagram
+    # 6. Auto Send to Make.com
     caption_text = f"{metadata['title']}\n\n{metadata['description']}\n\n{' '.join(metadata['hashtags'])}"
-    post_video(cl, output_file, caption_text)
+    from pipeline.make_handler import send_to_make_webhook
+    send_to_make_webhook(output_file, caption_text)
     
     print(f"Pipeline complete! Video saved to: {output_file}")
     print(f"Metadata saved to: video_metadata.json")
