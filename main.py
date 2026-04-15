@@ -6,6 +6,7 @@ from pipeline.voice_gen import run_generate_voiceover
 from pipeline.visual_gen import fetch_pexels_video, fetch_pexels_image, create_placeholder_image
 from pipeline.video_editor import create_video
 from pipeline.seo_gen import generate_seo_metadata, save_metadata
+from pipeline.insta_handler import get_insta_client, get_performance_data, post_video
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -18,11 +19,15 @@ def clean_json_response(response_text):
     return response_text
 
 def main(topic):
-    print(f"Starting pipeline for topic: {topic}")
+    print(f"Starting pipeline...")
     
-    # 1. Generate Script
-    print("Generating script...")
-    raw_script = generate_script(topic)
+    # 0. Initialize Instagram and Fetch Analytics
+    cl = get_insta_client()
+    analytics_data = get_performance_data(cl)
+
+    # 1. Generate Script using AI Feedback
+    print(f"Brainstorming script using topic: '{topic}' and past performance data...")
+    raw_script = generate_script(topic, analytics_data)
     script_json = json.loads(clean_json_response(raw_script))
     
     scenes = script_json['scenes']
@@ -70,6 +75,10 @@ def main(topic):
     metadata = generate_seo_metadata(topic, script_json)
     save_metadata(metadata, "video_metadata.json")
     
+    # 6. Auto Post to Instagram
+    caption_text = f"{metadata['title']}\n\n{metadata['description']}\n\n{' '.join(metadata['hashtags'])}"
+    post_video(cl, output_file, caption_text)
+    
     print(f"Pipeline complete! Video saved to: {output_file}")
     print(f"Metadata saved to: video_metadata.json")
 
@@ -78,5 +87,6 @@ if __name__ == "__main__":
     if len(sys.argv) > 1:
         topic = " ".join(sys.argv[1:])
     else:
-        topic = input("Enter a topic for the video: ")
+        # Instead of prompting, generate a generic topic to allow seamless headless cron execution
+        topic = "A shocking, unknown, and fascinating fact"
     main(topic)

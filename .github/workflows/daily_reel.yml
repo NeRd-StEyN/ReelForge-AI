@@ -1,0 +1,40 @@
+name: Auto Post Daily Reel
+
+on:
+  schedule:
+    # Runs at 9:00 AM UTC every day
+    - cron: '0 9 * * *'
+  workflow_dispatch: # Allows manual triggering from the GitHub website
+
+jobs:
+  build-and-post:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+
+    - name: Install System Dependencies for Video Editing
+      run: |
+        sudo apt update
+        sudo apt install -y ffmpeg
+
+    - name: Install Python Dependencies
+      run: |
+        pip install -r requirements.txt
+
+    - name: Run Complete Auto-Learning Pipeline
+      env:
+        GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
+        INSTA_USERNAME: ${{ secrets.INSTA_USERNAME }}
+        INSTA_PASSWORD: ${{ secrets.INSTA_PASSWORD }}
+      run: |
+        # Because we modified main.py to gracefully handle empty inputs,
+        # simply running `python main.py` triggers the whole autonomous feedback loop!
+        python main.py

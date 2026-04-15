@@ -5,3 +5,5 @@ requests
 python-dotenv
 openai
 pillow
+instagrapi
+schedule

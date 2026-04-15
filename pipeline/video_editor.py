@@ -3,41 +3,53 @@ from PIL import Image, ImageDraw, ImageFont
 import numpy as np
 import os
 
-def create_text_image(text, size=(1080, 1920), font_size=70, color=(255, 255, 255)):
-    """Creates an image with text centered using PIL."""
-    # Create transparent image
+def create_text_image(text, size=(1080, 1920), font_size=80):
+    """Creates a highly engaging 'Hormozi-style' subtitle image with stroke/shadow."""
     img = Image.new('RGBA', size, (0, 0, 0, 0))
     draw = ImageDraw.Draw(img)
     
-    # Try to load a font, fallback to default
     try:
-        # Windows default font path
-        font = ImageFont.truetype("arial.ttf", font_size)
+        font = ImageFont.truetype("arialbd.ttf", font_size) # Bold arial
     except:
-        font = ImageFont.load_default()
+        try:
+            font = ImageFont.truetype("arial.ttf", font_size)
+        except:
+            font = ImageFont.load_default()
     
-    # Calculate text position
-    # Split text into lines if it's too long
     words = text.split()
     lines = []
     current_line = []
+    
     for word in words:
         current_line.append(word)
-        # Check width
         w = draw.textlength(" ".join(current_line), font=font)
-        if w > size[0] - 100:
+        # Keep lines short for better punchiness
+        if w > size[0] - 200:
             current_line.pop()
             lines.append(" ".join(current_line))
             current_line = [word]
     lines.append(" ".join(current_line))
     
-    total_h = len(lines) * font_size * 1.2
+    total_h = len(lines) * font_size * 1.3
     current_y = (size[1] - total_h) / 2
+    
+    # Yellow text with black stroke is highly readable and attention-grabbing
+    text_color = (255, 223, 0) # Bold Yellow
+    stroke_color = (0, 0, 0)
+    stroke_width = 5
     
     for line in lines:
         w = draw.textlength(line, font=font)
-        draw.text(((size[0] - w) / 2, current_y), line, font=font, fill=color)
-        current_y += font_size * 1.2
+        x = (size[0] - w) / 2
+        
+        # Draw stroke (multiple offsets)
+        for adj_x in range(-stroke_width, stroke_width+1):
+            for adj_y in range(-stroke_width, stroke_width+1):
+                draw.text((x+adj_x, current_y+adj_y), line, font=font, fill=stroke_color)
+                
+        # Draw main text
+        draw.text((x, current_y), line, font=font, fill=text_color)
+        current_y += font_size * 1.3
         
     return np.array(img)
 
