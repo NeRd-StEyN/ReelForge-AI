@@ -1,4 +1,5 @@
-from moviepy import VideoFileClip, AudioFileClip, ImageClip, CompositeVideoClip, concatenate_videoclips
+from moviepy.editor import VideoFileClip, AudioFileClip, ImageClip, CompositeVideoClip, concatenate_videoclips
+import moviepy.video.fx.all as vfx
 from PIL import Image, ImageDraw, ImageFont
 import numpy as np
 import os
@@ -64,13 +65,12 @@ def create_video(scenes, voiceovers, visuals, output_file):
         
         visual_path = visuals[i]
         if visual_path.endswith(('.mp4', '.mov')):
-            clip = VideoFileClip(visual_path).with_duration(duration)
+            clip = VideoFileClip(visual_path).set_duration(duration)
             # Loop video if it's shorter than audio
             if clip.duration < duration:
-                # This is a bit complex in MoviePy 2.x, we'll just set it to loop
-                clip = clip.with_effects([lambda c: c.loop(duration=duration)])
+                clip = clip.fx(vfx.loop, duration=duration)
         else:
-            clip = ImageClip(visual_path).with_duration(duration)
+            clip = ImageClip(visual_path).set_duration(duration)
         
         # Resize to YouTube Shorts format (1080x1920)
         w, h = clip.size
@@ -79,20 +79,20 @@ def create_video(scenes, voiceovers, visuals, output_file):
         
         if current_ratio > target_ratio:
             # Too wide, resize by height then crop width
-            clip = clip.resized(height=1920)
+            clip = clip.resize(height=1920)
             w_new = clip.size[0]
-            clip = clip.cropped(x1=(w_new - 1080) / 2, y1=0, x2=(w_new + 1080) / 2, y2=1920)
+            clip = clip.crop(x1=(w_new - 1080) / 2, y1=0, x2=(w_new + 1080) / 2, y2=1920)
         else:
             # Too tall, resize by width then crop height
-            clip = clip.resized(width=1080)
+            clip = clip.resize(width=1080)
             h_new = clip.size[1]
-            clip = clip.cropped(x1=0, y1=(h_new - 1920) / 2, x2=1080, y2=(h_new + 1920) / 2)
+            clip = clip.crop(x1=0, y1=(h_new - 1920) / 2, x2=1080, y2=(h_new + 1920) / 2)
         
-        clip = clip.with_audio(audio)
+        clip = clip.set_audio(audio)
         
         # Add subtitle using PIL
         text_img = create_text_image(scene['text'])
-        txt_clip = ImageClip(text_img).with_duration(duration)
+        txt_clip = ImageClip(text_img).set_duration(duration)
         
         video_scene = CompositeVideoClip([clip, txt_clip])
         clips.append(video_scene)
