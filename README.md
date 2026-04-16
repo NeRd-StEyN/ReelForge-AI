@@ -54,11 +54,22 @@ Built for the ASTRONOVA SYNERGIES LLP internship assignment.
    ```env
    GEMINI_API_KEY=your_gemini_api_key_here
    PEXELS_API_KEY=your_pexels_api_key_here
+   MAKE_WEBHOOK_URL=https://hook.eu1.make.com/your_webhook_id
    ```
 
    **Get API Keys**:
    - **Gemini**: [Google AI Studio](https://aistudio.google.com/app/apikey) (Free tier available)
    - **Pexels**: [Pexels API](https://www.pexels.com/api/new/) (Free tier available)
+   - **Make Webhook**: Create a Custom Webhook module in Make and copy its URL
+
+### Make.com Reel Auto-Upload Mapping
+
+If your Make scenario uses Webhooks -> Instagram for Business (Facebook login), map these fields from the webhook payload:
+
+- `Video URL` -> `1.url`
+- `Caption` -> `1.modifications.Subtitles` + newline + `1.text`
+
+The pipeline now uploads your local MP4 to a temporary public URL and sends this JSON structure automatically.
 
 ---
 
@@ -79,6 +90,56 @@ python main.py "5 Mind-Blowing Facts About Space"
 - `output_video.mp4` - Your final YouTube Shorts video (1080x1920)
 - `video_metadata.json` - SEO-optimized title, description, and tags
 - `assets/` - Generated audio files and downloaded visuals
+
+## Instagram Growth Automation (2-3 Reels/Day)
+
+Set these fields in your `.env`:
+
+```env
+MAKE_WEBHOOK_URL=https://hook.eu1.make.com/your_webhook_id
+INSTA_USERNAME=your_instagram_username
+INSTA_PASSWORD=your_instagram_password
+CONTENT_DOMAIN=history facts
+REELS_PER_DAY=3
+REEL_SCHEDULE_TIMES=09:00,14:00,20:00
+RUN_FIRST_REEL_NOW=true
+```
+
+Run continuous daily automation:
+
+```bash
+python auto_scheduler.py --mode scheduler
+```
+
+Run an immediate test batch (for example 2 reels now):
+
+```bash
+python auto_scheduler.py --mode batch --count 2
+```
+
+How feedback improves content over time:
+
+- Recent reel analytics are fetched from Instagram
+- Snapshots are stored in `data/insta_analytics_history.jsonl`
+- New topics are generated inside your chosen domain using recent winners
+- Future scripts adapt to what already gets better reach
+
+## 24/7 Automation Without Laptop (GitHub Actions)
+
+This repo now includes [auto-reels workflow](.github/workflows/auto-reels.yml) that runs on GitHub servers at fixed times daily, so your laptop can stay OFF.
+
+One-time setup:
+
+1. Push this project to your GitHub repository.
+2. In GitHub, open: Settings -> Secrets and variables -> Actions.
+3. Add repository secrets:
+   - `GEMINI_API_KEY`
+   - `PEXELS_API_KEY`
+   - `MAKE_WEBHOOK_URL`
+   - `CONTENT_DOMAIN` (example: `interesting science facts`)
+4. Ensure your Make scenario is ON and set to trigger immediately on webhook.
+
+After this one-time setup, posting is automatic from GitHub infrastructure.
 
 ---
 

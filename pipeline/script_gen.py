@@ -48,3 +48,32 @@ def generate_script(topic, analytics_data=None):
     
     response = model.generate_content(prompt)
     return response.text
+
+
+def generate_topic_from_domain(domain, analytics_data=None, feedback_summary=""):
+    """Generate the next reel topic inside one domain using recent performance feedback."""
+    api_key = os.getenv("GEMINI_API_KEY")
+    if not api_key:
+        raise ValueError("GEMINI_API_KEY not found in environment variables")
+
+    genai.configure(api_key=api_key)
+    model = genai.GenerativeModel('gemini-2.5-flash')
+
+    analytics_text = analytics_data if analytics_data else "No analytics yet"
+
+    prompt = f"""
+You are a short-form content strategist.
+
+Domain to stay inside: "{domain}"
+Recent post analytics data: {analytics_text}
+Historical feedback summary: {feedback_summary}
+
+Task:
+Propose exactly ONE topic idea for the next Instagram Reel that stays inside the domain,
+iterates on what performed best, and has high hook potential.
+
+Return only a single plain-text topic line, max 12 words, no quotes, no numbering.
+"""
+
+    response = model.generate_content(prompt)
+    return response.text.strip().splitlines()[0].strip()

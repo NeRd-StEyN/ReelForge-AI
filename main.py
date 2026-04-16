@@ -12,7 +12,7 @@ from pipeline.voice_gen import run_generate_voiceover
 from pipeline.visual_gen import fetch_pexels_video, fetch_pexels_image, create_placeholder_image
 from pipeline.video_editor import create_video
 from pipeline.seo_gen import generate_seo_metadata, save_metadata
-from pipeline.insta_handler import get_insta_client, get_performance_data, post_video
+from pipeline.insta_handler import get_insta_client, get_performance_data
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -24,12 +24,20 @@ def clean_json_response(response_text):
         return match.group(0)
     return response_text
 
+
+def _env_flag(name, default="false"):
+    return os.getenv(name, default).strip().lower() in {"1", "true", "yes", "on"}
+
 def main(topic):
     print(f"Starting pipeline...")
     
-    # 0. Initialize Instagram and Fetch Analytics
-    cl = get_insta_client()
-    analytics_data = get_performance_data(cl)
+    # 0. Optional: Fetch Instagram analytics for feedback-based scripting.
+    analytics_data = "Instagram analytics disabled by config."
+    if _env_flag("ENABLE_INSTAGRAM_ANALYTICS", "false"):
+        cl = get_insta_client()
+        analytics_data = get_performance_data(cl)
+    else:
+        print("Skipping Instagram analytics login (ENABLE_INSTAGRAM_ANALYTICS=false).")
 
     # 1. Generate Script using AI Feedback
     print(f"Brainstorming script using topic: '{topic}' and past performance data...")
@@ -82,9 +90,10 @@ def main(topic):
     save_metadata(metadata, "video_metadata.json")
     
     # 6. Auto Send to Make.com
-    caption_text = f"{metadata['title']}\n\n{metadata['description']}\n\n{' '.join(metadata['hashtags'])}"
+    caption_tags = metadata.get('hashtags') or metadata.get('tags') or []
+    caption_text = f"{metadata.get('description', '')}\n\n{' '.join(caption_tags)}".strip()
     from pipeline.make_handler import send_to_make_webhook
-    send_to_make_webhook(output_file, caption_text)
+    send_to_make_webhook(output_file, metadata.get('title', 'AI Video'), caption_text)
     
     print(f"Pipeline complete! Video saved to: {output_file}")
     print(f"Metadata saved to: video_metadata.json")
