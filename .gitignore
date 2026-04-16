@@ -4,3 +4,14 @@ dist
 .vscode
 .DS_Store
 *.log
+
+# Generated media assets
+assets/audio/
+assets/video/
+assets/images/
+output_video.mp4
+output_videoTEMP_MPY_wvf_snd.mp4
+*.mp4
+*.mp3
+*.wav
+*.mov
