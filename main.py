@@ -1,6 +1,7 @@
 import os
 import json
 import re
+import glob
 
 # CRITICAL FIX for MoviePy 1.x crashing on modern Pillow 10+
 import PIL.Image
@@ -28,8 +29,33 @@ def clean_json_response(response_text):
 def _env_flag(name, default="false"):
     return os.getenv(name, default).strip().lower() in {"1", "true", "yes", "on"}
 
+
+def cleanup_generated_assets():
+    """Remove old generated scene files so each run starts clean."""
+    patterns = [
+        "assets/audio/scene_*.mp3",
+        "assets/video/scene_*.mp4",
+        "assets/images/scene_*.jpg",
+        "assets/images/placeholder_*.jpg",
+        "output_videoTEMP_MPY_wvf_snd.mp4",
+    ]
+
+    removed = 0
+    for pattern in patterns:
+        for path in glob.glob(pattern):
+            try:
+                os.remove(path)
+                removed += 1
+            except OSError:
+                pass
+
+    print(f"Cleanup complete. Removed {removed} old generated files.")
+
 def main(topic):
     print(f"Starting pipeline...")
+
+    if _env_flag("AUTO_CLEANUP_ASSETS", "true"):
+        cleanup_generated_assets()
     
     # 0. Optional: Fetch Instagram analytics for feedback-based scripting.
     analytics_data = "Instagram analytics disabled by config."
