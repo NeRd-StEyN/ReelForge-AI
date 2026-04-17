@@ -8,7 +8,7 @@ import PIL.Image
 if not hasattr(PIL.Image, 'ANTIALIAS'):
     PIL.Image.ANTIALIAS = PIL.Image.LANCZOS
 
-from pipeline.script_gen import generate_script
+from pipeline.script_gen import generate_script_payload
 from pipeline.voice_gen import run_generate_voiceover
 from pipeline.visual_gen import fetch_pexels_video, fetch_pexels_image, create_placeholder_image
 from pipeline.video_editor import create_video
@@ -67,8 +67,7 @@ def main(topic):
 
     # 1. Generate Script using AI Feedback
     print(f"Brainstorming script using topic: '{topic}' and past performance data...")
-    raw_script = generate_script(topic, analytics_data)
-    script_json = json.loads(clean_json_response(raw_script))
+    script_json = generate_script_payload(topic, analytics_data)
     
     scenes = script_json['scenes']
     print(f"Done Script generated with {len(scenes)} scenes.")

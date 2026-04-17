@@ -1,4 +1,5 @@
 import os
+import json
 from openai import OpenAI
 from dotenv import load_dotenv
 
@@ -74,6 +75,43 @@ def _openrouter_prompt(prompt):
 
     raise RuntimeError(f"All OpenRouter models failed. Last error: {last_error}")
 
+
+def _extract_json_block(text):
+    content = str(text or "").strip()
+    start = content.find("{")
+    end = content.rfind("}")
+    if start != -1 and end != -1 and end > start:
+        return content[start : end + 1]
+    return content
+
+
+def _parse_script_payload(raw_text):
+    payload = json.loads(_extract_json_block(raw_text))
+    if not isinstance(payload, dict):
+        raise ValueError("Script payload is not a JSON object")
+    if "scenes" not in payload or not isinstance(payload["scenes"], list):
+        raise ValueError("Script payload missing list field: scenes")
+    return payload
+
+
+def _repair_script_json(raw_text, error_message):
+    prompt = f"""
+You must fix malformed JSON and return valid JSON only.
+
+Rules:
+- Keep the same schema with fields: title, scenes[].id, scenes[].text, scenes[].visual_keyword
+- Do not add markdown fences.
+- Escape quotes correctly.
+- Ensure valid commas and brackets.
+
+Previous parser error:
+{error_message}
+
+Malformed content:
+{raw_text}
+"""
+    return _openrouter_prompt(prompt)
+
 def generate_script(topic, analytics_data=None):
     """Generates a highly viral video script based on the topic and past analytics."""
 
@@ -120,6 +158,22 @@ def generate_script(topic, analytics_data=None):
     """
 
     return _openrouter_prompt(prompt)
+
+
+def generate_script_payload(topic, analytics_data=None, max_repairs=2):
+    """Generate script and return a validated JSON payload with auto-repair retries."""
+    raw = generate_script(topic, analytics_data)
+
+    for attempt in range(max_repairs + 1):
+        try:
+            return _parse_script_payload(raw)
+        except Exception as exc:
+            if attempt >= max_repairs:
+                raise RuntimeError(
+                    f"Failed to parse script JSON after {max_repairs + 1} attempts: {exc}"
+                ) from exc
+            print(f"Script JSON invalid, attempting repair ({attempt + 1}/{max_repairs})...")
+            raw = _repair_script_json(raw, str(exc))
 
 def generate_topic_from_domain(domain, analytics_data=None, feedback_summary=""):
     """Generate the next reel topic inside one domain using recent performance feedback."""
