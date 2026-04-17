@@ -19,10 +19,20 @@ jobs:
       PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
       MAKE_WEBHOOK_URL: ${{ secrets.MAKE_WEBHOOK_URL }}
       CONTENT_DOMAIN: ${{ secrets.CONTENT_DOMAIN }}
-      ENABLE_INSTAGRAM_ANALYTICS: "false"
+      INSTA_USERNAME: ${{ secrets.INSTA_USERNAME }}
+      INSTA_PASSWORD: ${{ secrets.INSTA_PASSWORD }}
+      ENABLE_INSTAGRAM_ANALYTICS: ${{ secrets.ENABLE_INSTAGRAM_ANALYTICS }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Restore feedback history cache
+        uses: actions/cache/restore@v4
+        with:
+          path: data/insta_analytics_history.jsonl
+          key: analytics-history-${{ github.ref_name }}-${{ github.run_id }}
+          restore-keys: |
+            analytics-history-${{ github.ref_name }}-
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -42,3 +52,9 @@ jobs:
       - name: Generate and post one reel
         run: |
           python auto_scheduler.py --mode batch --count 1
+
+      - name: Save feedback history cache
+        uses: actions/cache/save@v4
+        with:
+          path: data/insta_analytics_history.jsonl
+          key: analytics-history-${{ github.ref_name }}-${{ github.run_id }}

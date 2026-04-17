@@ -4,7 +4,7 @@ from PIL import Image, ImageDraw, ImageFont
 import numpy as np
 import os
 
-def create_text_image(text, size=(1080, 1920), font_size=80):
+def create_text_image(text, size=(1080, 1920), font_size=150):
     """Creates a highly engaging 'Hormozi-style' subtitle image with stroke/shadow."""
     img = Image.new('RGBA', size, (0, 0, 0, 0))
     draw = ImageDraw.Draw(img)
@@ -25,7 +25,7 @@ def create_text_image(text, size=(1080, 1920), font_size=80):
         current_line.append(word)
         w = draw.textlength(" ".join(current_line), font=font)
         # Keep lines short for better punchiness
-        if w > size[0] - 200:
+        if w > size[0] - 150:
             current_line.pop()
             lines.append(" ".join(current_line))
             current_line = [word]
@@ -34,10 +34,10 @@ def create_text_image(text, size=(1080, 1920), font_size=80):
     total_h = len(lines) * font_size * 1.3
     current_y = (size[1] - total_h) / 2
     
-    # Yellow text with black stroke is highly readable and attention-grabbing
-    text_color = (255, 223, 0) # Bold Yellow
-    stroke_color = (0, 0, 0)
-    stroke_width = 5
+    # Horror styling: Creepy Blood-Red text with dark black stroke generates a chilling vibe
+    text_color = (200, 0, 0) # Deep Blood Red
+    stroke_color = (0, 0, 0) # Pitch black
+    stroke_width = 12 # Extremely thick shadows for bold readability
     
     for line in lines:
         w = draw.textlength(line, font=font)
@@ -101,5 +101,13 @@ def create_video(scenes, voiceovers, visuals, output_file):
     final_video = concatenate_videoclips(clips, method="compose")
     
     print(f"Writing file: {output_file}")
-    final_video.write_videofile(output_file, fps=24, codec="libx264", audio_codec="aac")
+    final_video.write_videofile(
+        output_file, 
+        fps=60, # Ultra-smooth 60 fps for premium shorts
+        codec="libx264", 
+        audio_codec="aac", 
+        bitrate="8000k", # Very high bitrate to prevent pixelation
+        threads=4, 
+        preset="ultrafast" # Render incredibly fast in workflows
+    )
     return output_file

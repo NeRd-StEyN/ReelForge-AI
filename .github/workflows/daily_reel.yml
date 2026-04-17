@@ -30,7 +30,7 @@ jobs:
 
     - name: Run Complete Auto-Learning Pipeline
       env:
-        GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
         PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
         INSTA_USERNAME: ${{ secrets.INSTA_USERNAME }}
         INSTA_PASSWORD: ${{ secrets.INSTA_PASSWORD }}

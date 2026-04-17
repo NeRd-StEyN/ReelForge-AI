@@ -1,17 +1,21 @@
-import google.generativeai as genai
 import os
+from openai import OpenAI
 from dotenv import load_dotenv
 
 load_dotenv()
 
+def get_openrouter_client():
+    api_key = os.getenv("OPENROUTER_API_KEY")
+    if not api_key:
+        raise ValueError("OPENROUTER_API_KEY not found in environment variables. Please add it to your .env file.")
+    return OpenAI(
+        base_url="https://openrouter.ai/api/v1",
+        api_key=api_key,
+    )
+
 def generate_script(topic, analytics_data=None):
     """Generates a highly viral video script based on the topic and past analytics."""
-    api_key = os.getenv("GEMINI_API_KEY")
-    if not api_key:
-        raise ValueError("GEMINI_API_KEY not found in environment variables")
-    
-    genai.configure(api_key=api_key)
-    model = genai.GenerativeModel('gemini-2.5-flash')
+    client = get_openrouter_client()
     
     instructions = ""
     if analytics_data and analytics_data != "No previous reels found. Start fresh!" and "Error" not in analytics_data:
@@ -25,12 +29,12 @@ def generate_script(topic, analytics_data=None):
     """
 
     prompt = f"""
-    You are a viral TikTok & YouTube Shorts strategist.
+    You are a viral TikTok & YouTube Shorts strategist specializing in HORROR and PARANORMAL reels.
     {instructions}
     
-    Your directive is to create a highly engaging, concise, fast-paced script for the topic: "{topic}".
-    The hook (first 3 seconds) must be absolutely irresistible.
-    The script should be exactly 45-60 seconds when read aloud fast.
+    Your directive is to create a highly engaging, terrifying, suspenseful, fast-paced script for the topic: "{topic}".
+    The hook (first 3 seconds) must be absolutely paralyzing and terrifying to stop the viewer from scrolling. Use dark psychology to hook them immediately.
+    The total script when read aloud fast MUST strictly be 40 to 45 seconds long. NEVER exceed 50 seconds in length! Focus on mysterious, scary, unsettling narratives!
     
     Format the output as strict JSON with the following structure:
     {{
@@ -46,18 +50,26 @@ def generate_script(topic, analytics_data=None):
     Provide only the valid JSON, no markdown formatting blocks.
     """
     
-    response = model.generate_content(prompt)
-    return response.text
-
+    response = client.chat.completions.create(
+        model="openai/gpt-4o", # Upgraded to best-in-class GPT-4o for ultimate script creativity
+        messages=[
+            {"role": "user", "content": prompt}
+        ]
+    )
+    # OpenRouter returns markdown JSON sometimes, so we strip out common markdown formatting
+    content = response.choices[0].message.content.strip()
+    if content.startswith("```json"):
+        content = content[7:]
+    if content.startswith("```"):
+        content = content[3:]
+    if content.endswith("```"):
+        content = content[:-3]
+        
+    return content.strip()
 
 def generate_topic_from_domain(domain, analytics_data=None, feedback_summary=""):
     """Generate the next reel topic inside one domain using recent performance feedback."""
-    api_key = os.getenv("GEMINI_API_KEY")
-    if not api_key:
-        raise ValueError("GEMINI_API_KEY not found in environment variables")
-
-    genai.configure(api_key=api_key)
-    model = genai.GenerativeModel('gemini-2.5-flash')
+    client = get_openrouter_client()
 
     analytics_text = analytics_data if analytics_data else "No analytics yet"
 
@@ -75,5 +87,10 @@ iterates on what performed best, and has high hook potential.
 Return only a single plain-text topic line, max 12 words, no quotes, no numbering.
 """
 
-    response = model.generate_content(prompt)
-    return response.text.strip().splitlines()[0].strip()
+    response = client.chat.completions.create(
+        model="openai/gpt-4o", 
+        messages=[
+            {"role": "user", "content": prompt}
+        ]
+    )
+    return response.choices[0].message.content.strip().splitlines()[0].strip()

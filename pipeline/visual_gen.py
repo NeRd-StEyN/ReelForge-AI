@@ -19,7 +19,10 @@ def fetch_pexels_video(query, output_path):
     if response.status_code == 200:
         data = response.json()
         if data['total_results'] > 0:
-            video_url = data['videos'][0]['video_files'][0]['link']
+            video_files = data['videos'][0]['video_files']
+            # Find the highest resolution video (often HD/4K)
+            best_video = max(video_files, key=lambda v: (v.get('width', 0) or 0) * (v.get('height', 0) or 0))
+            video_url = best_video['link']
             # Download the video
             video_data = requests.get(video_url).content
             with open(output_path, 'wb') as f:
