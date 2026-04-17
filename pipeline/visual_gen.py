@@ -13,7 +13,8 @@ def fetch_pexels_video(query, output_path):
         return None
     
     headers = {"Authorization": api_key}
-    url = f"https://api.pexels.com/videos/search?query={query}&per_page=1&orientation=portrait"
+    # Enforce size=large so Pexels exclusively returns native 4K or True HD source material
+    url = f"https://api.pexels.com/videos/search?query={query}&per_page=1&orientation=portrait&size=large"
     
     response = requests.get(url, headers=headers)
     if response.status_code == 200:

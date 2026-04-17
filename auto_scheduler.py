@@ -14,13 +14,15 @@ from pipeline.script_gen import generate_topic_from_domain
 load_dotenv()
 
 
-def _get_domain():
-    domain = (os.getenv("CONTENT_DOMAIN") or "interesting science facts").strip()
-    return domain
-
-
 def _env_flag(name, default="false"):
     return os.getenv(name, default).strip().lower() in {"1", "true", "yes", "on"}
+
+
+def _get_domain():
+    domain = (os.getenv("CONTENT_DOMAIN") or "hooked horror story").strip()
+    if _env_flag("FORCE_HORROR_THEME", "true") and "horror" not in domain.lower():
+        domain = f"{domain} with horror mystery angle"
+    return domain
 
 
 def _default_times_for_count(count):

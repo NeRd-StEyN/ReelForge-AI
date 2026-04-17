@@ -4,7 +4,7 @@ from PIL import Image, ImageDraw, ImageFont
 import numpy as np
 import os
 
-def create_text_image(text, size=(1080, 1920), font_size=150):
+def create_text_image(text, size=(1080, 1920), font_size=120):
     """Creates a highly engaging 'Hormozi-style' subtitle image with stroke/shadow."""
     img = Image.new('RGBA', size, (0, 0, 0, 0))
     draw = ImageDraw.Draw(img)
@@ -102,12 +102,12 @@ def create_video(scenes, voiceovers, visuals, output_file):
     
     print(f"Writing file: {output_file}")
     final_video.write_videofile(
-        output_file, 
-        fps=60, # Ultra-smooth 60 fps for premium shorts
-        codec="libx264", 
-        audio_codec="aac", 
-        bitrate="8000k", # Very high bitrate to prevent pixelation
-        threads=4, 
-        preset="ultrafast" # Render incredibly fast in workflows
+        output_file,
+        fps=30,  # 30 fps is stable and platform-friendly for reels.
+        codec="libx264",
+        audio_codec="aac",
+        bitrate="10000k",  # Higher bitrate for cleaner 1080x1920 output.
+        threads=4,
+        preset="medium",  # Better quality compression than ultrafast.
     )
     return output_file

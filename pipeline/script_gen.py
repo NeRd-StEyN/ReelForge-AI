@@ -13,10 +13,70 @@ def get_openrouter_client():
         api_key=api_key,
     )
 
+
+def _get_model_candidates():
+    primary = (os.getenv("OPENROUTER_MODEL") or "google/gemini-2.5-flash").strip()
+    fallback_raw = (os.getenv("OPENROUTER_FALLBACK_MODELS") or "google/gemini-2.0-flash-001").strip()
+
+    candidates = [primary]
+    if fallback_raw:
+        candidates.extend([m.strip() for m in fallback_raw.split(",") if m.strip()])
+
+    # Preserve order while removing duplicates.
+    unique = []
+    seen = set()
+    for model in candidates:
+        if model not in seen:
+            unique.append(model)
+            seen.add(model)
+    return unique
+
+
+def _normalize_content(content):
+    if isinstance(content, list):
+        parts = []
+        for item in content:
+            if isinstance(item, dict) and item.get("type") == "text":
+                parts.append(item.get("text", ""))
+            elif isinstance(item, str):
+                parts.append(item)
+        content = "\n".join(parts)
+
+    text = str(content or "").strip()
+    if text.startswith("```json"):
+        text = text[7:]
+    if text.startswith("```"):
+        text = text[3:]
+    if text.endswith("```"):
+        text = text[:-3]
+    return text.strip()
+
+
+def _openrouter_prompt(prompt):
+    client = get_openrouter_client()
+    last_error = None
+    max_tokens = int(os.getenv("OPENROUTER_MAX_TOKENS", "2500"))
+    max_tokens = max(256, min(max_tokens, 16000))
+
+    for model in _get_model_candidates():
+        try:
+            response = client.chat.completions.create(
+                model=model,
+                messages=[
+                    {"role": "user", "content": prompt}
+                ],
+                max_tokens=max_tokens,
+            )
+            return _normalize_content(response.choices[0].message.content)
+        except Exception as exc:
+            last_error = exc
+            print(f"OpenRouter model failed ({model}): {exc}")
+
+    raise RuntimeError(f"All OpenRouter models failed. Last error: {last_error}")
+
 def generate_script(topic, analytics_data=None):
     """Generates a highly viral video script based on the topic and past analytics."""
-    client = get_openrouter_client()
-    
+
     instructions = ""
     if analytics_data and analytics_data != "No previous reels found. Start fresh!" and "Error" not in analytics_data:
         instructions = f"""
@@ -29,12 +89,21 @@ def generate_script(topic, analytics_data=None):
     """
 
     prompt = f"""
-    You are a viral TikTok & YouTube Shorts strategist specializing in HORROR and PARANORMAL reels.
+    You are a viral Instagram Reels strategist specialized in horror mystery content.
     {instructions}
     
-    Your directive is to create a highly engaging, terrifying, suspenseful, fast-paced script for the topic: "{topic}".
-    The hook (first 3 seconds) must be absolutely paralyzing and terrifying to stop the viewer from scrolling. Use dark psychology to hook them immediately.
-    The total script when read aloud fast MUST strictly be 40 to 45 seconds long. NEVER exceed 50 seconds in length! Focus on mysterious, scary, unsettling narratives!
+    Create a highly engaging, suspenseful, fast-paced reel script for this topic: "{topic}".
+    The content style must be horror or unsettling mystery, with curiosity and tension.
+
+    Hard requirements:
+    - First line must be a strong hook that instantly stops scroll in under 8 words.
+    - Build open loops and tension every few lines so viewer wants to watch till end.
+    - End with a payoff reveal or twist.
+    - Script should read in about 40 to 55 seconds.
+    - Keep language punchy and easy to understand.
+    - Avoid explicit gore.
+    - Return 6 to 8 scenes.
+    - Each scene text should be short enough for readable subtitles.
     
     Format the output as strict JSON with the following structure:
     {{
@@ -49,32 +118,15 @@ def generate_script(topic, analytics_data=None):
     }}
     Provide only the valid JSON, no markdown formatting blocks.
     """
-    
-    response = client.chat.completions.create(
-        model="openai/gpt-4o", # Upgraded to best-in-class GPT-4o for ultimate script creativity
-        messages=[
-            {"role": "user", "content": prompt}
-        ]
-    )
-    # OpenRouter returns markdown JSON sometimes, so we strip out common markdown formatting
-    content = response.choices[0].message.content.strip()
-    if content.startswith("```json"):
-        content = content[7:]
-    if content.startswith("```"):
-        content = content[3:]
-    if content.endswith("```"):
-        content = content[:-3]
-        
-    return content.strip()
+
+    return _openrouter_prompt(prompt)
 
 def generate_topic_from_domain(domain, analytics_data=None, feedback_summary=""):
     """Generate the next reel topic inside one domain using recent performance feedback."""
-    client = get_openrouter_client()
-
     analytics_text = analytics_data if analytics_data else "No analytics yet"
 
     prompt = f"""
-You are a short-form content strategist.
+You are a short-form content strategist specialized in horror reels.
 
 Domain to stay inside: "{domain}"
 Recent post analytics data: {analytics_text}
@@ -82,15 +134,11 @@ Historical feedback summary: {feedback_summary}
 
 Task:
 Propose exactly ONE topic idea for the next Instagram Reel that stays inside the domain,
-iterates on what performed best, and has high hook potential.
+iterates on what performed best, and has very strong hook potential.
+Topic must support a horror or unsettling mystery storytelling angle.
 
 Return only a single plain-text topic line, max 12 words, no quotes, no numbering.
 """
 
-    response = client.chat.completions.create(
-        model="openai/gpt-4o", 
-        messages=[
-            {"role": "user", "content": prompt}
-        ]
-    )
-    return response.choices[0].message.content.strip().splitlines()[0].strip()
+    content = _openrouter_prompt(prompt)
+    return content.splitlines()[0].strip()

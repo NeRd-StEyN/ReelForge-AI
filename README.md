@@ -8,7 +8,7 @@ Built for the ASTRONOVA SYNERGIES LLP internship assignment.
 
 ## 🚀 Features
 
-- **AI Script Generation**: Uses Google Gemini 2.5 Flash to create engaging, structured scripts
+- **AI Script Generation**: Uses OpenRouter with Gemini models to create engaging, structured scripts
 - **Natural Voiceover**: High-quality text-to-speech using Microsoft Edge TTS (free tier)
 - **Stock Visuals**: Automatically fetches relevant videos/images from Pexels API
 - **Automated Editing**: Syncs audio, video, and adds subtitles using MoviePy
@@ -21,7 +21,7 @@ Built for the ASTRONOVA SYNERGIES LLP internship assignment.
 
 | Component | Technology |
 |-----------|-----------|
-| **AI Script** | Google Gemini 2.5 Flash API |
+| **AI Script** | OpenRouter (Gemini models) |
 | **Voiceover** | Edge TTS (Microsoft) |
 | **Visuals** | Pexels API |
 | **Video Editing** | MoviePy + Pillow (PIL) |
@@ -52,13 +52,16 @@ Built for the ASTRONOVA SYNERGIES LLP internship assignment.
    
    Rename `.env.example` to `.env` and add your keys:
    ```env
-   GEMINI_API_KEY=your_gemini_api_key_here
+   OPENROUTER_API_KEY=your_openrouter_api_key_here
+   OPENROUTER_MODEL=google/gemini-2.5-flash
+   OPENROUTER_FALLBACK_MODELS=google/gemini-2.0-flash-001
+   OPENROUTER_MAX_TOKENS=2500
    PEXELS_API_KEY=your_pexels_api_key_here
    MAKE_WEBHOOK_URL=https://hook.eu1.make.com/your_webhook_id
    ```
 
    **Get API Keys**:
-   - **Gemini**: [Google AI Studio](https://aistudio.google.com/app/apikey) (Free tier available)
+   - **OpenRouter**: [OpenRouter Keys](https://openrouter.ai/keys)
    - **Pexels**: [Pexels API](https://www.pexels.com/api/new/) (Free tier available)
    - **Make Webhook**: Create a Custom Webhook module in Make and copy its URL
 
@@ -99,7 +102,7 @@ Set these fields in your `.env`:
 MAKE_WEBHOOK_URL=https://hook.eu1.make.com/your_webhook_id
 INSTA_USERNAME=your_instagram_username
 INSTA_PASSWORD=your_instagram_password
-CONTENT_DOMAIN=history facts
+CONTENT_DOMAIN=hooked horror story
 REELS_PER_DAY=3
 REEL_SCHEDULE_TIMES=09:00,14:00,20:00
 RUN_FIRST_REEL_NOW=true
@@ -133,10 +136,12 @@ One-time setup:
 1. Push this project to your GitHub repository.
 2. In GitHub, open: Settings -> Secrets and variables -> Actions.
 3. Add repository secrets:
-   - `GEMINI_API_KEY`
+   - `OPENROUTER_API_KEY`
+   - `OPENROUTER_MODEL` (example: `google/gemini-2.5-flash`)
+   - `OPENROUTER_FALLBACK_MODELS` (optional, comma-separated)
    - `PEXELS_API_KEY`
    - `MAKE_WEBHOOK_URL`
-   - `CONTENT_DOMAIN` (example: `interesting science facts`)
+   - `CONTENT_DOMAIN` (example: `hooked horror story`)
 4. Ensure your Make scenario is ON and set to trigger immediately on webhook.
 
 After this one-time setup, posting is automatic from GitHub infrastructure.
