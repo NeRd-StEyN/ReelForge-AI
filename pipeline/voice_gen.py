@@ -4,8 +4,8 @@ import os
 
 async def generate_voiceover(text, output_path, voice="en-US-GuyNeural"):
     """Generates a high-energy, fast-paced, high-retention voiceover file using edge-tts."""
-    # Rate +15% increases engagement for short-form content
-    communicate = edge_tts.Communicate(text, voice, rate="+15%")
+    # Slightly slower than before to improve flow on longer 55-60s scripts.
+    communicate = edge_tts.Communicate(text, voice, rate="+5%")
     await communicate.save(output_path)
     return output_path
 

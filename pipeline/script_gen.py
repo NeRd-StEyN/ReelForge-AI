@@ -112,6 +112,20 @@ Malformed content:
 """
     return _openrouter_prompt(prompt)
 
+
+def _normalize_scene_text(text):
+    """Collapse line breaks/extra spaces so TTS reads each scene as one continuous thought."""
+    return " ".join(str(text or "").replace("\n", " ").split())
+
+
+def _postprocess_script_payload(payload):
+    scenes = payload.get("scenes", [])
+    for scene in scenes:
+        if isinstance(scene, dict):
+            scene["text"] = _normalize_scene_text(scene.get("text", ""))
+            scene["visual_keyword"] = str(scene.get("visual_keyword", "")).strip()
+    return payload
+
 def generate_script(topic, analytics_data=None):
     """Generates a highly viral video script based on the topic and past analytics."""
 
@@ -131,17 +145,30 @@ def generate_script(topic, analytics_data=None):
     {instructions}
     
     Create a highly engaging, suspenseful, fast-paced reel script for this topic: "{topic}".
-    The content style must be horror or unsettling mystery, with curiosity and tension.
+    The content style must be mysterious horror storytelling with curiosity, tension, and strong retention.
+
+    Retention framework you must follow:
+    - Start with a pattern-interrupt hook in the very first words (shock, contradiction, forbidden truth, or eerie question).
+    - Build the script like a mini story, not disconnected lines: Setup -> Escalation -> Revelation.
+    - Keep at least one unanswered question active until the final scene.
+    - Add a micro cliffhanger at the end of each scene that creates urgency for the next scene.
+    - Reveal the payoff only in the final scene.
 
     Hard requirements:
     - First line must be a strong hook that instantly stops scroll in under 8 words.
+    - The first line should feel impossible to ignore and emotionally charged.
     - Build open loops and tension every few lines so viewer wants to watch till end.
     - End with a payoff reveal or twist.
-    - Script should read in about 40 to 55 seconds.
+    - Script should read in about 55 to 60 seconds.
+    - Target total word count around 150 to 170 words.
     - Keep language punchy and easy to understand.
     - Avoid explicit gore.
-    - Return 6 to 8 scenes.
-    - Each scene text should be short enough for readable subtitles.
+    - Return 4 to 6 scenes.
+    - Each scene text must be one long flowing sentence (or two connected clauses), not short choppy lines.
+    - Keep each scene text around 20 to 35 words to reduce frequent voice pauses.
+    - Avoid line breaks inside scene text.
+    - Avoid generic filler language; every scene must add new mystery or escalation.
+    - Keep the narration story-first, as if telling one creepy incident from beginning to end.
     
     Format the output as strict JSON with the following structure:
     {{
@@ -166,7 +193,8 @@ def generate_script_payload(topic, analytics_data=None, max_repairs=2):
 
     for attempt in range(max_repairs + 1):
         try:
-            return _parse_script_payload(raw)
+            payload = _parse_script_payload(raw)
+            return _postprocess_script_payload(payload)
         except Exception as exc:
             if attempt >= max_repairs:
                 raise RuntimeError(
@@ -190,6 +218,7 @@ Task:
 Propose exactly ONE topic idea for the next Instagram Reel that stays inside the domain,
 iterates on what performed best, and has very strong hook potential.
 Topic must support a horror or unsettling mystery storytelling angle.
+The idea should naturally allow: an immediate hook, rising mystery, and a final disturbing reveal.
 
 Return only a single plain-text topic line, max 12 words, no quotes, no numbering.
 """

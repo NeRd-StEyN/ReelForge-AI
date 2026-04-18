@@ -4,8 +4,8 @@ from PIL import Image, ImageDraw, ImageFont
 import numpy as np
 import os
 
-def create_text_image(text, size=(1080, 1920), font_size=120):
-    """Creates a highly engaging 'Hormozi-style' subtitle image with stroke/shadow."""
+def create_text_image(text, size=(1080, 1920), font_size=150):
+    """Create high-contrast, lower-third subtitles that remain readable on mobile reels."""
     img = Image.new('RGBA', size, (0, 0, 0, 0))
     draw = ImageDraw.Draw(img)
     
@@ -17,40 +17,46 @@ def create_text_image(text, size=(1080, 1920), font_size=120):
         except:
             font = ImageFont.load_default()
     
-    words = text.split()
+    clean_text = " ".join(str(text or "").replace("\n", " ").split())
+    words = clean_text.split()
     lines = []
     current_line = []
     
     for word in words:
         current_line.append(word)
         w = draw.textlength(" ".join(current_line), font=font)
-        # Keep lines short for better punchiness
-        if w > size[0] - 150:
+        # Wrap text to fit a readable lower-third block with side padding.
+        if w > size[0] - 140:
             current_line.pop()
             lines.append(" ".join(current_line))
             current_line = [word]
-    lines.append(" ".join(current_line))
+    if current_line:
+        lines.append(" ".join(current_line))
+
+    if not lines:
+        return np.array(img)
     
-    total_h = len(lines) * font_size * 1.3
-    current_y = (size[1] - total_h) / 2
+    line_spacing = int(font_size * 0.26)
+    total_h = len(lines) * font_size + (max(0, len(lines) - 1) * line_spacing)
+    # Keep subtitles in the lower safe area instead of center.
+    current_y = int(size[1] * 0.68) - (total_h // 2)
     
-    # Horror styling: Creepy Blood-Red text with dark black stroke generates a chilling vibe
-    text_color = (200, 0, 0) # Deep Blood Red
-    stroke_color = (0, 0, 0) # Pitch black
-    stroke_width = 12 # Extremely thick shadows for bold readability
+    text_color = (255, 255, 255)
+    stroke_color = (0, 0, 0)
+    stroke_width = 10
     
     for line in lines:
         w = draw.textlength(line, font=font)
         x = (size[0] - w) / 2
         
-        # Draw stroke (multiple offsets)
+        # Draw stroke behind text for readability against bright/dark footage.
         for adj_x in range(-stroke_width, stroke_width+1):
             for adj_y in range(-stroke_width, stroke_width+1):
                 draw.text((x+adj_x, current_y+adj_y), line, font=font, fill=stroke_color)
                 
-        # Draw main text
+        # Draw main text.
         draw.text((x, current_y), line, font=font, fill=text_color)
-        current_y += font_size * 1.3
+        current_y += font_size + line_spacing
         
     return np.array(img)
 
