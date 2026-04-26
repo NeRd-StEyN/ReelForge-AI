@@ -3,28 +3,91 @@ import moviepy.video.fx.all as vfx
 from PIL import Image, ImageDraw, ImageFont
 import numpy as np
 import os
+import urllib.request
+
+
+def _contains_devanagari(text):
+    for ch in str(text or ""):
+        if "\u0900" <= ch <= "\u097F":
+            return True
+    return False
+
+
+def _render_signature(font, text):
+    canvas = Image.new("L", (700, 140), 0)
+    draw = ImageDraw.Draw(canvas)
+    draw.text((6, 6), text, font=font, fill=255)
+    return canvas.tobytes()
+
+
+def _font_supports_devanagari(font):
+    """Heuristic: rendered Hindi should not look identical to tofu box fallback."""
+    try:
+        sample = "कहानी रात डरावना"
+        tofu = "□□□□□□□□□□□□"
+        return _render_signature(font, sample) != _render_signature(font, tofu)
+    except Exception:
+        return False
+
+
+def _maybe_download_noto_devanagari_bold(target_path):
+    if os.path.exists(target_path):
+        return target_path
+
+    if os.getenv("AUTO_DOWNLOAD_HINDI_FONT", "true").strip().lower() not in {"1", "true", "yes", "on"}:
+        return None
+
+    os.makedirs(os.path.dirname(target_path), exist_ok=True)
+    url = (
+        "https://github.com/googlefonts/noto-fonts/raw/main/hinted/ttf/"
+        "NotoSansDevanagari/NotoSansDevanagari-Bold.ttf"
+    )
+    try:
+        urllib.request.urlretrieve(url, target_path)
+        return target_path
+    except Exception:
+        return None
 
 
 def _load_caption_font(font_size):
-    """Load a bold caption font reliably across Windows/Linux/macOS runners."""
+    """Load a bold Hindi-capable caption font across runners."""
+    env_font = (os.getenv("SUBTITLE_FONT_PATH") or "").strip()
+    bundled_noto = os.path.join("assets", "fonts", "NotoSansDevanagari-Bold.ttf")
+    _maybe_download_noto_devanagari_bold(bundled_noto)
+
     font_candidates = [
+        env_font,
+        bundled_noto,
+        "C:/Windows/Fonts/KohinoorDevanagari-Bold.ttf",
+        "C:/Windows/Fonts/KohinoorDevanagari-Regular.ttf",
         "C:/Windows/Fonts/NirmalaB.ttf",
         "C:/Windows/Fonts/Nirmala.ttf",
         "C:/Windows/Fonts/mangal.ttf",
+        "/usr/share/fonts/truetype/noto/NotoSansDevanagari-Bold.ttf",
+        "/usr/share/fonts/truetype/noto/NotoSansDevanagari-Regular.ttf",
+        "/Library/Fonts/NotoSansDevanagari-Bold.ttf",
+        "/Library/Fonts/Mangal.ttf",
         "C:/Windows/Fonts/arialbd.ttf",
         "C:/Windows/Fonts/segoeuib.ttf",
         "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
         "/Library/Fonts/Arial Bold.ttf",
+        "NotoSansDevanagari-Bold.ttf",
         "Nirmala.ttf",
         "mangal.ttf",
         "arialbd.ttf",
         "DejaVuSans-Bold.ttf",
     ]
+
     for font_path in font_candidates:
+        if not font_path:
+            continue
         try:
-            return ImageFont.truetype(font_path, font_size)
+            loaded = ImageFont.truetype(font_path, font_size)
+            if _font_supports_devanagari(loaded):
+                return loaded
         except Exception:
             continue
+
     return ImageFont.load_default()
 
 def create_text_image(text, size=(1080, 1920), font_size=150):
@@ -33,6 +96,10 @@ def create_text_image(text, size=(1080, 1920), font_size=150):
     draw = ImageDraw.Draw(img)
 
     font = _load_caption_font(font_size)
+    if _contains_devanagari(text) and not _font_supports_devanagari(font):
+        print(
+            "Warning: Hindi subtitle font missing. Set SUBTITLE_FONT_PATH or keep AUTO_DOWNLOAD_HINDI_FONT=true."
+        )
     
     clean_text = " ".join(str(text or "").replace("\n", " ").split())
     words = clean_text.split()

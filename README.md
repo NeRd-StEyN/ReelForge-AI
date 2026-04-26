@@ -152,13 +152,20 @@ Subtitle style defaults:
 - Bold yellow text with black outline/shadow (mobile-friendly, Hindi-capable)
 - Rolling one-word subtitle chunks for punchy short-form feel
 - Lower-third placement tuned for reels safe area
+- Auto-downloads Noto Devanagari subtitle font when missing
 
 ## Hindi + Realistic Setup
 
 - Set `CONTENT_LANGUAGE=hindi` to force Hindi narration text
 - Set `TTS_VOICE=hi-IN-MadhurNeural` (or any Edge Hindi voice)
+- Keep `AUTO_DOWNLOAD_HINDI_FONT=true` for automatic Hindi subtitle font setup
+- Optional: set `SUBTITLE_FONT_PATH` to your local Devanagari TTF (example: C:/Windows/Fonts/Nirmala.ttf)
 - Script prompt now requests realistic visual keywords (cinematic, photoreal)
 - Pexels search is auto-enriched for realism and retries across pages
+
+If subtitles show square boxes:
+- Ensure internet access once so Noto Devanagari can be downloaded automatically
+- Or set `SUBTITLE_FONT_PATH` to a Hindi-capable font file
 
 ## Quality Notes
 
