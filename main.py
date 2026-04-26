@@ -30,6 +30,10 @@ def _env_flag(name, default="false"):
     return os.getenv(name, default).strip().lower() in {"1", "true", "yes", "on"}
 
 
+def _get_tts_voice():
+    return (os.getenv("TTS_VOICE") or "hi-IN-MadhurNeural").strip()
+
+
 def cleanup_generated_assets():
     """Remove old generated scene files so each run starts clean."""
     patterns = [
@@ -54,6 +58,7 @@ def cleanup_generated_assets():
 
 def main(topic):
     print(f"Starting pipeline...")
+    tts_voice = _get_tts_voice()
 
     if _env_flag("AUTO_CLEANUP_ASSETS", "true"):
         cleanup_generated_assets()
@@ -88,7 +93,7 @@ def main(topic):
         if not use_single_narration:
             # Legacy mode: generate one voice clip per scene.
             vo_path = f"assets/audio/scene_{i+1}.mp3"
-            run_generate_voiceover(scene['text'], vo_path)
+            run_generate_voiceover(scene['text'], vo_path, voice=tts_voice)
             voiceover_paths.append(vo_path)
         
         # 3. Fetch Visuals
@@ -115,7 +120,11 @@ def main(topic):
             for scene in scenes
         ).strip()
         full_narration_path = "assets/audio/full_narration.mp3"
-        _, word_timeline = run_generate_voiceover_with_timestamps(full_narration_text, full_narration_path)
+        _, word_timeline = run_generate_voiceover_with_timestamps(
+            full_narration_text,
+            full_narration_path,
+            voice=tts_voice,
+        )
         voice_input = full_narration_path
     else:
         voice_input = voiceover_paths

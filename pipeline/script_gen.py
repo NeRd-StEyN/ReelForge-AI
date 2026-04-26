@@ -5,6 +5,10 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+
+def _get_content_language():
+    return (os.getenv("CONTENT_LANGUAGE") or "hindi").strip().lower()
+
 def get_openrouter_client():
     api_key = os.getenv("OPENROUTER_API_KEY")
     if not api_key:
@@ -128,6 +132,14 @@ def _postprocess_script_payload(payload):
 
 def generate_script(topic, analytics_data=None):
     """Generates a highly viral video script based on the topic and past analytics."""
+    language = _get_content_language()
+    language_rules = """
+    Language rules:
+    - Narration text must be in Hindi using Devanagari script.
+    - Avoid English words unless absolutely unavoidable proper nouns.
+    - Keep pronunciation natural for Hindi TTS.
+    - Title can be Hindi or Hinglish, but scene narration must stay Devanagari Hindi.
+    """ if language in {"hindi", "hi", "hi-in"} else ""
 
     instructions = ""
     if analytics_data and analytics_data != "No previous reels found. Start fresh!" and "Error" not in analytics_data:
@@ -143,6 +155,7 @@ def generate_script(topic, analytics_data=None):
     prompt = f"""
     You are a viral Instagram Reels strategist specialized in horror mystery content.
     {instructions}
+    {language_rules}
     
     Create a highly engaging, suspenseful, fast-paced reel script for this topic: "{topic}".
     The content style must be mysterious horror storytelling with curiosity, tension, and strong retention.
@@ -171,6 +184,7 @@ def generate_script(topic, analytics_data=None):
     - Avoid generic filler language; every scene must add new mystery or escalation.
     - Keep the narration story-first, as if telling one creepy incident from beginning to end.
     - Every scene must have a distinct visual_keyword so visuals do not repeat.
+    - visual_keyword must target realistic footage (cinematic, photoreal, real people/real place, dramatic lighting), avoid cartoon/anime/illustration words.
     
     Format the output as strict JSON with the following structure:
     {{
@@ -179,7 +193,7 @@ def generate_script(topic, analytics_data=None):
             {{
                 "id": 1,
                 "text": "The spoken words for this scene",
-                "visual_keyword": "Highly specific visual term to search stock footage for (e.g. 'mysterious dark galaxy space explosion')"
+                "visual_keyword": "Highly specific realistic visual term for stock footage (e.g. 'realistic abandoned haveli corridor at night cinematic lighting')"
             }}
         ]
     }}

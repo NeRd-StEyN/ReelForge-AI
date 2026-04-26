@@ -101,6 +101,8 @@ OPENROUTER_FALLBACK_MODELS=google/gemini-2.0-flash-001
 OPENROUTER_MAX_TOKENS=2500
 AUTO_CLEANUP_ASSETS=true
 SINGLE_NARRATION_MODE=true
+CONTENT_LANGUAGE=hindi
+TTS_VOICE=hi-IN-MadhurNeural
 CONTENT_DOMAIN=hooked horror story
 ENABLE_INSTAGRAM_ANALYTICS=false
 ```
@@ -145,6 +147,18 @@ If you manually type 1.caption, Make may treat it as plain text.
 - Pipeline groups words into rolling chunks
 - Subtitle chunks are shown exactly when spoken
 - Fallback: static scene subtitle if timestamps are unavailable
+
+Subtitle style defaults:
+- Bold yellow text with black outline/shadow (mobile-friendly, Hindi-capable)
+- Rolling one-word subtitle chunks for punchy short-form feel
+- Lower-third placement tuned for reels safe area
+
+## Hindi + Realistic Setup
+
+- Set `CONTENT_LANGUAGE=hindi` to force Hindi narration text
+- Set `TTS_VOICE=hi-IN-MadhurNeural` (or any Edge Hindi voice)
+- Script prompt now requests realistic visual keywords (cinematic, photoreal)
+- Pexels search is auto-enriched for realism and retries across pages
 
 ## Quality Notes
 

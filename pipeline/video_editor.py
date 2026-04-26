@@ -8,10 +8,15 @@ import os
 def _load_caption_font(font_size):
     """Load a bold caption font reliably across Windows/Linux/macOS runners."""
     font_candidates = [
+        "C:/Windows/Fonts/NirmalaB.ttf",
+        "C:/Windows/Fonts/Nirmala.ttf",
+        "C:/Windows/Fonts/mangal.ttf",
         "C:/Windows/Fonts/arialbd.ttf",
         "C:/Windows/Fonts/segoeuib.ttf",
         "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
         "/Library/Fonts/Arial Bold.ttf",
+        "Nirmala.ttf",
+        "mangal.ttf",
         "arialbd.ttf",
         "DejaVuSans-Bold.ttf",
     ]
@@ -23,7 +28,7 @@ def _load_caption_font(font_size):
     return ImageFont.load_default()
 
 def create_text_image(text, size=(1080, 1920), font_size=150):
-    """Create high-contrast, lower-third subtitles that remain readable on mobile reels."""
+    """Create high-contrast yellow outlined subtitles for mobile reels."""
     img = Image.new('RGBA', size, (0, 0, 0, 0))
     draw = ImageDraw.Draw(img)
 
@@ -48,31 +53,27 @@ def create_text_image(text, size=(1080, 1920), font_size=150):
     if not lines:
         return np.array(img)
     
-    line_spacing = int(font_size * 0.18)
+    line_spacing = int(font_size * 0.22)
     total_h = len(lines) * font_size + (max(0, len(lines) - 1) * line_spacing)
-    # Keep subtitles in the lower safe area instead of center.
-    current_y = int(size[1] * 0.74) - (total_h // 2)
+    # Keep subtitles around the lower third similar to short-form caption style.
+    current_y = int(size[1] * 0.80) - (total_h // 2)
     
-    text_color = (255, 255, 255)
+    text_color = (255, 210, 30)
     stroke_color = (0, 0, 0)
-    stroke_width = 5
-    box_fill = (0, 0, 0, 185)
-    horizontal_padding = 26
-    vertical_padding = 14
+    stroke_width = 8
+    shadow_color = (0, 0, 0, 185)
+    shadow_offset = (4, 4)
     
     for line in lines:
         w = draw.textlength(line, font=font)
         x = (size[0] - w) / 2
 
-        # Draw a translucent rounded box so text remains visible on bright footage.
-        box_left = max(24, int(x - horizontal_padding))
-        box_top = max(24, int(current_y - vertical_padding))
-        box_right = min(size[0] - 24, int(x + w + horizontal_padding))
-        box_bottom = min(size[1] - 24, int(current_y + font_size + vertical_padding))
-        draw.rounded_rectangle(
-            [(box_left, box_top), (box_right, box_bottom)],
-            radius=16,
-            fill=box_fill,
+        # Draw soft shadow first so text remains visible even on bright frames.
+        draw.text(
+            (x + shadow_offset[0], current_y + shadow_offset[1]),
+            line,
+            font=font,
+            fill=shadow_color,
         )
         
         # Draw stroke behind text for readability against bright/dark footage.
@@ -195,7 +196,7 @@ def _scene_durations_from_timeline(scene_word_events, total_duration):
     return durations
 
 
-def _build_dynamic_subtitle_clips(events, scene_start, scene_duration, words_per_chunk=4):
+def _build_dynamic_subtitle_clips(events, scene_start, scene_duration, words_per_chunk=1):
     """Create rolling subtitle clips aligned to spoken word boundaries."""
     clips = []
     if not events:
