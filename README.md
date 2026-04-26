@@ -10,6 +10,7 @@ Built for the ASTRONOVA SYNERGIES LLP internship assignment.
 
 - **AI Script Generation**: Uses OpenRouter with Gemini models to create engaging, structured scripts
 - **Natural Voiceover**: High-quality text-to-speech using Microsoft Edge TTS (free tier)
+- **Dynamic Subtitles**: Word-timed rolling captions synced to spoken narration
 - **Stock Visuals**: Automatically fetches relevant videos/images from Pexels API
 - **Automated Editing**: Syncs audio, video, and adds subtitles using MoviePy
 - **YouTube Shorts Ready**: Outputs 1080x1920 portrait videos optimized for Shorts
@@ -58,6 +59,7 @@ Built for the ASTRONOVA SYNERGIES LLP internship assignment.
    OPENROUTER_MAX_TOKENS=2500
    PEXELS_API_KEY=your_pexels_api_key_here
    MAKE_WEBHOOK_URL=https://hook.eu1.make.com/your_webhook_id
+   SINGLE_NARRATION_MODE=true
    ```
 
    **Get API Keys**:
@@ -106,6 +108,7 @@ CONTENT_DOMAIN=hooked horror story
 REELS_PER_DAY=3
 REEL_SCHEDULE_TIMES=09:00,14:00,20:00
 RUN_FIRST_REEL_NOW=true
+SINGLE_NARRATION_MODE=true
 ```
 
 Run continuous daily automation:

@@ -9,7 +9,7 @@ if not hasattr(PIL.Image, 'ANTIALIAS'):
     PIL.Image.ANTIALIAS = PIL.Image.LANCZOS
 
 from pipeline.script_gen import generate_script_payload
-from pipeline.voice_gen import run_generate_voiceover
+from pipeline.voice_gen import run_generate_voiceover, run_generate_voiceover_with_timestamps
 from pipeline.visual_gen import fetch_pexels_video, fetch_pexels_image, create_placeholder_image
 from pipeline.video_editor import create_video
 from pipeline.seo_gen import generate_seo_metadata, save_metadata
@@ -34,6 +34,7 @@ def cleanup_generated_assets():
     """Remove old generated scene files so each run starts clean."""
     patterns = [
         "assets/audio/scene_*.mp3",
+        "assets/audio/full_narration.mp3",
         "assets/video/scene_*.mp4",
         "assets/images/scene_*.jpg",
         "assets/images/placeholder_*.jpg",
@@ -72,8 +73,10 @@ def main(topic):
     scenes = script_json['scenes']
     print(f"Done Script generated with {len(scenes)} scenes.")
     
+    use_single_narration = _env_flag("SINGLE_NARRATION_MODE", "true")
     voiceover_paths = []
     visual_paths = []
+    word_timeline = None
     
     # Create asset folders if they don't exist
     os.makedirs("assets/audio", exist_ok=True)
@@ -82,11 +85,11 @@ def main(topic):
     
     for i, scene in enumerate(scenes):
         print(f"Processing scene {i+1}/{len(scenes)}...")
-        
-        # 2. Generate Voiceover
-        vo_path = f"assets/audio/scene_{i+1}.mp3"
-        run_generate_voiceover(scene['text'], vo_path)
-        voiceover_paths.append(vo_path)
+        if not use_single_narration:
+            # Legacy mode: generate one voice clip per scene.
+            vo_path = f"assets/audio/scene_{i+1}.mp3"
+            run_generate_voiceover(scene['text'], vo_path)
+            voiceover_paths.append(vo_path)
         
         # 3. Fetch Visuals
         visual_path = f"assets/video/scene_{i+1}.mp4"
@@ -105,9 +108,21 @@ def main(topic):
         else:
             visual_paths.append(visual_path)
             
+    if use_single_narration:
+        print("Generating one continuous narration track for smoother voice flow...")
+        full_narration_text = " ".join(
+            " ".join(str(scene.get('text', '')).replace("\n", " ").split())
+            for scene in scenes
+        ).strip()
+        full_narration_path = "assets/audio/full_narration.mp3"
+        _, word_timeline = run_generate_voiceover_with_timestamps(full_narration_text, full_narration_path)
+        voice_input = full_narration_path
+    else:
+        voice_input = voiceover_paths
+
     print("Assembling final video...")
     output_file = "output_video.mp4"
-    create_video(scenes, voiceover_paths, visual_paths, output_file)
+    create_video(scenes, voice_input, visual_paths, output_file, word_timeline=word_timeline)
     
     # 5. Generate SEO Metadata
     print("Generating SEO metadata...")
