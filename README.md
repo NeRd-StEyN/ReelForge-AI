@@ -1,239 +1,187 @@
-# AI Video Generation Pipeline 🎬
+# ReelForge AI
 
-**Automated end-to-end pipeline that transforms a single topic into a YouTube-ready video.**
+AI-powered short-form video pipeline for Instagram Reels and YouTube Shorts.
 
-Built for the ASTRONOVA SYNERGIES LLP internship assignment.
+If you want a strong repo name, use:
+- Primary recommendation: ReelForge AI
+- Alternative options: ClipSmith AI, ViralReel Engine, GhostFrame Studio
 
----
+## What This Project Does
 
-## 🚀 Features
+Given one topic, this project can automatically:
+- Generate a story-driven script from LLM prompts
+- Produce natural voice narration with Edge TTS
+- Fetch portrait visuals from Pexels
+- Build a final 1080x1920 reel with synced rolling subtitles
+- Generate SEO metadata
+- Send the final video URL and caption to Make webhook for publishing flows
 
-- **AI Script Generation**: Uses OpenRouter with Gemini models to create engaging, structured scripts
-- **Natural Voiceover**: High-quality text-to-speech using Microsoft Edge TTS (free tier)
-- **Dynamic Subtitles**: Word-timed rolling captions synced to spoken narration
-- **Stock Visuals**: Automatically fetches relevant videos/images from Pexels API
-- **Automated Editing**: Syncs audio, video, and adds subtitles using MoviePy
-- **YouTube Shorts Ready**: Outputs 1080x1920 portrait videos optimized for Shorts
-- **SEO Metadata**: Generates titles, descriptions, and tags for better discoverability
+## Core Features
 
----
+- Continuous narration mode for smooth voice flow
+- Dynamic subtitles synced to spoken words (word-boundary timing)
+- Improved subtitle visibility (bold font, high-contrast box)
+- Visual diversity logic to avoid repeated-looking scenes
+- Domain-focused topic generation with optional analytics feedback loop
+- Scheduler support for multi-post daily automation
 
-## 🛠️ Tech Stack
+## Tech Stack
 
-| Component | Technology |
-|-----------|-----------|
-| **AI Script** | OpenRouter (Gemini models) |
-| **Voiceover** | Edge TTS (Microsoft) |
-| **Visuals** | Pexels API |
-| **Video Editing** | MoviePy + Pillow (PIL) |
-| **Language** | Python 3.10+ |
+- Python 3.10+
+- OpenRouter (LLM script generation)
+- Edge TTS (voice synthesis)
+- Pexels API (visual assets)
+- MoviePy + Pillow (editing and subtitles)
+- Make.com webhook (publishing handoff)
 
----
+## Project Layout
 
-## 📦 Installation
-
-### Prerequisites
-- Python 3.10 or higher
-- FFmpeg (bundled with `imageio-ffmpeg`)
-
-### Setup
-
-1. **Clone the repository**:
-   ```bash
-   git clone https://github.com/NeRd-StEyN/DruiDot.git
-   cd DruiDot
-   ```
-
-2. **Install dependencies**:
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-3. **Configure API Keys**:
-   
-   Rename `.env.example` to `.env` and add your keys:
-   ```env
-   OPENROUTER_API_KEY=your_openrouter_api_key_here
-   OPENROUTER_MODEL=google/gemini-2.5-flash
-   OPENROUTER_FALLBACK_MODELS=google/gemini-2.0-flash-001
-   OPENROUTER_MAX_TOKENS=2500
-   PEXELS_API_KEY=your_pexels_api_key_here
-   MAKE_WEBHOOK_URL=https://hook.eu1.make.com/your_webhook_id
-   SINGLE_NARRATION_MODE=true
-   ```
-
-   **Get API Keys**:
-   - **OpenRouter**: [OpenRouter Keys](https://openrouter.ai/keys)
-   - **Pexels**: [Pexels API](https://www.pexels.com/api/new/) (Free tier available)
-   - **Make Webhook**: Create a Custom Webhook module in Make and copy its URL
-
-### Make.com Reel Auto-Upload Mapping
-
-If your Make scenario uses Webhooks -> Instagram for Business (Facebook login), map these fields from the webhook payload:
-
-- `Video URL` -> `1.url`
-- `Caption` -> `1.modifications.Subtitles` + newline + `1.text`
-
-The pipeline now uploads your local MP4 to a temporary public URL and sends this JSON structure automatically.
-
----
-
-## 🎮 Usage
-
-Run the pipeline with a topic:
-
-```bash
-python main.py "Your Video Topic Here"
+```text
+.
+|- main.py
+|- auto_scheduler.py
+|- requirements.txt
+|- .env.example
+|- pipeline/
+|  |- script_gen.py
+|  |- voice_gen.py
+|  |- visual_gen.py
+|  |- video_editor.py
+|  |- seo_gen.py
+|  |- make_handler.py
+|  |- insta_handler.py
+|  |- feedback_loop.py
+|- assets/
+|  |- audio/
+|  |- video/
+|  |- images/
+|- data/
+|  |- insta_analytics_history.jsonl
 ```
 
-**Example**:
+## Quick Start
+
+1. Clone and install:
+
 ```bash
-python main.py "5 Mind-Blowing Facts About Space"
+git clone <your-repo-url>
+cd <your-repo-folder>
+pip install -r requirements.txt
 ```
 
-### Output
-- `output_video.mp4` - Your final YouTube Shorts video (1080x1920)
-- `video_metadata.json` - SEO-optimized title, description, and tags
-- `assets/` - Generated audio files and downloaded visuals
+2. Create env file:
+- Copy .env.example to .env
+- Fill required keys
 
-## Instagram Growth Automation (2-3 Reels/Day)
+3. Run one reel:
 
-Set these fields in your `.env`:
+```bash
+python main.py "A disturbing mystery no one solved"
+```
+
+Output files:
+- output_video.mp4
+- video_metadata.json
+
+## Environment Variables
+
+Minimum required:
 
 ```env
+OPENROUTER_API_KEY=your_key
+PEXELS_API_KEY=your_key
 MAKE_WEBHOOK_URL=https://hook.eu1.make.com/your_webhook_id
-INSTA_USERNAME=your_instagram_username
-INSTA_PASSWORD=your_instagram_password
+```
+
+Recommended quality settings:
+
+```env
+OPENROUTER_MODEL=google/gemini-2.5-flash
+OPENROUTER_FALLBACK_MODELS=google/gemini-2.0-flash-001
+OPENROUTER_MAX_TOKENS=2500
+AUTO_CLEANUP_ASSETS=true
+SINGLE_NARRATION_MODE=true
 CONTENT_DOMAIN=hooked horror story
+ENABLE_INSTAGRAM_ANALYTICS=false
+```
+
+Scheduling settings:
+
+```env
 REELS_PER_DAY=3
 REEL_SCHEDULE_TIMES=09:00,14:00,20:00
 RUN_FIRST_REEL_NOW=true
-SINGLE_NARRATION_MODE=true
 ```
 
-Run continuous daily automation:
+## Daily Automation
+
+Scheduler mode:
 
 ```bash
 python auto_scheduler.py --mode scheduler
 ```
 
-Run an immediate test batch (for example 2 reels now):
+Immediate batch mode:
 
 ```bash
 python auto_scheduler.py --mode batch --count 2
 ```
 
-How feedback improves content over time:
+## Make.com Mapping (Important)
 
-- Recent reel analytics are fetched from Instagram
-- Snapshots are stored in `data/insta_analytics_history.jsonl`
-- New topics are generated inside your chosen domain using recent winners
-- Future scripts adapt to what already gets better reach
+In your Make scenario:
+- Trigger: Custom Webhook
+- Publishing module: Instagram for Business
 
-## 24/7 Automation Without Laptop (GitHub Actions)
+Map fields from webhook output using variable picker (do not type literals):
+- Video URL -> url
+- Caption -> caption
 
-This repo now includes [auto-reels workflow](.github/workflows/auto-reels.yml) that runs on GitHub servers at fixed times daily, so your laptop can stay OFF.
+If you manually type 1.caption, Make may treat it as plain text.
 
-One-time setup:
+## How Subtitle Sync Works
 
-1. Push this project to your GitHub repository.
-2. In GitHub, open: Settings -> Secrets and variables -> Actions.
-3. Add repository secrets:
-   - `OPENROUTER_API_KEY`
-   - `OPENROUTER_MODEL` (example: `google/gemini-2.5-flash`)
-   - `OPENROUTER_FALLBACK_MODELS` (optional, comma-separated)
-   - `PEXELS_API_KEY`
-   - `MAKE_WEBHOOK_URL`
-   - `CONTENT_DOMAIN` (example: `hooked horror story`)
-4. Ensure your Make scenario is ON and set to trigger immediately on webhook.
+- Edge TTS provides word boundary events with timestamps
+- Pipeline groups words into rolling chunks
+- Subtitle chunks are shown exactly when spoken
+- Fallback: static scene subtitle if timestamps are unavailable
 
-After this one-time setup, posting is automatic from GitHub infrastructure.
+## Quality Notes
 
----
+- Subtitle readability is tuned for mobile with high contrast and safe lower-third positioning
+- Visual fetch selects random unseen Pexels results per run to reduce duplicates
+- Continuous narration reduces choppy scene-to-scene voice transitions
 
-## 📁 Project Structure
+## Troubleshooting
 
-```
-DruiDot/
-├── main.py                    # Main pipeline orchestrator
-├── requirements.txt           # Python dependencies
-├── .env.example              # API key template
-├── pipeline/
-│   ├── script_gen.py         # AI script generation (Gemini)
-│   ├── voice_gen.py          # Text-to-speech (Edge TTS)
-│   ├── visual_gen.py         # Stock footage fetcher (Pexels)
-│   ├── video_editor.py       # Video assembly (MoviePy)
-│   ├── seo_gen.py            # SEO metadata generator
-│   └── config.py             # Configuration utilities
-├── assets/
-│   ├── audio/                # Generated voiceovers
-│   ├── video/                # Downloaded stock videos
-│   └── images/               # Downloaded/placeholder images
-├── output_video.mp4          # Final generated video
-└── video_metadata.json       # SEO metadata
-```
+No webhook variables in Make:
+- Click Run once in Make
+- Trigger script again
+- Open mapping field and pick webhook variables
 
----
+Caption appears as 1.caption:
+- Remove typed text
+- Insert mapped webhook variable token for caption
 
-## 🎯 Pipeline Workflow
+Subtitles too fast/slow:
+- Keep SINGLE_NARRATION_MODE=true
+- Use fewer, longer scenes in script prompt (already configured)
 
-1. **Script Generation** → Gemini AI creates a JSON-structured script with scenes and visual keywords
-2. **Voiceover Creation** → Edge TTS converts text to natural-sounding audio
-3. **Visual Fetching** → Pexels API downloads relevant stock footage/images
-4. **Video Assembly** → MoviePy combines audio, video, and subtitles
-5. **SEO Generation** → Creates YouTube-optimized metadata
+Pexels repetition still visible:
+- Increase topic specificity in visual_keyword prompts
+- Run with fresh cleanup enabled
 
----
+## Roadmap
 
-## 📝 Assignment Write-up (200 words)
+- Per-word highlight karaoke caption style
+- Background music with automatic ducking
+- Transition templates for scene changes
+- Direct platform upload adapters beyond Make
 
-### Tools Used
-I built this pipeline using **Google Gemini 2.5 Flash** for AI-driven script generation, which outputs a structured JSON with scene-by-scene content and visual keywords. **Edge TTS** provides free, natural-sounding voiceovers without API limits, using the "AndrewNeural" voice. **Pexels API** supplies high-quality portrait stock footage matching the generated keywords. **MoviePy** handles all video processing—resizing to 9:16 aspect ratio, audio-video synchronization, and subtitle overlays using PIL for text rendering.
+## License
 
-### Biggest Challenge
-The most significant challenge was ensuring robust audio-video synchronization while handling varied aspect ratios from Pexels. Stock videos come in different orientations, so I implemented intelligent resizing and center-cropping to maintain a consistent 1080x1920 layout for YouTube Shorts. Additionally, parsing JSON from LLM outputs required regex-based cleaning to handle markdown code blocks. Windows console encoding issues with emoji characters also required removing all Unicode symbols from print statements.
+MIT
 
-### What I'd Improve
-1. **Dynamic Transitions**: Add smooth fade/slide transitions between scenes
-2. **Advanced Subtitles**: Implement word-level timing using Whisper API for viral-style captions
-3. **Background Music**: Integrate royalty-free music mixing with volume ducking
-4. **Thumbnail Generation**: Auto-create eye-catching thumbnails using AI image generation
-5. **YouTube Auto-Upload**: Add YouTube Data API integration for one-click publishing
+## Author
 
----
-
-## 🎥 Demo
-
-Run the pipeline and watch it generate a complete video in ~15-20 minutes:
-
-```bash
-python main.py "The Science Behind Dreams"
-```
-
----
-
-## 🤝 Contributing
-
-This project was built as an internship assignment. Feel free to fork and extend it!
-
----
-
-## 📄 License
-
-MIT License - Feel free to use this project for learning and development.
-
----
-
-## 👨‍💻 Author
-
-**NeRd-StEyN**  
-Built for ASTRONOVA SYNERGIES LLP Internship Assignment
-
----
-
-## 🙏 Acknowledgments
-
-- Google Gemini for AI script generation
-- Microsoft Edge TTS for free voiceover synthesis
-- Pexels for high-quality stock footage
-- MoviePy community for video processing tools
+Built by NeRd-StEyN for internship and production experimentation in automated short-form content systems.
