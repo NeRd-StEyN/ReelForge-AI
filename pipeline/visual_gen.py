@@ -1,9 +1,26 @@
 import requests
 import os
+import random
 from dotenv import load_dotenv
 from PIL import Image, ImageDraw
 
 load_dotenv()
+
+_USED_PEXELS_VIDEO_IDS = set()
+_USED_PEXELS_IMAGE_IDS = set()
+
+
+def _pick_diverse_pexels_item(items, used_ids):
+    """Prefer unseen assets first, then fall back to any item if exhausted."""
+    unseen = [item for item in items if item.get("id") not in used_ids]
+    pool = unseen if unseen else items
+    if not pool:
+        return None
+    choice = random.choice(pool)
+    item_id = choice.get("id")
+    if item_id is not None:
+        used_ids.add(item_id)
+    return choice
 
 def fetch_pexels_video(query, output_path):
     """Fetches a stock video from Pexels based on query."""
@@ -13,14 +30,20 @@ def fetch_pexels_video(query, output_path):
         return None
     
     headers = {"Authorization": api_key}
-    # Enforce size=large so Pexels exclusively returns native 4K or True HD source material
-    url = f"https://api.pexels.com/videos/search?query={query}&per_page=1&orientation=portrait&size=large"
+    # Pull a batch and randomly pick an unseen item to avoid repeated-looking reels.
+    page = random.randint(1, 5)
+    url = f"https://api.pexels.com/videos/search?query={query}&per_page=15&page={page}&orientation=portrait&size=large"
     
     response = requests.get(url, headers=headers)
     if response.status_code == 200:
         data = response.json()
         if data['total_results'] > 0:
-            video_files = data['videos'][0]['video_files']
+            picked_video = _pick_diverse_pexels_item(data.get('videos', []), _USED_PEXELS_VIDEO_IDS)
+            if not picked_video:
+                return None
+            video_files = picked_video.get('video_files', [])
+            if not video_files:
+                return None
             # Find the highest resolution video (often HD/4K)
             best_video = max(video_files, key=lambda v: (v.get('width', 0) or 0) * (v.get('height', 0) or 0))
             video_url = best_video['link']
@@ -40,13 +63,17 @@ def fetch_pexels_image(query, output_path):
         return None
     
     headers = {"Authorization": api_key}
-    url = f"https://api.pexels.com/v1/search?query={query}&per_page=1"
+    page = random.randint(1, 5)
+    url = f"https://api.pexels.com/v1/search?query={query}&per_page=15&page={page}&orientation=portrait"
     
     response = requests.get(url, headers=headers)
     if response.status_code == 200:
         data = response.json()
         if data['total_results'] > 0:
-            image_url = data['photos'][0]['src']['large']
+            picked_photo = _pick_diverse_pexels_item(data.get('photos', []), _USED_PEXELS_IMAGE_IDS)
+            if not picked_photo:
+                return None
+            image_url = picked_photo['src']['large']
             image_data = requests.get(image_url).content
             with open(output_path, 'wb') as f:
                 f.write(image_data)

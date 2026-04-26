@@ -163,12 +163,14 @@ def generate_script(topic, analytics_data=None):
     - Target total word count around 150 to 170 words.
     - Keep language punchy and easy to understand.
     - Avoid explicit gore.
-    - Return 4 to 6 scenes.
-    - Each scene text must be one long flowing sentence (or two connected clauses), not short choppy lines.
-    - Keep each scene text around 20 to 35 words to reduce frequent voice pauses.
+    - Return 3 to 4 scenes.
+    - Each scene text must be one long flowing sentence (or two tightly connected clauses), not short choppy lines.
+    - Keep each scene text around 35 to 50 words to reduce frequent voice pauses.
     - Avoid line breaks inside scene text.
+    - Use natural connectors (and, while, because, then) so narration sounds like one continuous story.
     - Avoid generic filler language; every scene must add new mystery or escalation.
     - Keep the narration story-first, as if telling one creepy incident from beginning to end.
+    - Every scene must have a distinct visual_keyword so visuals do not repeat.
     
     Format the output as strict JSON with the following structure:
     {{

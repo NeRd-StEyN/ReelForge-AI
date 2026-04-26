@@ -4,18 +4,30 @@ from PIL import Image, ImageDraw, ImageFont
 import numpy as np
 import os
 
+
+def _load_caption_font(font_size):
+    """Load a bold caption font reliably across Windows/Linux/macOS runners."""
+    font_candidates = [
+        "C:/Windows/Fonts/arialbd.ttf",
+        "C:/Windows/Fonts/segoeuib.ttf",
+        "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
+        "/Library/Fonts/Arial Bold.ttf",
+        "arialbd.ttf",
+        "DejaVuSans-Bold.ttf",
+    ]
+    for font_path in font_candidates:
+        try:
+            return ImageFont.truetype(font_path, font_size)
+        except Exception:
+            continue
+    return ImageFont.load_default()
+
 def create_text_image(text, size=(1080, 1920), font_size=150):
     """Create high-contrast, lower-third subtitles that remain readable on mobile reels."""
     img = Image.new('RGBA', size, (0, 0, 0, 0))
     draw = ImageDraw.Draw(img)
-    
-    try:
-        font = ImageFont.truetype("arialbd.ttf", font_size) # Bold arial
-    except:
-        try:
-            font = ImageFont.truetype("arial.ttf", font_size)
-        except:
-            font = ImageFont.load_default()
+
+    font = _load_caption_font(font_size)
     
     clean_text = " ".join(str(text or "").replace("\n", " ").split())
     words = clean_text.split()
@@ -36,18 +48,32 @@ def create_text_image(text, size=(1080, 1920), font_size=150):
     if not lines:
         return np.array(img)
     
-    line_spacing = int(font_size * 0.26)
+    line_spacing = int(font_size * 0.18)
     total_h = len(lines) * font_size + (max(0, len(lines) - 1) * line_spacing)
     # Keep subtitles in the lower safe area instead of center.
-    current_y = int(size[1] * 0.68) - (total_h // 2)
+    current_y = int(size[1] * 0.74) - (total_h // 2)
     
     text_color = (255, 255, 255)
     stroke_color = (0, 0, 0)
-    stroke_width = 10
+    stroke_width = 5
+    box_fill = (0, 0, 0, 185)
+    horizontal_padding = 26
+    vertical_padding = 14
     
     for line in lines:
         w = draw.textlength(line, font=font)
         x = (size[0] - w) / 2
+
+        # Draw a translucent rounded box so text remains visible on bright footage.
+        box_left = max(24, int(x - horizontal_padding))
+        box_top = max(24, int(current_y - vertical_padding))
+        box_right = min(size[0] - 24, int(x + w + horizontal_padding))
+        box_bottom = min(size[1] - 24, int(current_y + font_size + vertical_padding))
+        draw.rounded_rectangle(
+            [(box_left, box_top), (box_right, box_bottom)],
+            radius=16,
+            fill=box_fill,
+        )
         
         # Draw stroke behind text for readability against bright/dark footage.
         for adj_x in range(-stroke_width, stroke_width+1):
@@ -97,14 +123,15 @@ def create_video(scenes, voiceovers, visuals, output_file):
         clip = clip.set_audio(audio)
         
         # Add subtitle using PIL
-        text_img = create_text_image(scene['text'])
+        text_img = create_text_image(scene['text'], font_size=72)
         txt_clip = ImageClip(text_img).set_duration(duration)
         
         video_scene = CompositeVideoClip([clip, txt_clip])
         clips.append(video_scene)
     
     print("Concatenating clips...")
-    final_video = concatenate_videoclips(clips, method="compose")
+    # Slight overlap helps hide tiny seam pauses between scene TTS chunks.
+    final_video = concatenate_videoclips(clips, method="compose", padding=-0.06)
     
     print(f"Writing file: {output_file}")
     final_video.write_videofile(
