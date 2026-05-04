@@ -9,17 +9,43 @@ load_dotenv()
 _USED_PEXELS_VIDEO_IDS = set()
 _USED_PEXELS_IMAGE_IDS = set()
 
+# Proven Pexels search terms that consistently return beautiful girl/woman clips.
+# Used as fallbacks when the AI-generated visual_keyword returns zero results.
+_GIRL_FALLBACK_QUERIES = [
+    "beautiful woman portrait cinematic",
+    "attractive girl smiling slow motion",
+    "fashion model walking city",
+    "young woman confident lifestyle",
+    "girl dancing aesthetic lighting",
+    "beautiful indian woman portrait",
+    "woman hair flip slow motion",
+    "girl getting ready mirror",
+    "couple romantic cinematic",
+    "woman looking at camera close up",
+    "girl in cafe aesthetic",
+    "beautiful woman sunset golden hour",
+    "woman fitness workout aesthetic",
+    "girl laughing candid slow motion",
+    "beautiful woman street style fashion",
+]
+
 
 def _build_realistic_query(query):
-    """Bias stock search toward realistic cinematic visuals."""
+    """Bias stock search toward beautiful woman/girl footage with cinematic quality."""
     base = " ".join(str(query or "").split())
-    realism_tokens = "realistic cinematic photoreal dramatic lighting real location"
+    # Quality tokens without over-constraining — Pexels handles natural language well.
+    quality_tokens = "cinematic beautiful aesthetic"
     if not base:
-        return realism_tokens
+        return random.choice(_GIRL_FALLBACK_QUERIES)
     lowered = base.lower()
     if "cartoon" in lowered or "anime" in lowered or "illustration" in lowered:
         base = base.replace("cartoon", "").replace("anime", "").replace("illustration", "")
-    return f"{base} {realism_tokens}".strip()
+    # If the query already mentions woman/girl/female/lady, just add quality tokens.
+    # Otherwise inject "beautiful woman" to guarantee girl-focused results.
+    has_girl_term = any(w in lowered for w in ["woman", "girl", "female", "lady", "model", "couple"])
+    if not has_girl_term:
+        base = f"{base} beautiful woman"
+    return f"{base} {quality_tokens}".strip()
 
 
 def _pick_diverse_pexels_item(items, used_ids):
@@ -34,16 +60,8 @@ def _pick_diverse_pexels_item(items, used_ids):
         used_ids.add(item_id)
     return choice
 
-def fetch_pexels_video(query, output_path):
-    """Fetches a stock video from Pexels based on query."""
-    api_key = os.getenv("PEXELS_API_KEY")
-    if not api_key:
-        print("PEXELS_API_KEY not found. Skipping video fetch.")
-        return None
-    
-    headers = {"Authorization": api_key}
-    search_query = _build_realistic_query(query)
-    # Pull multiple batches/pages to improve chance of fitting scenes with realistic clips.
+def _try_fetch_pexels_video(search_query, output_path, headers):
+    """Internal helper: attempt to fetch a video for a single search query."""
     for page in random.sample([1, 2, 3, 4, 5], 3):
         url = f"https://api.pexels.com/videos/search?query={search_query}&per_page=15&page={page}&orientation=portrait&size=large"
 
@@ -71,18 +89,35 @@ def fetch_pexels_video(query, output_path):
         with open(output_path, 'wb') as f:
             f.write(video_data)
         return output_path
-    
     return None
 
-def fetch_pexels_image(query, output_path):
-    """Fetches a stock image from Pexels based on query."""
+
+def fetch_pexels_video(query, output_path):
+    """Fetches a stock video from Pexels. Falls back to beautiful-girl queries if primary fails."""
     api_key = os.getenv("PEXELS_API_KEY")
     if not api_key:
-        print("PEXELS_API_KEY not found. Skipping image fetch.")
+        print("PEXELS_API_KEY not found. Skipping video fetch.")
         return None
     
     headers = {"Authorization": api_key}
     search_query = _build_realistic_query(query)
+
+    # Try primary query first
+    result = _try_fetch_pexels_video(search_query, output_path, headers)
+    if result:
+        return result
+
+    # Fallback: try 2 random proven beautiful-girl queries
+    for fallback_q in random.sample(_GIRL_FALLBACK_QUERIES, min(2, len(_GIRL_FALLBACK_QUERIES))):
+        print(f"Primary video query failed. Retrying with fallback: '{fallback_q}'")
+        result = _try_fetch_pexels_video(fallback_q, output_path, headers)
+        if result:
+            return result
+
+    return None
+
+def _try_fetch_pexels_image(search_query, output_path, headers):
+    """Internal helper: attempt to fetch an image for a single search query."""
     for page in random.sample([1, 2, 3, 4, 5], 3):
         url = f"https://api.pexels.com/v1/search?query={search_query}&per_page=15&page={page}&orientation=portrait"
 
@@ -103,6 +138,31 @@ def fetch_pexels_image(query, output_path):
         with open(output_path, 'wb') as f:
             f.write(image_data)
         return output_path
+    return None
+
+
+def fetch_pexels_image(query, output_path):
+    """Fetches a stock image from Pexels. Falls back to beautiful-girl queries if primary fails."""
+    api_key = os.getenv("PEXELS_API_KEY")
+    if not api_key:
+        print("PEXELS_API_KEY not found. Skipping image fetch.")
+        return None
+    
+    headers = {"Authorization": api_key}
+    search_query = _build_realistic_query(query)
+
+    # Try primary query first
+    result = _try_fetch_pexels_image(search_query, output_path, headers)
+    if result:
+        return result
+
+    # Fallback: try 2 random proven beautiful-girl queries
+    for fallback_q in random.sample(_GIRL_FALLBACK_QUERIES, min(2, len(_GIRL_FALLBACK_QUERIES))):
+        print(f"Primary image query failed. Retrying with fallback: '{fallback_q}'")
+        result = _try_fetch_pexels_image(fallback_q, output_path, headers)
+        if result:
+            return result
+
     return None
 
 def create_placeholder_image(output_path, text="Visual Placeholder"):

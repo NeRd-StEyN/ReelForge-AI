@@ -31,7 +31,7 @@ def _env_flag(name, default="false"):
 
 
 def _get_tts_voice():
-    return (os.getenv("TTS_VOICE") or "hi-IN-MadhurNeural").strip()
+    return (os.getenv("TTS_VOICE") or "hi-IN-SwaraNeural").strip()
 
 
 def cleanup_generated_assets():

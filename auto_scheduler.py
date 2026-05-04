@@ -19,10 +19,7 @@ def _env_flag(name, default="false"):
 
 
 def _get_domain():
-    domain = (os.getenv("CONTENT_DOMAIN") or "hooked horror story").strip()
-    if _env_flag("FORCE_HORROR_THEME", "true") and "horror" not in domain.lower():
-        domain = f"{domain} with horror mystery angle"
-    return domain
+    return (os.getenv("CONTENT_DOMAIN") or "girl psychology and dating secrets").strip()
 
 
 def _default_times_for_count(count):

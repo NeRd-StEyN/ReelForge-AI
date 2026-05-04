@@ -153,38 +153,39 @@ def generate_script(topic, analytics_data=None):
     """
 
     prompt = f"""
-    You are a viral Instagram Reels strategist specialized in horror mystery content.
+    You are a viral Instagram Reels strategist specialized in girl psychology, dating secrets, and relationship content.
+    Your audience is primarily young men (18-30) who are curious about female behavior, attraction, and dating dynamics.
     {instructions}
     {language_rules}
     
-    Create a highly engaging, suspenseful, fast-paced reel script for this topic: "{topic}".
-    The content style must be mysterious horror storytelling with curiosity, tension, and strong retention.
+    Create a highly engaging, curiosity-driven reel script for this topic: "{topic}".
+    The content style must be psychology-backed storytelling about girls, dating, and attraction with relatable hooks and emotional payoffs.
 
     Retention framework you must follow:
-    - Start with a pattern-interrupt hook in the very first words (shock, contradiction, forbidden truth, or eerie question).
-    - Build the script like a mini story, not disconnected lines: Setup -> Escalation -> Revelation.
-    - Keep at least one unanswered question active until the final scene.
-    - Add a micro cliffhanger at the end of each scene that creates urgency for the next scene.
-    - Reveal the payoff only in the final scene.
+    - Start with a bold curiosity hook that makes every guy stop scrolling (e.g. "ladkiyan ye cheez sabse pehle notice karti hain...", "agar ladki ye karti hai toh samajh jao...").
+    - Build the script as a reveal: Setup (surprising claim) -> Evidence (relatable examples) -> Payoff (mind-blowing insight or actionable tip).
+    - Keep at least one unanswered question or "wait for it" moment active until the final scene.
+    - Each scene must drop a new insight or fact that keeps the viewer hooked.
+    - The final scene must deliver a satisfying "aha" moment or practical dating advice.
 
     Hard requirements:
     - First line must be a strong hook that instantly stops scroll in under 8 words.
-    - The first line should feel impossible to ignore and emotionally charged.
-    - Build open loops and tension every few lines so viewer wants to watch till end.
-    - End with a payoff reveal or twist.
+    - The hook must trigger male curiosity about girls or attraction ("ye galti 90 percent ladke karte hain", "ladkiyon ko ye secretly pasand hai").
+    - Build open loops so viewer watches till end ("lekin sabse important baat ye hai...", "aur teesri cheez sunke hosh ud jayenge").
+    - End with a surprising twist, relatable truth, or powerful dating tip.
     - Script should read in about 55 to 60 seconds.
     - Target total word count around 150 to 170 words.
-    - Keep language punchy and easy to understand.
-    - Avoid explicit gore.
+    - Keep language punchy, relatable, and conversational.
+    - Content must be respectful and non-objectifying — focus on psychology, behavior, and attraction science.
     - Return 3 to 4 scenes.
     - Each scene text must be one long flowing sentence (or two tightly connected clauses), not short choppy lines.
     - Keep each scene text around 35 to 50 words to reduce frequent voice pauses.
     - Avoid line breaks inside scene text.
     - Use natural connectors (and, while, because, then) so narration sounds like one continuous story.
-    - Avoid generic filler language; every scene must add new mystery or escalation.
-    - Keep the narration story-first, as if telling one creepy incident from beginning to end.
-    - Every scene must have a distinct visual_keyword so visuals do not repeat.
-    - visual_keyword must target realistic footage (cinematic, photoreal, real people/real place, dramatic lighting), avoid cartoon/anime/illustration words.
+    - Avoid generic filler; every scene must add a new insight or escalation.
+    - Every scene must have a distinct visual_keyword that returns attractive, relevant footage of women/couples/dating scenarios from stock libraries.
+    - visual_keyword MUST include terms like: "beautiful woman", "attractive girl", "couple", "girl smiling", "woman confidence", "dating scene" — something that shows appealing female presence.
+    - visual_keyword must target realistic footage (cinematic, photoreal, real people, aesthetic lighting), avoid cartoon/anime/illustration words.
     
     Format the output as strict JSON with the following structure:
     {{
@@ -193,7 +194,7 @@ def generate_script(topic, analytics_data=None):
             {{
                 "id": 1,
                 "text": "The spoken words for this scene",
-                "visual_keyword": "Highly specific realistic visual term for stock footage (e.g. 'realistic abandoned haveli corridor at night cinematic lighting')"
+                "visual_keyword": "Highly specific realistic visual term featuring women/couples (e.g. 'beautiful confident woman walking in city street cinematic golden hour')"
             }}
         ]
     }}
@@ -224,7 +225,8 @@ def generate_topic_from_domain(domain, analytics_data=None, feedback_summary="")
     analytics_text = analytics_data if analytics_data else "No analytics yet"
 
     prompt = f"""
-You are a short-form content strategist specialized in horror reels.
+You are a short-form content strategist specialized in viral reels about girl psychology, dating, and attraction.
+Your target audience is young men (18-30) on Instagram who love content about understanding women, dating tips, and relationship psychology.
 
 Domain to stay inside: "{domain}"
 Recent post analytics data: {analytics_text}
@@ -233,8 +235,17 @@ Historical feedback summary: {feedback_summary}
 Task:
 Propose exactly ONE topic idea for the next Instagram Reel that stays inside the domain,
 iterates on what performed best, and has very strong hook potential.
-Topic must support a horror or unsettling mystery storytelling angle.
-The idea should naturally allow: an immediate hook, rising mystery, and a final disturbing reveal.
+Topic must be about girl psychology, female behavior, dating secrets, attraction science, or relationship dynamics.
+The idea should naturally allow: a bold curiosity hook, relatable buildup, and a surprising insight or tip.
+
+Great topic examples (for inspiration, don't copy exactly):
+- Signs she secretly likes you but will never tell
+- Things girls notice in the first 5 seconds of meeting you
+- Why girls lose interest after texting for too long
+- The one thing that makes every girl feel special
+- Body language tricks girls use when they are attracted
+- Why girls test you and how to pass every time
+- What girls actually want vs what they say they want
 
 Return only a single plain-text topic line, max 12 words, no quotes, no numbering.
 """
