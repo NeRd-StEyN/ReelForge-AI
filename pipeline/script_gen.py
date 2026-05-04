@@ -153,48 +153,50 @@ def generate_script(topic, analytics_data=None):
     """
 
     prompt = f"""
-    You are a viral Instagram Reels strategist specialized in girl psychology, dating secrets, and relationship content.
-    Your audience is primarily young men (18-30) who are curious about female behavior, attraction, and dating dynamics.
+    You are a viral Instagram Reels strategist specialized in bold, seductive, and provocative content about girls, dating, and attraction.
+    Your audience is young men (18-30) who love bold content about what girls secretly want, seduction, body language, and intimate dating dynamics.
+    The content must be bold, flirty, and slightly naughty — the kind that makes guys STOP scrolling immediately.
     {instructions}
     {language_rules}
     
-    Create a highly engaging, curiosity-driven reel script for this topic: "{topic}".
-    The content style must be psychology-backed storytelling about girls, dating, and attraction with relatable hooks and emotional payoffs.
+    Create a highly engaging, bold, seductive reel script for this topic: "{topic}".
+    The content style must be provocative, flirty storytelling about girls' secret desires, seduction psychology, and bold dating truths.
 
     Retention framework you must follow:
-    - Start with a bold curiosity hook that makes every guy stop scrolling (e.g. "ladkiyan ye cheez sabse pehle notice karti hain...", "agar ladki ye karti hai toh samajh jao...").
-    - Build the script as a reveal: Setup (surprising claim) -> Evidence (relatable examples) -> Payoff (mind-blowing insight or actionable tip).
-    - Keep at least one unanswered question or "wait for it" moment active until the final scene.
-    - Each scene must drop a new insight or fact that keeps the viewer hooked.
-    - The final scene must deliver a satisfying "aha" moment or practical dating advice.
+    - Start with a BOLD, slightly naughty hook that no guy can skip (e.g. "ladkiyan raat ko akele mein ye sochti hain...", "agar ladki ye karti hai toh wo tumhe bed mein chahti hai...", "ye 3 cheezein ladkiyon ko pagal karti hain...").
+    - Build the script as a seductive reveal: Bold claim -> Teasing evidence -> Mind-blowing intimate truth.
+    - Keep sexual tension and curiosity alive throughout — always hint at something spicier coming next.
+    - Each scene must drop a bold, slightly taboo insight that keeps the viewer glued.
+    - The final scene must deliver a satisfying, provocative payoff.
 
     Hard requirements:
-    - First line must be a strong hook that instantly stops scroll in under 8 words.
-    - The hook must trigger male curiosity about girls or attraction ("ye galti 90 percent ladke karte hain", "ladkiyon ko ye secretly pasand hai").
-    - Build open loops so viewer watches till end ("lekin sabse important baat ye hai...", "aur teesri cheez sunke hosh ud jayenge").
-    - End with a surprising twist, relatable truth, or powerful dating tip.
-    - Script should read in about 55 to 60 seconds.
-    - Target total word count around 150 to 170 words.
-    - Keep language punchy, relatable, and conversational.
-    - Content must be respectful and non-objectifying — focus on psychology, behavior, and attraction science.
-    - Return 3 to 4 scenes.
+    - First line must be a BOLD hook that instantly stops scroll in under 8 words.
+    - The hook must be slightly naughty or seductive — trigger male fantasy and curiosity.
+    - Use suggestive language that hints but doesn't cross into explicit territory (Instagram safe but bold).
+    - Topics should revolve around: what girls secretly desire, seduction body language, things girls do when attracted, bedroom psychology, what turns girls on, intimate secrets girls never say out loud.
+    - Build open loops so viewer watches till end ("lekin jo baat koi nahi batata wo ye hai...", "aur sabse wild cheez toh ye hai...").
+    - End with a bold, provocative truth or seduction tip.
+    - Script should read in about 30 to 35 seconds (SHORT reels get higher completion rate = more views).
+    - Target total word count around 80 to 100 words.
+    - Keep language bold, flirty, street-smart, and conversational — like a wingman sharing secrets.
+    - Stay within Instagram guidelines — suggestive but not explicit.
+    - Return exactly 3 scenes.
     - Each scene text must be one long flowing sentence (or two tightly connected clauses), not short choppy lines.
-    - Keep each scene text around 35 to 50 words to reduce frequent voice pauses.
+    - Keep each scene text around 25 to 35 words for fast punchy delivery.
     - Avoid line breaks inside scene text.
-    - Use natural connectors (and, while, because, then) so narration sounds like one continuous story.
-    - Avoid generic filler; every scene must add a new insight or escalation.
-    - Every scene must have a distinct visual_keyword that returns attractive, relevant footage of women/couples/dating scenarios from stock libraries.
-    - visual_keyword MUST include terms like: "beautiful woman", "attractive girl", "couple", "girl smiling", "woman confidence", "dating scene" — something that shows appealing female presence.
-    - visual_keyword must target realistic footage (cinematic, photoreal, real people, aesthetic lighting), avoid cartoon/anime/illustration words.
+    - Use natural connectors so narration sounds like one continuous seductive story.
+    - Every scene must have a distinct visual_keyword that returns HOT, attractive woman footage from stock libraries.
+    - visual_keyword MUST include bold terms like: "sexy woman dancing", "hot girl", "attractive model", "seductive woman", "girl in bikini", "woman body fitness" — eye-catching female visuals.
+    - visual_keyword must target realistic footage (cinematic, slow motion, real people, aesthetic lighting), avoid cartoon/anime.
     
     Format the output as strict JSON with the following structure:
     {{
-        "title": "A catchy viral title",
+        "title": "A catchy bold viral title",
         "scenes": [
             {{
                 "id": 1,
                 "text": "The spoken words for this scene",
-                "visual_keyword": "Highly specific realistic visual term featuring women/couples (e.g. 'beautiful confident woman walking in city street cinematic golden hour')"
+                "visual_keyword": "Bold visual term featuring hot women (e.g. 'sexy woman dancing in neon club lights slow motion cinematic')"
             }}
         ]
     }}
@@ -225,8 +227,8 @@ def generate_topic_from_domain(domain, analytics_data=None, feedback_summary="")
     analytics_text = analytics_data if analytics_data else "No analytics yet"
 
     prompt = f"""
-You are a short-form content strategist specialized in viral reels about girl psychology, dating, and attraction.
-Your target audience is young men (18-30) on Instagram who love content about understanding women, dating tips, and relationship psychology.
+You are a short-form content strategist specialized in bold, provocative viral reels about girls, seduction, and attraction.
+Your target audience is young men (18-30) on Instagram who love bold, slightly naughty content about women's secret desires, dating, and seduction.
 
 Domain to stay inside: "{domain}"
 Recent post analytics data: {analytics_text}
@@ -234,18 +236,20 @@ Historical feedback summary: {feedback_summary}
 
 Task:
 Propose exactly ONE topic idea for the next Instagram Reel that stays inside the domain,
-iterates on what performed best, and has very strong hook potential.
-Topic must be about girl psychology, female behavior, dating secrets, attraction science, or relationship dynamics.
-The idea should naturally allow: a bold curiosity hook, relatable buildup, and a surprising insight or tip.
+iterates on what performed best, and has VERY strong hook potential.
+Topic must be bold, provocative, and seductive — about what girls secretly want, seduction tricks, intimate female psychology, or bold dating truths.
+The idea should naturally allow: a naughty curiosity hook, teasing buildup, and a provocative reveal.
 
 Great topic examples (for inspiration, don't copy exactly):
-- Signs she secretly likes you but will never tell
-- Things girls notice in the first 5 seconds of meeting you
-- Why girls lose interest after texting for too long
-- The one thing that makes every girl feel special
-- Body language tricks girls use when they are attracted
-- Why girls test you and how to pass every time
-- What girls actually want vs what they say they want
+- Things girls secretly want in bed but never say
+- Body language signs she wants you to kiss her
+- Why bad boys attract every girl effortlessly
+- What girls do when they are turned on
+- Seduction tricks that make any girl obsessed
+- Things girls notice about your body first
+- Why girls are attracted to guys who ignore them
+- What her eyes tell you about her desires
+- Secret things girls find irresistibly sexy
 
 Return only a single plain-text topic line, max 12 words, no quotes, no numbering.
 """

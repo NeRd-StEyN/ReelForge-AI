@@ -9,24 +9,24 @@ load_dotenv()
 _USED_PEXELS_VIDEO_IDS = set()
 _USED_PEXELS_IMAGE_IDS = set()
 
-# Proven Pexels search terms that consistently return beautiful girl/woman clips.
+# Bold Pexels search terms that return eye-catching attractive woman clips.
 # Used as fallbacks when the AI-generated visual_keyword returns zero results.
 _GIRL_FALLBACK_QUERIES = [
-    "beautiful woman portrait cinematic",
-    "attractive girl smiling slow motion",
-    "fashion model walking city",
-    "young woman confident lifestyle",
-    "girl dancing aesthetic lighting",
-    "beautiful indian woman portrait",
-    "woman hair flip slow motion",
-    "girl getting ready mirror",
-    "couple romantic cinematic",
-    "woman looking at camera close up",
-    "girl in cafe aesthetic",
-    "beautiful woman sunset golden hour",
-    "woman fitness workout aesthetic",
-    "girl laughing candid slow motion",
-    "beautiful woman street style fashion",
+    "sexy woman dancing slow motion",
+    "hot girl bikini beach cinematic",
+    "attractive model lingerie photoshoot",
+    "sexy girl dance moves aesthetic",
+    "beautiful woman body fitness gym",
+    "hot indian girl dancing bollywood",
+    "sexy woman pool summer cinematic",
+    "attractive girl lip bite close up",
+    "woman dancing club neon lights",
+    "hot model fashion runway slow motion",
+    "sexy girl twerking dance party",
+    "beautiful woman shower water cinematic",
+    "attractive woman bedroom morning aesthetic",
+    "hot girl car lifestyle luxury",
+    "sexy dancer woman body movement",
 ]
 
 

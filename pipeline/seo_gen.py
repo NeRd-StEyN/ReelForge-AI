@@ -1,27 +1,51 @@
 import json
+import random
 
 def generate_seo_metadata(topic, script_data):
-    """Generates SEO title, description, and tags."""
-    title = script_data.get('title', f"{topic} | Horror Reel")
+    """Generates engagement-optimized SEO metadata for bold girl/dating content."""
+    title = script_data.get('title', f"{topic} | Bold Facts")
 
-    hook_line = f"You will not expect this: {topic}".strip()
-    body_lines = [
-        "A fast horror mystery reel built to keep you watching till the final twist.",
-        "Watch till the end and tell me your theory in comments.",
+    hook_line = f"🔥 {topic}".strip()
+
+    # Randomized CTAs to keep captions fresh and drive different engagement signals.
+    cta_pool = [
+        "Comment 🔥 if you agree 👇",
+        "Tag a bro who needs this 😏",
+        "Double tap if this blew your mind 💥",
+        "Share this with your bestie 📩",
+        "Save this for later — you'll need it 📌",
+        "Comment 'YES' if you relate 🙌",
+        "DM this to someone who needs to hear this 💬",
+        "Type '💯' if this is facts 👇",
+    ]
+    selected_ctas = random.sample(cta_pool, min(3, len(cta_pool)))
+
+    body_lines = selected_ctas + [
+        "",
+        "Follow for more bold facts about girls 💋",
+        "Part 2? Comment 'MORE' 👇🔥",
     ]
 
     hashtags = [
-        "#HorrorReel",
-        "#ScaryFacts",
-        "#Mystery",
+        "#GirlFacts",
+        "#DatingTips",
+        "#AttractionPsychology",
+        "#RelationshipSecrets",
+        "#BoldFacts",
+        "#WhatGirlsWant",
+        "#SeductionTips",
         "#Reels",
-        "#Shorts",
-        "#" + topic.replace(" ", ""),
+        "#Viral",
+        "#ExplorePage",
+        "#LoveTips",
+        "#GirlPsychology",
+        "#ForYou",
+        "#Trending",
     ]
 
-    description = "\n\n".join([hook_line] + body_lines + [" ".join(hashtags)])
+    description = "\n".join([hook_line, ""] + body_lines + ["", " ".join(hashtags)])
 
-    tags = [topic, "Horror", "Mystery", "AI Generated", "Reels"]
+    tags = [topic, "Girl Facts", "Dating", "Attraction", "Bold", "Reels"]
     
     return {
         "title": title,

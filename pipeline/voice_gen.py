@@ -10,14 +10,14 @@ def _ticks_to_seconds(ticks):
 async def generate_voiceover(text, output_path, voice="hi-IN-SwaraNeural"):
     """Generates a high-energy, fast-paced, high-retention voiceover file using edge-tts."""
     # Neutral rate sounds more natural with longer paragraph narration.
-    communicate = edge_tts.Communicate(text, voice, rate="+0%")
+    communicate = edge_tts.Communicate(text, voice, rate="+12%")
     await communicate.save(output_path)
     return output_path
 
 
 async def generate_voiceover_with_timestamps(text, output_path, voice="hi-IN-SwaraNeural"):
     """Generate voiceover and return word timing events for subtitle sync."""
-    communicate = edge_tts.Communicate(text, voice, rate="+0%")
+    communicate = edge_tts.Communicate(text, voice, rate="+12%")
     word_timeline = []
 
     with open(output_path, "wb") as audio_file:

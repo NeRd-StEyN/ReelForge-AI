@@ -1,4 +1,4 @@
-from moviepy.editor import VideoFileClip, AudioFileClip, ImageClip, CompositeVideoClip, concatenate_videoclips
+from moviepy.editor import VideoFileClip, AudioFileClip, ImageClip, CompositeVideoClip, concatenate_videoclips, CompositeAudioClip
 import moviepy.video.fx.all as vfx
 from PIL import Image, ImageDraw, ImageFont
 import numpy as np
@@ -156,7 +156,7 @@ def create_text_image(text, size=(1080, 1920), font_size=150):
 
 
 def _prepare_visual_clip(visual_path, duration):
-    """Load, fit, and duration-lock a visual for 1080x1920 reels."""
+    """Load, fit, duration-lock, and apply Ken Burns zoom for 1080x1920 reels."""
     if visual_path.endswith(('.mp4', '.mov')):
         clip = VideoFileClip(visual_path).set_duration(duration)
         if clip.duration < duration:
@@ -177,7 +177,104 @@ def _prepare_visual_clip(visual_path, duration):
         h_new = clip.size[1]
         clip = clip.crop(x1=0, y1=(h_new - 1920) / 2, x2=1080, y2=(h_new + 1920) / 2)
 
+    # Ken Burns slow zoom (1.0x → 1.12x) for dynamic feel — prevents static boring look.
+    zoom_start = 1.0
+    zoom_end = 1.12
+    clip = clip.resize(lambda t: zoom_start + (zoom_end - zoom_start) * (t / max(0.1, duration)))
+    # Re-crop to 1080x1920 after zoom to keep frame size consistent.
+    clip = clip.resize((1080, 1920))
+
     return clip
+
+
+def _create_hook_overlay(duration=2.5, size=(1080, 1920)):
+    """Create a bold 'WAIT FOR IT 🔥' hook text for the first few seconds."""
+    img = Image.new('RGBA', size, (0, 0, 0, 0))
+    draw = ImageDraw.Draw(img)
+    font = _load_caption_font(80)
+
+    hook_texts = ["👆 SUNNA PADEGA 🔥", "RUKO... 🔥", "WAIT FOR IT 👀", "YE SUNLO 😏"]
+    import random
+    hook_text = random.choice(hook_texts)
+
+    w = draw.textlength(hook_text, font=font)
+    x = (size[0] - w) / 2
+    y = int(size[1] * 0.12)  # Top area
+
+    # Black stroke for readability
+    stroke_w = 6
+    for ax in range(-stroke_w, stroke_w + 1):
+        for ay in range(-stroke_w, stroke_w + 1):
+            draw.text((x + ax, y + ay), hook_text, font=font, fill=(0, 0, 0))
+    draw.text((x, y), hook_text, font=font, fill=(255, 60, 60))
+
+    return ImageClip(np.array(img)).set_duration(duration)
+
+
+def _create_follow_cta(duration=3.0, size=(1080, 1920)):
+    """Create a 'Follow for Part 2 🔥' CTA text for the last few seconds."""
+    img = Image.new('RGBA', size, (0, 0, 0, 0))
+    draw = ImageDraw.Draw(img)
+    font = _load_caption_font(70)
+
+    cta_text = "FOLLOW FOR PART 2 🔥"
+    w = draw.textlength(cta_text, font=font)
+    x = (size[0] - w) / 2
+    y = int(size[1] * 0.15)  # Top area, below hook position
+
+    # Black stroke
+    stroke_w = 5
+    for ax in range(-stroke_w, stroke_w + 1):
+        for ay in range(-stroke_w, stroke_w + 1):
+            draw.text((x + ax, y + ay), cta_text, font=font, fill=(0, 0, 0))
+    draw.text((x, y), cta_text, font=font, fill=(0, 255, 100))
+
+    return ImageClip(np.array(img)).set_duration(duration)
+
+
+def _maybe_download_bg_music(target_path):
+    """Download a royalty-free background beat if not already cached."""
+    if os.path.exists(target_path):
+        return target_path
+
+    if os.getenv("ENABLE_BG_MUSIC", "true").strip().lower() not in {"1", "true", "yes", "on"}:
+        return None
+
+    os.makedirs(os.path.dirname(target_path), exist_ok=True)
+    # Free royalty-free lo-fi beat from Pixabay (CC0 license).
+    url = "https://cdn.pixabay.com/audio/2024/11/01/audio_1f6b285aea.mp3"
+    try:
+        print("Downloading background music...")
+        urllib.request.urlretrieve(url, target_path)
+        print("Background music downloaded.")
+        return target_path
+    except Exception as e:
+        print(f"Could not download background music: {e}")
+        return None
+
+
+def _mix_background_music(narration_audio, total_duration):
+    """Mix a low-volume background beat under the narration for energy."""
+    bg_path = os.path.join("assets", "audio", "bg_music.mp3")
+    bg_path = _maybe_download_bg_music(bg_path)
+    if not bg_path:
+        return narration_audio
+
+    try:
+        bg_music = AudioFileClip(bg_path)
+        # Loop if shorter than the video.
+        if bg_music.duration < total_duration:
+            loops_needed = int(total_duration / bg_music.duration) + 1
+            from moviepy.editor import concatenate_audioclips
+            bg_music = concatenate_audioclips([bg_music] * loops_needed)
+        bg_music = bg_music.subclip(0, total_duration)
+        # Keep background music at 12% volume so voice stays clear.
+        bg_music = bg_music.volumex(0.12)
+        mixed = CompositeAudioClip([narration_audio, bg_music])
+        return mixed
+    except Exception as e:
+        print(f"Could not mix background music: {e}")
+        return narration_audio
 
 
 def _scene_durations_from_word_weights(scenes, total_duration, min_duration=2.0):
@@ -263,8 +360,12 @@ def _scene_durations_from_timeline(scene_word_events, total_duration):
     return durations
 
 
-def _build_dynamic_subtitle_clips(events, scene_start, scene_duration, words_per_chunk=1):
-    """Create rolling subtitle clips aligned to spoken word boundaries."""
+def _build_dynamic_subtitle_clips(events, scene_start, scene_duration, words_per_chunk=3):
+    """Create rolling subtitle clips aligned to spoken word boundaries.
+    
+    Shows 2-3 words at a time in big bold font, synced to when the voice
+    speaks them — the standard viral reel caption style.
+    """
     clips = []
     if not events:
         return clips
@@ -283,7 +384,8 @@ def _build_dynamic_subtitle_clips(events, scene_start, scene_duration, words_per
         local_end = min(scene_duration, max(local_start + 0.35, last_end - scene_start))
         local_duration = max(0.2, local_end - local_start)
 
-        text_img = create_text_image(chunk_text, font_size=68)
+        # Big bold font for word-synced captions — easy to read on mobile.
+        text_img = create_text_image(chunk_text, font_size=100)
         txt_clip = (
             ImageClip(text_img)
             .set_start(local_start)
@@ -326,14 +428,30 @@ def create_video(scenes, voiceovers, visuals, output_file, word_timeline=None):
                     duration,
                 )
             if not subtitle_layers:
-                text_img = create_text_image(scene['text'], font_size=72)
+                text_img = create_text_image(scene['text'], font_size=100)
                 subtitle_layers = [ImageClip(text_img).set_duration(duration)]
 
-            video_scene = CompositeVideoClip([clip] + subtitle_layers)
+            # Add hook text overlay on first scene (first 2.5 seconds).
+            extra_overlays = []
+            if i == 0:
+                hook_overlay = _create_hook_overlay(duration=min(2.5, duration))
+                extra_overlays.append(hook_overlay)
+
+            # Add "Follow for Part 2" CTA on last scene (last 3 seconds).
+            if i == len(scenes) - 1:
+                cta_dur = min(3.0, duration)
+                cta_overlay = _create_follow_cta(duration=cta_dur).set_start(max(0, duration - cta_dur))
+                extra_overlays.append(cta_overlay)
+
+            video_scene = CompositeVideoClip([clip] + subtitle_layers + extra_overlays)
             clips.append(video_scene)
 
         print("Concatenating clips...")
-        final_video = concatenate_videoclips(clips, method="compose").set_audio(narration)
+        final_video = concatenate_videoclips(clips, method="compose")
+
+        # Mix background music under the narration for energy.
+        mixed_audio = _mix_background_music(narration, narration.duration)
+        final_video = final_video.set_audio(mixed_audio)
         final_video = final_video.set_duration(narration.duration)
 
         print(f"Writing file: {output_file}")
@@ -358,7 +476,7 @@ def create_video(scenes, voiceovers, visuals, output_file, word_timeline=None):
         clip = clip.set_audio(audio)
         
         # Add subtitle using PIL
-        text_img = create_text_image(scene['text'], font_size=72)
+        text_img = create_text_image(scene['text'], font_size=100)
         txt_clip = ImageClip(text_img).set_duration(duration)
         
         video_scene = CompositeVideoClip([clip, txt_clip])
