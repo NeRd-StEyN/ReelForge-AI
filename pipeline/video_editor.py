@@ -433,15 +433,16 @@ def create_video(scenes, voiceovers, visuals, output_file, word_timeline=None):
 
             # Add hook text overlay on first scene (first 2.5 seconds).
             extra_overlays = []
-            if i == 0:
-                hook_overlay = _create_hook_overlay(duration=min(2.5, duration))
-                extra_overlays.append(hook_overlay)
+            # Hook and CTA overlays are commented out to remove the top box symbols (tofu/font rendering issues).
+            # if i == 0:
+            #     hook_overlay = _create_hook_overlay(duration=min(2.5, duration))
+            #     extra_overlays.append(hook_overlay)
 
             # Add "Follow for Part 2" CTA on last scene (last 3 seconds).
-            if i == len(scenes) - 1:
-                cta_dur = min(3.0, duration)
-                cta_overlay = _create_follow_cta(duration=cta_dur).set_start(max(0, duration - cta_dur))
-                extra_overlays.append(cta_overlay)
+            # if i == len(scenes) - 1:
+            #     cta_dur = min(3.0, duration)
+            #     cta_overlay = _create_follow_cta(duration=cta_dur).set_start(max(0, duration - cta_dur))
+            #     extra_overlays.append(cta_overlay)
 
             video_scene = CompositeVideoClip([clip] + subtitle_layers + extra_overlays)
             clips.append(video_scene)
