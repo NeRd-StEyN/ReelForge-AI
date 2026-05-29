@@ -460,6 +460,33 @@ def _build_dynamic_subtitle_clips(events, scene_start, scene_duration, words_per
     return clips
 
 
+def _build_even_word_clips(text, total_duration, content_type=None):
+    """Fallback: show one word at a time, evenly spaced across the duration.
+    
+    Used when word-level timing from TTS is unavailable. Each word gets
+    an equal share of the total duration so only one word is visible at a time.
+    """
+    words = _split_words(text)
+    if not words:
+        return []
+
+    clips = []
+    word_duration = total_duration / len(words)
+
+    for idx, word in enumerate(words):
+        start = idx * word_duration
+        dur = max(0.15, word_duration)
+        text_img = create_text_image(word, font_size=130, content_type=content_type)
+        clip = (
+            ImageClip(text_img)
+            .set_start(start)
+            .set_duration(dur)
+        )
+        clips.append(clip)
+
+    return clips
+
+
 def generate_thumbnail(title, content_type, output_path, size=(1080, 1920)):
     """Generate an eye-catching cover/thumbnail image for the reel grid."""
     # Background color per content type
@@ -556,8 +583,10 @@ def create_video(scenes, voiceovers, visuals, output_file, word_timeline=None, c
                     content_type=content_type,
                 )
             if not subtitle_layers:
-                text_img = create_text_image(scene['text'], font_size=130, content_type=content_type)
-                subtitle_layers = [ImageClip(text_img).set_duration(duration)]
+                # Fallback: split scene text into single words, evenly timed
+                subtitle_layers = _build_even_word_clips(
+                    scene['text'], duration, content_type=content_type
+                )
 
             # Flash transition overlay at the start of every scene except the first
             extra_overlays = []
@@ -597,15 +626,17 @@ def create_video(scenes, voiceovers, visuals, output_file, word_timeline=None, c
         clip = _apply_color_grade(clip, content_type)
         clip = clip.set_audio(audio)
         
-        text_img = create_text_image(scene['text'], font_size=130, content_type=content_type)
-        txt_clip = ImageClip(text_img).set_duration(duration)
+        # Word-by-word subtitles (one word at a time on screen)
+        subtitle_layers = _build_even_word_clips(
+            scene['text'], duration, content_type=content_type
+        )
         
         extra_overlays = []
         if i > 0:
             flash = _create_flash_overlay(0.1, duration, content_type)
             extra_overlays.append(flash)
 
-        video_scene = CompositeVideoClip([clip, txt_clip] + extra_overlays)
+        video_scene = CompositeVideoClip([clip] + subtitle_layers + extra_overlays)
         clips.append(video_scene)
     
     print("Concatenating clips...")
