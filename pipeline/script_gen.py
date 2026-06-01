@@ -21,7 +21,7 @@ def get_openrouter_client():
 
 def _get_model_candidates():
     primary = (os.getenv("OPENROUTER_MODEL") or "google/gemini-2.5-flash").strip()
-    fallback_raw = (os.getenv("OPENROUTER_FALLBACK_MODELS") or "google/gemini-2.0-flash-001").strip()
+    fallback_raw = (os.getenv("OPENROUTER_FALLBACK_MODELS") or "openrouter/free").strip()
 
     candidates = [primary]
     if fallback_raw:
