@@ -60,7 +60,7 @@ def _normalize_content(content):
 def _openrouter_prompt(prompt):
     client = get_openrouter_client()
     last_error = None
-    max_tokens = int(os.getenv("OPENROUTER_MAX_TOKENS", "2500"))
+    max_tokens = int(os.getenv("OPENROUTER_MAX_TOKENS", "1000"))
     max_tokens = max(256, min(max_tokens, 16000))
 
     for model in _get_model_candidates():
