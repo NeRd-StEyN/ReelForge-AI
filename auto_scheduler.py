@@ -9,7 +9,6 @@ from main import main as run_pipeline
 from pipeline.feedback_loop import append_analytics_snapshot, summarize_feedback
 from pipeline.insta_handler import get_insta_client, get_performance_data
 from pipeline.script_gen import generate_topic_from_domain
-from pipeline.topic_tracker import is_duplicate
 
 
 load_dotenv()
@@ -20,79 +19,39 @@ def _env_flag(name, default="false"):
 
 
 def _get_domain():
-    return (os.getenv("CONTENT_DOMAIN") or "mysterious horror ghost girl stories and paranormal encounters").strip()
+    return (os.getenv("CONTENT_DOMAIN") or "girl psychology and dating secrets").strip()
 
 
-# --- Content rotation: 2 horror reels + 1 girl facts reel per day ---
-
-def _default_schedule():
-    """Default: 3 posts/day — 2 horror reels + 1 bold girl facts reel."""
-    return [
-        {"time": "10:00", "content_type": "horror_reel"},
-        {"time": "14:00", "content_type": "girl_facts"},
-        {"time": "20:00", "content_type": "horror_reel"},
-    ]
+def _default_times_for_count(count):
+    presets = {
+        1: ["12:00"],
+        2: ["10:00", "19:00"],
+        3: ["09:00", "14:00", "20:00"],
+    }
+    return presets.get(count, ["09:00", "13:00", "17:00", "21:00"][:count])
 
 
-def _read_schedule():
-    """Read schedule from env or return defaults.
-    
-    REEL_SCHEDULE_TIMES format: "HH:MM:type,HH:MM:type,..."
-    where type is 'story', 'horror', 'reel', or 'girl'.
-    If type is omitted, defaults to 'horror_reel'.
-    
-    Examples:
-    - "10:00:horror,14:00:girl,20:00:horror"
-    - "10:00:story,14:00:reel,20:00:girl"
-    """
+def _read_schedule_times(reels_per_day):
     raw = (os.getenv("REEL_SCHEDULE_TIMES") or "").strip()
     if not raw:
-        return _default_schedule()
+        return _default_times_for_count(reels_per_day)
 
-    schedule = []
-    type_map = {
-        "story": "horror_story",
-        "horror_story": "horror_story",
-        "horror": "horror_reel",
-        "horror_reel": "horror_reel",
-        "reel": "horror_reel",
-        "girl": "girl_facts",
-        "girl_facts": "girl_facts",
-        "girls": "girl_facts",
-        "bold": "girl_facts",
-    }
+    times = [t.strip() for t in raw.split(",") if t.strip()]
+    if len(times) < reels_per_day:
+        defaults = _default_times_for_count(reels_per_day)
+        for t in defaults:
+            if t not in times:
+                times.append(t)
+            if len(times) == reels_per_day:
+                break
 
-    for entry in raw.split(","):
-        entry = entry.strip()
-        if not entry:
-            continue
-        parts = entry.split(":")
-        if len(parts) >= 3:
-            # Format: HH:MM:type
-            time_str = f"{parts[0]}:{parts[1]}"
-            ctype = parts[2].strip().lower()
-            content_type = type_map.get(ctype, "horror_reel")
-        else:
-            # Format: HH:MM (default to horror_reel)
-            time_str = entry
-            content_type = "horror_reel"
-        schedule.append({"time": time_str, "content_type": content_type})
-
-    if not schedule:
-        return _default_schedule()
-    return schedule
+    return times[:reels_per_day]
 
 
-def create_and_post_one_reel(content_type="horror_reel"):
+def create_and_post_one_reel():
     domain = _get_domain()
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    type_labels = {
-        "horror_reel": "HORROR REEL 👻",
-        "horror_story": "HORROR STORY 😱",
-        "girl_facts": "GIRL FACTS 🔥",
-    }
-    type_label = type_labels.get(content_type, content_type.upper())
-    print(f"[{now}] Starting automated {type_label} cycle for domain: {domain}")
+    print(f"[{now}] Starting automated reel cycle for domain: {domain}")
 
     analytics_data = "Instagram analytics disabled by config."
     if _env_flag("ENABLE_INSTAGRAM_ANALYTICS", "false"):
@@ -108,41 +67,23 @@ def create_and_post_one_reel(content_type="horror_reel"):
         domain=domain,
         analytics_data=analytics_data,
         feedback_summary=feedback_summary,
-        content_type=content_type,
     )
+    print(f"Selected topic: {topic}")
 
-    # Topic deduplication: retry up to 5 times if duplicate
-    for retry in range(5):
-        if not is_duplicate(topic):
-            break
-        print(f"Topic '{topic}' is a duplicate, regenerating... ({retry+1}/5)")
-        topic = generate_topic_from_domain(
-            domain=domain,
-            analytics_data=analytics_data,
-            feedback_summary=feedback_summary,
-            content_type=content_type,
-        )
-
-    print(f"Selected topic ({type_label}): {topic}")
-
-    run_pipeline(topic, content_type=content_type)
-    print(f"Automated {type_label} cycle finished.")
+    run_pipeline(topic)
+    print("Automated reel cycle finished.")
 
 
 def run_scheduler_loop():
-    schedule = _read_schedule()
+    reels_per_day = int(os.getenv("REELS_PER_DAY", "2"))
+    times_to_run = _read_schedule_times(reels_per_day)
 
-    print(f"Scheduler configured for {len(schedule)} posts/day")
-    type_icons = {"horror_reel": "👻 HORROR REEL", "horror_story": "😱 HORROR STORY", "girl_facts": "🔥 GIRL FACTS"}
-    for slot in schedule:
-        label = type_icons.get(slot["content_type"], slot["content_type"])
-        print(f"  {slot['time']} -> {label}")
+    print(f"Scheduler configured for {reels_per_day} reels/day")
+    print(f"Posting times: {times_to_run}")
 
     run_now = (os.getenv("RUN_FIRST_REEL_NOW", "true").strip().lower() == "true")
     if run_now:
-        # Run the first scheduled content type immediately
-        first_type = schedule[0]["content_type"] if schedule else "horror_reel"
-        create_and_post_one_reel(content_type=first_type)
+        create_and_post_one_reel()
 
     last_run_by_time = {}
     print("Scheduler running. Press Ctrl+C to stop.")
@@ -151,45 +92,37 @@ def run_scheduler_loop():
         now_hhmm = now.strftime("%H:%M")
         today = now.strftime("%Y-%m-%d")
 
-        for slot in schedule:
-            run_time = slot["time"]
-            content_type = slot["content_type"]
+        for run_time in times_to_run:
             already_ran_today = last_run_by_time.get(run_time) == today
             if now_hhmm == run_time and not already_ran_today:
-                create_and_post_one_reel(content_type=content_type)
+                create_and_post_one_reel()
                 last_run_by_time[run_time] = today
 
         time.sleep(20)
 
 
 def run_immediate_batch(count):
-    """Run batch: follows the schedule pattern (horror, girl, horror, repeat)."""
-    schedule = _read_schedule()
-    print(f"Running immediate batch: {count} posts")
-    for idx in range(count):
-        slot = schedule[idx % len(schedule)]
-        content_type = slot["content_type"]
-        type_labels = {"horror_reel": "HORROR REEL", "horror_story": "HORROR STORY", "girl_facts": "GIRL FACTS"}
-        label = type_labels.get(content_type, content_type)
-        print(f"\n--- Post {idx+1}/{count} ({label}) ---")
-        create_and_post_one_reel(content_type=content_type)
+    print(f"Running immediate batch: {count} reels")
+    for idx in range(1, count + 1):
+        print(f"\n--- Reel {idx}/{count} ---")
+        create_and_post_one_reel()
 
 
 def parse_args():
     parser = argparse.ArgumentParser(
-        description="Automate mixed horror + girl facts Reel creation/posting with feedback loop."
+        description="Automate domain-focused Reel creation/posting with feedback loop."
     )
     parser.add_argument(
         "--mode",
         choices=["scheduler", "batch"],
         default="scheduler",
-        help="scheduler: run daily at scheduled times, batch: run N posts immediately",
+        help="scheduler: run daily at scheduled times, batch: run N reels immediately",
     )
     parser.add_argument(
         "--count",
         type=int,
-        default=3,
-        help="How many posts to run immediately in batch mode (default: 3 = 2 horror + 1 girl facts)",
+        default=2,
+        help="How many reels to run immediately in batch mode",
     )
     return parser.parse_args()
 

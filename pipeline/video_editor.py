@@ -3,7 +3,6 @@ import moviepy.video.fx.all as vfx
 from PIL import Image, ImageDraw, ImageFont
 import numpy as np
 import os
-import random
 import urllib.request
 
 
@@ -91,11 +90,8 @@ def _load_caption_font(font_size):
 
     return ImageFont.load_default()
 
-def create_text_image(text, size=(1080, 1920), font_size=150, content_type=None):
-    """Create high-contrast word-pop subtitles for mobile reels.
-    
-    Color-coded per content type: red for horror, pink for girl facts, white default.
-    """
+def create_text_image(text, size=(1080, 1920), font_size=150):
+    """Create high-contrast yellow outlined subtitles for mobile reels."""
     img = Image.new('RGBA', size, (0, 0, 0, 0))
     draw = ImageDraw.Draw(img)
 
@@ -124,22 +120,16 @@ def create_text_image(text, size=(1080, 1920), font_size=150, content_type=None)
     if not lines:
         return np.array(img)
     
-    line_spacing = int(font_size * 0.25)
+    line_spacing = int(font_size * 0.22)
     total_h = len(lines) * font_size + (max(0, len(lines) - 1) * line_spacing)
-    # Position subtitles at 75% height — slightly higher for word-pop visibility.
-    current_y = int(size[1] * 0.75) - (total_h // 2)
+    # Keep subtitles around the lower third similar to short-form caption style.
+    current_y = int(size[1] * 0.80) - (total_h // 2)
     
-    # Color-coded text per content type for thematic consistency.
-    if content_type in ("horror_reel", "horror_story"):
-        text_color = (255, 50, 50)       # Blood red for horror
-    elif content_type == "girl_facts":
-        text_color = (255, 105, 180)     # Hot pink for girl facts
-    else:
-        text_color = (255, 255, 255)     # White default
+    text_color = (255, 210, 30)
     stroke_color = (0, 0, 0)
-    stroke_width = 10
-    shadow_color = (0, 0, 0, 200)
-    shadow_offset = (5, 5)
+    stroke_width = 8
+    shadow_color = (0, 0, 0, 185)
+    shadow_offset = (4, 4)
     
     for line in lines:
         w = draw.textlength(line, font=font)
@@ -153,12 +143,12 @@ def create_text_image(text, size=(1080, 1920), font_size=150, content_type=None)
             fill=shadow_color,
         )
         
-        # Draw heavy stroke behind text for readability against any footage.
+        # Draw stroke behind text for readability against bright/dark footage.
         for adj_x in range(-stroke_width, stroke_width+1):
             for adj_y in range(-stroke_width, stroke_width+1):
                 draw.text((x+adj_x, current_y+adj_y), line, font=font, fill=stroke_color)
                 
-        # Draw main text — crisp white for word-pop impact.
+        # Draw main text.
         draw.text((x, current_y), line, font=font, fill=text_color)
         current_y += font_size + line_spacing
         
@@ -195,46 +185,6 @@ def _prepare_visual_clip(visual_path, duration):
     clip = clip.resize((1080, 1920))
 
     return clip
-
-
-def _apply_color_grade(clip, content_type):
-    """Apply content-specific color grading to a visual clip."""
-    if content_type in ("horror_reel", "horror_story"):
-        # Dark blue desaturated horror look
-        def horror_grade(frame):
-            f = frame.astype(np.float32)
-            gray = np.mean(f, axis=2, keepdims=True)
-            f = f * 0.5 + gray * 0.5   # desaturate 50%
-            f[:,:,0] *= 0.7             # red down
-            f[:,:,1] *= 0.75            # green down
-            f[:,:,2] *= 1.15            # blue up
-            f *= 0.75                   # darken overall
-            return np.clip(f, 0, 255).astype(np.uint8)
-        return clip.fl_image(horror_grade)
-    elif content_type == "girl_facts":
-        # Warm vibrant look
-        def warm_grade(frame):
-            f = frame.astype(np.float32)
-            f[:,:,0] *= 1.12            # red up
-            f[:,:,1] *= 0.95            # green slight down
-            f[:,:,2] *= 0.85            # blue down
-            f *= 1.05                   # slight brighten
-            return np.clip(f, 0, 255).astype(np.uint8)
-        return clip.fl_image(warm_grade)
-    return clip
-
-
-def _create_flash_overlay(duration, scene_duration, content_type):
-    """Create a brief flash overlay at the start of a scene for transitions."""
-    if content_type in ("horror_reel", "horror_story"):
-        # Dark red flash for horror
-        color = [80, 0, 0, 180]
-    else:
-        # Soft white flash for girl facts
-        color = [255, 255, 255, 160]
-    flash_img = np.full((1920, 1080, 4), color, dtype=np.uint8)
-    flash_clip = ImageClip(flash_img).set_duration(min(duration, scene_duration))
-    return flash_clip
 
 
 def _create_hook_overlay(duration=2.5, size=(1080, 1920)):
@@ -282,24 +232,19 @@ def _create_follow_cta(duration=3.0, size=(1080, 1920)):
     return ImageClip(np.array(img)).set_duration(duration)
 
 
-# --- Content-specific background music ---
-_BG_MUSIC_URLS = {
-    "horror": os.getenv("HORROR_BG_MUSIC_URL",
-        "https://cdn.pixabay.com/audio/2024/02/14/audio_8e8580ef47.mp3"),  # Dark suspense ambient
-    "girl": os.getenv("GIRL_BG_MUSIC_URL",
-        "https://cdn.pixabay.com/audio/2024/11/01/audio_1f6b285aea.mp3"),  # Chill lo-fi beat
-}
-
-
-def _maybe_download_bg_music(target_path, url):
+def _maybe_download_bg_music(target_path):
     """Download a royalty-free background beat if not already cached."""
     if os.path.exists(target_path):
         return target_path
+
     if os.getenv("ENABLE_BG_MUSIC", "true").strip().lower() not in {"1", "true", "yes", "on"}:
         return None
+
     os.makedirs(os.path.dirname(target_path), exist_ok=True)
+    # Free royalty-free lo-fi beat from Pixabay (CC0 license).
+    url = "https://cdn.pixabay.com/audio/2024/11/01/audio_1f6b285aea.mp3"
     try:
-        print(f"Downloading background music from {url[:60]}...")
+        print("Downloading background music...")
         urllib.request.urlretrieve(url, target_path)
         print("Background music downloaded.")
         return target_path
@@ -308,30 +253,23 @@ def _maybe_download_bg_music(target_path, url):
         return None
 
 
-def _mix_background_music(narration_audio, total_duration, content_type=None):
-    """Mix a content-specific low-volume background beat under the narration."""
-    if content_type in ("horror_reel", "horror_story"):
-        filename = "bg_music_horror.mp3"
-        url = _BG_MUSIC_URLS["horror"]
-        volume = 0.18  # Slightly louder for horror ambiance
-    else:
-        filename = "bg_music_girl.mp3"
-        url = _BG_MUSIC_URLS["girl"]
-        volume = 0.12
-
-    bg_path = os.path.join("assets", "audio", filename)
-    bg_path = _maybe_download_bg_music(bg_path, url)
+def _mix_background_music(narration_audio, total_duration):
+    """Mix a low-volume background beat under the narration for energy."""
+    bg_path = os.path.join("assets", "audio", "bg_music.mp3")
+    bg_path = _maybe_download_bg_music(bg_path)
     if not bg_path:
         return narration_audio
 
     try:
         bg_music = AudioFileClip(bg_path)
+        # Loop if shorter than the video.
         if bg_music.duration < total_duration:
             loops_needed = int(total_duration / bg_music.duration) + 1
             from moviepy.editor import concatenate_audioclips
             bg_music = concatenate_audioclips([bg_music] * loops_needed)
         bg_music = bg_music.subclip(0, total_duration)
-        bg_music = bg_music.volumex(volume)
+        # Keep background music at 12% volume so voice stays clear.
+        bg_music = bg_music.volumex(0.12)
         mixed = CompositeAudioClip([narration_audio, bg_music])
         return mixed
     except Exception as e:
@@ -422,12 +360,11 @@ def _scene_durations_from_timeline(scene_word_events, total_duration):
     return durations
 
 
-def _build_dynamic_subtitle_clips(events, scene_start, scene_duration, words_per_chunk=1, content_type=None):
-    """Create word-by-word karaoke-style subtitle clips synced to spoken timing.
+def _build_dynamic_subtitle_clips(events, scene_start, scene_duration, words_per_chunk=3):
+    """Create rolling subtitle clips aligned to spoken word boundaries.
     
-    Shows ONE word at a time in big bold font, perfectly synced to when the
-    voice speaks it — the viral TikTok/Reels "word pop" caption style that
-    keeps viewers reading and watching till the end.
+    Shows 2-3 words at a time in big bold font, synced to when the voice
+    speaks them — the standard viral reel caption style.
     """
     clips = []
     if not events:
@@ -444,11 +381,11 @@ def _build_dynamic_subtitle_clips(events, scene_start, scene_duration, words_per
         first_start = float(chunk[0].get('start', 0.0))
         last_end = float(chunk[-1].get('end', first_start + 0.3))
         local_start = max(0.0, first_start - scene_start)
-        local_end = min(scene_duration, max(local_start + 0.25, last_end - scene_start))
-        local_duration = max(0.15, local_end - local_start)
+        local_end = min(scene_duration, max(local_start + 0.35, last_end - scene_start))
+        local_duration = max(0.2, local_end - local_start)
 
-        # Big bold single-word caption — color-coded per content type.
-        text_img = create_text_image(chunk_text, font_size=130, content_type=content_type)
+        # Big bold font for word-synced captions — easy to read on mobile.
+        text_img = create_text_image(chunk_text, font_size=100)
         txt_clip = (
             ImageClip(text_img)
             .set_start(local_start)
@@ -459,89 +396,8 @@ def _build_dynamic_subtitle_clips(events, scene_start, scene_duration, words_per
 
     return clips
 
-
-def _build_even_word_clips(text, total_duration, content_type=None):
-    """Fallback: show one word at a time, evenly spaced across the duration.
-    
-    Used when word-level timing from TTS is unavailable. Each word gets
-    an equal share of the total duration so only one word is visible at a time.
-    """
-    words = _split_words(text)
-    if not words:
-        return []
-
-    clips = []
-    word_duration = total_duration / len(words)
-
-    for idx, word in enumerate(words):
-        start = idx * word_duration
-        dur = max(0.15, word_duration)
-        text_img = create_text_image(word, font_size=130, content_type=content_type)
-        clip = (
-            ImageClip(text_img)
-            .set_start(start)
-            .set_duration(dur)
-        )
-        clips.append(clip)
-
-    return clips
-
-
-def generate_thumbnail(title, content_type, output_path, size=(1080, 1920)):
-    """Generate an eye-catching cover/thumbnail image for the reel grid."""
-    # Background color per content type
-    if content_type in ("horror_reel", "horror_story"):
-        bg_color = (10, 5, 20)  # Near-black with purple tint
-        text_color = (255, 50, 50)  # Blood red
-        accent = (80, 0, 0)
-    else:
-        bg_color = (25, 5, 15)  # Dark warm
-        text_color = (255, 105, 180)  # Hot pink
-        accent = (80, 20, 40)
-
-    img = Image.new('RGB', size, bg_color)
-    draw = ImageDraw.Draw(img)
-
-    # Draw accent gradient bars
-    for y in range(0, size[1], 4):
-        alpha = max(0, 1.0 - abs(y - size[1] * 0.5) / (size[1] * 0.5))
-        bar_color = tuple(int(c * alpha * 0.3) for c in accent)
-        draw.rectangle([0, y, size[0], y + 2], fill=bar_color)
-
-    font = _load_caption_font(90)
-    # Word-wrap the title
-    words = title.split()
-    lines = []
-    current = []
-    for w in words:
-        current.append(w)
-        if draw.textlength(" ".join(current), font=font) > size[0] - 160:
-            current.pop()
-            if current:
-                lines.append(" ".join(current))
-            current = [w]
-    if current:
-        lines.append(" ".join(current))
-
-    total_h = len(lines) * 110
-    y_start = (size[1] - total_h) // 2
-    for i, line in enumerate(lines):
-        w = draw.textlength(line, font=font)
-        x = (size[0] - w) / 2
-        # Stroke
-        for ax in range(-6, 7):
-            for ay in range(-6, 7):
-                draw.text((x+ax, y_start+ay), line, font=font, fill=(0, 0, 0))
-        draw.text((x, y_start), line, font=font, fill=text_color)
-        y_start += 110
-
-    img.save(output_path, quality=95)
-    print(f"Thumbnail saved to {output_path}")
-    return output_path
-
-
-def create_video(scenes, voiceovers, visuals, output_file, word_timeline=None, content_type=None):
-    """Combines voiceovers and visuals into a final video with content-aware effects."""
+def create_video(scenes, voiceovers, visuals, output_file, word_timeline=None):
+    """Combines voiceovers and visuals into a final video."""
     clips = []
 
     # Continuous narration mode: one TTS file over multiple visual scenes.
@@ -564,35 +420,29 @@ def create_video(scenes, voiceovers, visuals, output_file, word_timeline=None, c
             duration = durations[i]
             clip = _prepare_visual_clip(visuals[i], duration)
 
-            # Apply content-specific color grading
-            clip = _apply_color_grade(clip, content_type)
-
-            # Dramatic zoom on last horror scene for twist reveal effect
-            if content_type in ("horror_reel", "horror_story") and i == len(scenes) - 1:
-                zoom_start = 1.0
-                zoom_end = 1.25  # More aggressive zoom for dramatic twist
-                clip = clip.resize(lambda t: zoom_start + (zoom_end - zoom_start) * (t / max(0.1, duration)))
-                clip = clip.resize((1080, 1920))
-
             subtitle_layers = []
             if i < len(scene_word_events) and scene_word_events[i]:
                 subtitle_layers = _build_dynamic_subtitle_clips(
                     scene_word_events[i],
                     scene_starts[i],
                     duration,
-                    content_type=content_type,
                 )
             if not subtitle_layers:
-                # Fallback: split scene text into single words, evenly timed
-                subtitle_layers = _build_even_word_clips(
-                    scene['text'], duration, content_type=content_type
-                )
+                text_img = create_text_image(scene['text'], font_size=100)
+                subtitle_layers = [ImageClip(text_img).set_duration(duration)]
 
-            # Flash transition overlay at the start of every scene except the first
+            # Add hook text overlay on first scene (first 2.5 seconds).
             extra_overlays = []
-            if i > 0:
-                flash = _create_flash_overlay(0.1, duration, content_type)
-                extra_overlays.append(flash)
+            # Hook and CTA overlays are commented out to remove the top box symbols (tofu/font rendering issues).
+            # if i == 0:
+            #     hook_overlay = _create_hook_overlay(duration=min(2.5, duration))
+            #     extra_overlays.append(hook_overlay)
+
+            # Add "Follow for Part 2" CTA on last scene (last 3 seconds).
+            # if i == len(scenes) - 1:
+            #     cta_dur = min(3.0, duration)
+            #     cta_overlay = _create_follow_cta(duration=cta_dur).set_start(max(0, duration - cta_dur))
+            #     extra_overlays.append(cta_overlay)
 
             video_scene = CompositeVideoClip([clip] + subtitle_layers + extra_overlays)
             clips.append(video_scene)
@@ -600,8 +450,8 @@ def create_video(scenes, voiceovers, visuals, output_file, word_timeline=None, c
         print("Concatenating clips...")
         final_video = concatenate_videoclips(clips, method="compose")
 
-        # Mix content-specific background music under the narration.
-        mixed_audio = _mix_background_music(narration, narration.duration, content_type=content_type)
+        # Mix background music under the narration for energy.
+        mixed_audio = _mix_background_music(narration, narration.duration)
         final_video = final_video.set_audio(mixed_audio)
         final_video = final_video.set_duration(narration.duration)
 
@@ -623,33 +473,28 @@ def create_video(scenes, voiceovers, visuals, output_file, word_timeline=None, c
         duration = audio.duration
 
         clip = _prepare_visual_clip(visuals[i], duration)
-        clip = _apply_color_grade(clip, content_type)
+        
         clip = clip.set_audio(audio)
         
-        # Word-by-word subtitles (one word at a time on screen)
-        subtitle_layers = _build_even_word_clips(
-            scene['text'], duration, content_type=content_type
-        )
+        # Add subtitle using PIL
+        text_img = create_text_image(scene['text'], font_size=100)
+        txt_clip = ImageClip(text_img).set_duration(duration)
         
-        extra_overlays = []
-        if i > 0:
-            flash = _create_flash_overlay(0.1, duration, content_type)
-            extra_overlays.append(flash)
-
-        video_scene = CompositeVideoClip([clip] + subtitle_layers + extra_overlays)
+        video_scene = CompositeVideoClip([clip, txt_clip])
         clips.append(video_scene)
     
     print("Concatenating clips...")
+    # Slight overlap helps hide tiny seam pauses between scene TTS chunks.
     final_video = concatenate_videoclips(clips, method="compose", padding=-0.06)
     
     print(f"Writing file: {output_file}")
     final_video.write_videofile(
         output_file,
-        fps=30,
+        fps=30,  # 30 fps is stable and platform-friendly for reels.
         codec="libx264",
         audio_codec="aac",
-        bitrate="10000k",
+        bitrate="10000k",  # Higher bitrate for cleaner 1080x1920 output.
         threads=4,
-        preset="medium",
+        preset="medium",  # Better quality compression than ultrafast.
     )
     return output_file

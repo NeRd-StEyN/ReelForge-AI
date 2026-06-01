@@ -11,10 +11,9 @@ if not hasattr(PIL.Image, 'ANTIALIAS'):
 from pipeline.script_gen import generate_script_payload
 from pipeline.voice_gen import run_generate_voiceover, run_generate_voiceover_with_timestamps
 from pipeline.visual_gen import fetch_pexels_video, fetch_pexels_image, create_placeholder_image
-from pipeline.video_editor import create_video, generate_thumbnail
+from pipeline.video_editor import create_video
 from pipeline.seo_gen import generate_seo_metadata, save_metadata
 from pipeline.insta_handler import get_insta_client, get_performance_data
-from pipeline.topic_tracker import save_topic, is_duplicate
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -57,8 +56,8 @@ def cleanup_generated_assets():
 
     print(f"Cleanup complete. Removed {removed} old generated files.")
 
-def main(topic, content_type="horror_reel"):
-    print(f"Starting pipeline... (content_type={content_type})")
+def main(topic):
+    print(f"Starting pipeline...")
     tts_voice = _get_tts_voice()
 
     if _env_flag("AUTO_CLEANUP_ASSETS", "true"):
@@ -74,7 +73,7 @@ def main(topic, content_type="horror_reel"):
 
     # 1. Generate Script using AI Feedback
     print(f"Brainstorming script using topic: '{topic}' and past performance data...")
-    script_json = generate_script_payload(topic, analytics_data, content_type=content_type)
+    script_json = generate_script_payload(topic, analytics_data)
     
     scenes = script_json['scenes']
     print(f"Done Script generated with {len(scenes)} scenes.")
@@ -100,11 +99,11 @@ def main(topic, content_type="horror_reel"):
         # 3. Fetch Visuals
         visual_path = f"assets/video/scene_{i+1}.mp4"
         # Try video first
-        res = fetch_pexels_video(scene['visual_keyword'], visual_path, content_type=content_type)
+        res = fetch_pexels_video(scene['visual_keyword'], visual_path)
         if not res:
             # Fallback to image
             visual_path = f"assets/images/scene_{i+1}.jpg"
-            res = fetch_pexels_image(scene['visual_keyword'], visual_path, content_type=content_type)
+            res = fetch_pexels_image(scene['visual_keyword'], visual_path)
         
         if not res:
             print(f"No visual found for scene {i+1}. Using placeholder.")
@@ -132,16 +131,11 @@ def main(topic, content_type="horror_reel"):
 
     print("Assembling final video...")
     output_file = "output_video.mp4"
-    create_video(scenes, voice_input, visual_paths, output_file, word_timeline=word_timeline, content_type=content_type)
-    
-    # 5a. Generate thumbnail/cover image
-    print("Generating thumbnail...")
-    thumb_path = "output_thumbnail.jpg"
-    generate_thumbnail(script_json.get('title', topic), content_type, thumb_path)
+    create_video(scenes, voice_input, visual_paths, output_file, word_timeline=word_timeline)
     
     # 5. Generate SEO Metadata
     print("Generating SEO metadata...")
-    metadata = generate_seo_metadata(topic, script_json, content_type=content_type)
+    metadata = generate_seo_metadata(topic, script_json)
     save_metadata(metadata, "video_metadata.json")
     
     # 6. Auto Send to Make.com
@@ -151,11 +145,7 @@ def main(topic, content_type="horror_reel"):
     send_to_make_webhook(output_file, metadata.get('title', 'AI Video'), caption_text)
     
     print(f"Pipeline complete! Video saved to: {output_file}")
-    print(f"Thumbnail saved to: {thumb_path}")
     print(f"Metadata saved to: video_metadata.json")
-
-    # Track this topic to avoid future duplicates
-    save_topic(topic, content_type)
 
 if __name__ == "__main__":
     import sys
@@ -163,5 +153,5 @@ if __name__ == "__main__":
         topic = " ".join(sys.argv[1:])
     else:
         # Instead of prompting, generate a generic topic to allow seamless headless cron execution
-        topic = "A terrifying ghost girl mystery"
+        topic = "A shocking, unknown, and fascinating fact"
     main(topic)
