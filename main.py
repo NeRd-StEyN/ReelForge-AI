@@ -96,14 +96,27 @@ def main(topic):
             run_generate_voiceover(scene['text'], vo_path, voice=tts_voice)
             voiceover_paths.append(vo_path)
         
-        # 3. Fetch Visuals
+        # Get visual mood from scene data (new field from updated script_gen)
+        visual_mood = scene.get('visual_mood', 'neutral')
+
+        # 3. Fetch Visuals — with mood and scene index for diversity
         visual_path = f"assets/video/scene_{i+1}.mp4"
         # Try video first
-        res = fetch_pexels_video(scene['visual_keyword'], visual_path)
+        res = fetch_pexels_video(
+            scene['visual_keyword'],
+            visual_path,
+            visual_mood=visual_mood,
+            scene_index=i,
+        )
         if not res:
             # Fallback to image
             visual_path = f"assets/images/scene_{i+1}.jpg"
-            res = fetch_pexels_image(scene['visual_keyword'], visual_path)
+            res = fetch_pexels_image(
+                scene['visual_keyword'],
+                visual_path,
+                visual_mood=visual_mood,
+                scene_index=i,
+            )
         
         if not res:
             print(f"No visual found for scene {i+1}. Using placeholder.")
@@ -131,7 +144,15 @@ def main(topic):
 
     print("Assembling final video...")
     output_file = "output_video.mp4"
-    create_video(scenes, voice_input, visual_paths, output_file, word_timeline=word_timeline)
+    # Pass content theme for theme-aware background music selection
+    create_video(
+        scenes,
+        voice_input,
+        visual_paths,
+        output_file,
+        word_timeline=word_timeline,
+        content_theme="default",  # Auto-detected from scenes + domain inside create_video
+    )
     
     # 5. Generate SEO Metadata
     print("Generating SEO metadata...")
@@ -140,7 +161,7 @@ def main(topic):
     
     # 6. Auto Send to Make.com
     caption_tags = metadata.get('hashtags') or metadata.get('tags') or []
-    caption_text = f"{metadata.get('description', '')}\n\n{' '.join(caption_tags)}".strip()
+    caption_text = f"{metadata.get('description', '')}".strip()
     from pipeline.make_handler import send_to_make_webhook
     send_to_make_webhook(output_file, metadata.get('title', 'AI Video'), caption_text)
     

@@ -1,5 +1,6 @@
 import os
 import json
+import random
 from openai import OpenAI
 from dotenv import load_dotenv
 
@@ -103,7 +104,7 @@ def _repair_script_json(raw_text, error_message):
 You must fix malformed JSON and return valid JSON only.
 
 Rules:
-- Keep the same schema with fields: title, scenes[].id, scenes[].text, scenes[].visual_keyword
+- Keep the same schema with fields: title, scenes[].id, scenes[].text, scenes[].visual_keyword, scenes[].visual_mood
 - Do not add markdown fences.
 - Escape quotes correctly.
 - Ensure valid commas and brackets.
@@ -128,10 +129,37 @@ def _postprocess_script_payload(payload):
         if isinstance(scene, dict):
             scene["text"] = _normalize_scene_text(scene.get("text", ""))
             scene["visual_keyword"] = str(scene.get("visual_keyword", "")).strip()
+            scene["visual_mood"] = str(scene.get("visual_mood", "neutral")).strip()
     return payload
 
+
+# ── Hook framework rotation for maximum variety ──────────────────────
+_HOOK_FRAMEWORKS = [
+    {
+        "name": "curiosity_gap",
+        "instruction": "Start with an incomplete statement that creates burning curiosity. Example pattern: 'Ye cheez ladkiyan kabhi nahi bolti, lekin...' — leave the answer dangling so viewer MUST watch.",
+    },
+    {
+        "name": "shock_stat",
+        "instruction": "Open with a surprising statistic or psychological fact that sounds unbelievable. Example pattern: '90% ladkiyan ye secretly karti hain...' — make the number feel exclusive and secret.",
+    },
+    {
+        "name": "challenge",
+        "instruction": "Challenge the viewer's beliefs directly. Example pattern: 'Tum galat sochte ho attraction ke baare mein...' — create a 'prove me wrong' urge.",
+    },
+    {
+        "name": "story_open",
+        "instruction": "Start mid-story as if catching someone in the act. Example pattern: 'Jab ek ladki baar baar ye karti hai toh samajh jaao...' — make it feel like a real moment.",
+    },
+    {
+        "name": "controversial_take",
+        "instruction": "Lead with a bold, polarizing opinion. Example pattern: 'Acche ladke kabhi attract nahi karte, aur reason ye hai...' — force the viewer to pick a side.",
+    },
+]
+
+
 def generate_script(topic, analytics_data=None):
-    """Generates a highly viral video script based on the topic and past analytics."""
+    """Generates a highly viral, SHORT video script optimized for completion rate."""
     language = _get_content_language()
     language_rules = """
     Language rules:
@@ -152,51 +180,69 @@ def generate_script(topic, analytics_data=None):
     Use that knowledge to brainstorm a hook and topic that expands on what the audience already loves!
     """
 
+    # Rotate hook framework randomly for variety
+    hook_framework = random.choice(_HOOK_FRAMEWORKS)
+
     prompt = f"""
-    You are a viral Instagram Reels strategist specialized in bold, seductive, and provocative content about girls, dating, and attraction.
-    Your audience is young men (18-30) who love bold content about what girls secretly want, seduction, body language, and intimate dating dynamics.
-    The content must be bold, flirty, and slightly naughty — the kind that makes guys STOP scrolling immediately.
+    You are an expert Instagram Reels strategist. Your goal: maximum completion rate and engagement.
+    Your audience is young men (18-30) on Indian Instagram who love bold, intriguing content about psychology, attraction, relationships, and human behavior.
     {instructions}
     {language_rules}
     
-    Create a highly engaging, bold, seductive reel script for this topic: "{topic}".
-    The content style must be provocative, flirty storytelling about girls' secret desires, seduction psychology, and bold dating truths.
-
-    Retention framework you must follow:
-    - Start with a BOLD, slightly naughty hook that no guy can skip (e.g. "ladkiyan raat ko akele mein ye sochti hain...", "agar ladki ye karti hai toh wo tumhe bed mein chahti hai...", "ye 3 cheezein ladkiyon ko pagal karti hain...").
-    - Build the script as a seductive reveal: Bold claim -> Teasing evidence -> Mind-blowing intimate truth.
-    - Keep sexual tension and curiosity alive throughout — always hint at something spicier coming next.
-    - Each scene must drop a bold, slightly taboo insight that keeps the viewer glued.
-    - The final scene must deliver a satisfying, provocative payoff.
-
-    Hard requirements:
-    - First line must be a BOLD hook that instantly stops scroll in under 8 words.
-    - The hook must be slightly naughty or seductive — trigger male fantasy and curiosity.
-    - Use suggestive language that hints but doesn't cross into explicit territory (Instagram safe but bold).
-    - Topics should revolve around: what girls secretly desire, seduction body language, things girls do when attracted, bedroom psychology, what turns girls on, intimate secrets girls never say out loud.
-    - Build open loops so viewer watches till end ("lekin jo baat koi nahi batata wo ye hai...", "aur sabse wild cheez toh ye hai...").
-    - End with a bold, provocative truth or seduction tip.
-    - Script should read in about 30 to 35 seconds (SHORT reels get higher completion rate = more views).
-    - Target total word count around 80 to 100 words.
-    - Keep language bold, flirty, street-smart, and conversational — like a wingman sharing secrets.
-    - Stay within Instagram guidelines — suggestive but not explicit.
-    - Return exactly 3 scenes.
-    - Each scene text must be one long flowing sentence (or two tightly connected clauses), not short choppy lines.
-    - Keep each scene text around 25 to 35 words for fast punchy delivery.
-    - Avoid line breaks inside scene text.
-    - Use natural connectors so narration sounds like one continuous seductive story.
-    - Every scene must have a distinct visual_keyword that returns HOT, attractive woman footage from stock libraries.
-    - visual_keyword MUST include bold terms like: "sexy woman dancing", "hot girl", "attractive model", "seductive woman", "girl in bikini", "woman body fitness" — eye-catching female visuals.
-    - visual_keyword must target realistic footage (cinematic, slow motion, real people, aesthetic lighting), avoid cartoon/anime.
+    Create a PUNCHY, fast-paced reel script for this topic: "{topic}".
     
-    Format the output as strict JSON with the following structure:
+    HOOK FRAMEWORK (you MUST use this style):
+    {hook_framework['instruction']}
+
+    ──── CRITICAL RULES FOR MAXIMUM VIEWS ────
+    
+    DURATION: This reel MUST be 15-22 seconds when spoken. This is NON-NEGOTIABLE.
+    - Total word count: 45-65 words ONLY
+    - Return exactly 2 scenes
+    - Scene 1 (Hook + Setup): 20-30 words — grab attention + tease the revelation
+    - Scene 2 (Payoff + Twist): 20-35 words — deliver the insight + end with a rewatch trigger
+    
+    RETENTION TACTICS:
+    - First 2 seconds must be IMPOSSIBLE to skip — bold claim, shocking fact, or mid-story entrance
+    - Scene 1 must create an open loop that Scene 2 closes
+    - Scene 2 must end with a detail that makes the viewer want to watch AGAIN (rewatch trigger)
+    - Keep language conversational, raw, street-smart — like a friend sharing secrets, not a textbook
+    - Build tension: Scene 1 is the tease, Scene 2 is the mindblowing reveal
+    
+    PATTERN INTERRUPT:
+    - Scene 1 and Scene 2 must feel VISUALLY and TONALLY different
+    - Scene 1: mysterious, teasing energy
+    - Scene 2: confident, revealing energy
+    
+    CONTENT BOUNDARIES:
+    - Be intriguing and bold but stay Instagram-safe — NO explicit content
+    - Focus on psychology, body language, behavioral insights, confidence, and attraction dynamics
+    - Avoid overly suggestive or sexual language — Instagram's content classifier will suppress reach
+    - Think "Psychology Today meets street wisdom" not "clickbait"
+    
+    VISUAL KEYWORDS:
+    - Each scene must have a visual_keyword for stock footage search
+    - Keywords should describe the MOOD and SETTING, not just "hot girl"
+    - Good examples: "confident woman walking city street cinematic", "close up eyes mysterious lighting", "couple coffee shop candid moment"
+    - Include lighting/mood descriptors: neon, golden hour, moody dark, bright aesthetic, cinematic
+    - Each scene MUST have a different visual_mood (one of: mysterious, confident, dramatic, warm, dark, energetic, elegant)
+    - Avoid repetitive stock-looking keywords — make each scene feel visually distinct
+    
+    Format the output as strict JSON:
     {{
-        "title": "A catchy bold viral title",
+        "title": "A catchy viral title (max 8 words)",
         "scenes": [
             {{
                 "id": 1,
-                "text": "The spoken words for this scene",
-                "visual_keyword": "Bold visual term featuring hot women (e.g. 'sexy woman dancing in neon club lights slow motion cinematic')"
+                "text": "The spoken narration for this scene",
+                "visual_keyword": "Descriptive visual search term with mood and lighting",
+                "visual_mood": "mysterious"
+            }},
+            {{
+                "id": 2,
+                "text": "The spoken narration for this scene",
+                "visual_keyword": "Different visual search term with contrasting mood",
+                "visual_mood": "confident"
             }}
         ]
     }}
@@ -222,34 +268,56 @@ def generate_script_payload(topic, analytics_data=None, max_repairs=2):
             print(f"Script JSON invalid, attempting repair ({attempt + 1}/{max_repairs})...")
             raw = _repair_script_json(raw, str(exc))
 
+
+# ── Topic sub-category rotation for content variety ──────────────────
+_TOPIC_SUBCATEGORIES = [
+    "psychology of attraction and what makes someone irresistible",
+    "body language secrets that reveal hidden feelings",
+    "relationship red flags and green flags everyone should know",
+    "confidence and charisma tips that change how people see you",
+    "surprising psychological facts about human behavior and desire",
+    "dating mistakes that silently kill attraction",
+    "eye contact and micro-expressions that reveal true intentions",
+    "things people find attractive but never talk about",
+    "social psychology hacks for better connections",
+    "emotional intelligence and what makes someone magnetic",
+]
+
+
 def generate_topic_from_domain(domain, analytics_data=None, feedback_summary=""):
     """Generate the next reel topic inside one domain using recent performance feedback."""
     analytics_text = analytics_data if analytics_data else "No analytics yet"
 
-    prompt = f"""
-You are a short-form content strategist specialized in bold, provocative viral reels about girls, seduction, and attraction.
-Your target audience is young men (18-30) on Instagram who love bold, slightly naughty content about women's secret desires, dating, and seduction.
+    # Rotate through sub-categories for content variety
+    subcategory = random.choice(_TOPIC_SUBCATEGORIES)
 
-Domain to stay inside: "{domain}"
+    prompt = f"""
+You are a short-form content strategist specialized in viral Instagram Reels about psychology, attraction, and human behavior.
+Your target audience is young men (18-30) on Indian Instagram.
+
+Primary domain: "{domain}"
+Today's angle/subcategory to focus on: "{subcategory}"
 Recent post analytics data: {analytics_text}
 Historical feedback summary: {feedback_summary}
 
 Task:
-Propose exactly ONE topic idea for the next Instagram Reel that stays inside the domain,
-iterates on what performed best, and has VERY strong hook potential.
-Topic must be bold, provocative, and seductive — about what girls secretly want, seduction tricks, intimate female psychology, or bold dating truths.
-The idea should naturally allow: a naughty curiosity hook, teasing buildup, and a provocative reveal.
+Propose exactly ONE topic idea for the next Instagram Reel that:
+1. Stays within the primary domain
+2. Uses today's angle/subcategory as the specific focus
+3. Iterates on what performed best (if analytics data is available)
+4. Has VERY strong hook potential — must create instant curiosity
+5. Focuses on psychology, body language, attraction science, or behavioral insights
+6. Is bold and intriguing WITHOUT being sexually explicit (Instagram-safe)
 
 Great topic examples (for inspiration, don't copy exactly):
-- Things girls secretly want in bed but never say
-- Body language signs she wants you to kiss her
-- Why bad boys attract every girl effortlessly
-- What girls do when they are turned on
-- Seduction tricks that make any girl obsessed
-- Things girls notice about your body first
-- Why girls are attracted to guys who ignore them
-- What her eyes tell you about her desires
-- Secret things girls find irresistibly sexy
+- Ek cheez jo ladkiyon ko turant attract karti hai
+- Body language signs jo batati hain ke wo interested hai
+- Psychology trick jo kisi ko bhi tumhari taraf kheench le
+- 3 galtiyan jo ladke attraction mein karte hain
+- Ankhen kaise reveal karti hain true feelings
+- Red flags jo har ladke ko pehchanni chahiye
+- Confidence ka wo secret jo koi nahi batata
+- Kaise pata chale ke wo tumhare baare mein sochti hai
 
 Return only a single plain-text topic line, max 12 words, no quotes, no numbering.
 """

@@ -3,6 +3,7 @@ import moviepy.video.fx.all as vfx
 from PIL import Image, ImageDraw, ImageFont
 import numpy as np
 import os
+import random
 import urllib.request
 
 
@@ -90,12 +91,34 @@ def _load_caption_font(font_size):
 
     return ImageFont.load_default()
 
-def create_text_image(text, size=(1080, 1920), font_size=150):
-    """Create high-contrast yellow outlined subtitles for mobile reels."""
+
+# ── Karaoke-Style Subtitle Rendering ────────────────────────────────
+
+def _draw_rounded_rect(draw, xy, radius, fill):
+    """Draw a rounded rectangle as a subtitle background pill."""
+    x1, y1, x2, y2 = xy
+    r = min(radius, (x2 - x1) // 2, (y2 - y1) // 2)
+    draw.rectangle([x1 + r, y1, x2 - r, y2], fill=fill)
+    draw.rectangle([x1, y1 + r, x2, y2 - r], fill=fill)
+    draw.pieslice([x1, y1, x1 + 2 * r, y1 + 2 * r], 180, 270, fill=fill)
+    draw.pieslice([x2 - 2 * r, y1, x2, y1 + 2 * r], 270, 360, fill=fill)
+    draw.pieslice([x1, y2 - 2 * r, x1 + 2 * r, y2], 90, 180, fill=fill)
+    draw.pieslice([x2 - 2 * r, y2 - 2 * r, x2, y2], 0, 90, fill=fill)
+
+
+def create_text_image(text, size=(1080, 1920), font_size=100, highlight_word_index=-1):
+    """Create premium karaoke-style subtitles with highlighted active word.
+    
+    - White text by default, active word highlighted in bright accent color
+    - Semi-transparent dark pill background for readability
+    - Bold stroke for contrast against any footage
+    """
     img = Image.new('RGBA', size, (0, 0, 0, 0))
     draw = ImageDraw.Draw(img)
 
     font = _load_caption_font(font_size)
+    highlight_font = _load_caption_font(int(font_size * 1.15))  # Slightly bigger for active word
+
     if _contains_devanagari(text) and not _font_supports_devanagari(font):
         print(
             "Warning: Hindi subtitle font missing. Set SUBTITLE_FONT_PATH or keep AUTO_DOWNLOAD_HINDI_FONT=true."
@@ -103,56 +126,95 @@ def create_text_image(text, size=(1080, 1920), font_size=150):
     
     clean_text = " ".join(str(text or "").replace("\n", " ").split())
     words = clean_text.split()
+    if not words:
+        return np.array(img)
+
+    # Colors — premium white + neon accent scheme
+    normal_color = (255, 255, 255)          # Clean white for non-active words
+    highlight_color = (0, 255, 140)         # Neon green for active word
+    stroke_color = (0, 0, 0)
+    stroke_width = 6
+    bg_pill_color = (0, 0, 0, 140)          # Semi-transparent dark background
+
+    # Word wrapping
     lines = []
-    current_line = []
-    
+    current_line_words = []
+    current_line_word_indices = []
+    word_idx = 0
+
     for word in words:
-        current_line.append(word)
-        w = draw.textlength(" ".join(current_line), font=font)
-        # Wrap text to fit a readable lower-third block with side padding.
-        if w > size[0] - 140:
-            current_line.pop()
-            lines.append(" ".join(current_line))
-            current_line = [word]
-    if current_line:
-        lines.append(" ".join(current_line))
+        current_line_words.append(word)
+        current_line_word_indices.append(word_idx)
+        w = draw.textlength(" ".join(current_line_words), font=font)
+        if w > size[0] - 160:
+            current_line_words.pop()
+            current_line_word_indices.pop()
+            if current_line_words:
+                lines.append((list(current_line_words), list(current_line_word_indices)))
+            current_line_words = [word]
+            current_line_word_indices = [word_idx]
+        word_idx += 1
+
+    if current_line_words:
+        lines.append((list(current_line_words), list(current_line_word_indices)))
 
     if not lines:
         return np.array(img)
-    
-    line_spacing = int(font_size * 0.22)
-    total_h = len(lines) * font_size + (max(0, len(lines) - 1) * line_spacing)
-    # Keep subtitles around the lower third similar to short-form caption style.
-    current_y = int(size[1] * 0.80) - (total_h // 2)
-    
-    text_color = (255, 210, 30)
-    stroke_color = (0, 0, 0)
-    stroke_width = 8
-    shadow_color = (0, 0, 0, 185)
-    shadow_offset = (4, 4)
-    
-    for line in lines:
-        w = draw.textlength(line, font=font)
-        x = (size[0] - w) / 2
 
-        # Draw soft shadow first so text remains visible even on bright frames.
-        draw.text(
-            (x + shadow_offset[0], current_y + shadow_offset[1]),
-            line,
-            font=font,
-            fill=shadow_color,
-        )
-        
-        # Draw stroke behind text for readability against bright/dark footage.
-        for adj_x in range(-stroke_width, stroke_width+1):
-            for adj_y in range(-stroke_width, stroke_width+1):
-                draw.text((x+adj_x, current_y+adj_y), line, font=font, fill=stroke_color)
-                
-        # Draw main text.
-        draw.text((x, current_y), line, font=font, fill=text_color)
-        current_y += font_size + line_spacing
-        
+    line_spacing = int(font_size * 0.3)
+    total_h = len(lines) * int(font_size * 1.2) + (max(0, len(lines) - 1) * line_spacing)
+    # Keep subtitles in the lower third
+    base_y = int(size[1] * 0.78) - (total_h // 2)
+
+    # Draw background pill
+    # Calculate total text block dimensions
+    max_line_width = 0
+    for line_words, _ in lines:
+        w = draw.textlength(" ".join(line_words), font=font)
+        max_line_width = max(max_line_width, w)
+
+    pill_padding_x = 40
+    pill_padding_y = 20
+    pill_x1 = max(0, (size[0] - max_line_width) / 2 - pill_padding_x)
+    pill_y1 = base_y - pill_padding_y
+    pill_x2 = min(size[0], (size[0] + max_line_width) / 2 + pill_padding_x)
+    pill_y2 = base_y + total_h + pill_padding_y
+    _draw_rounded_rect(draw, (pill_x1, pill_y1, pill_x2, pill_y2), 24, bg_pill_color)
+
+    current_y = base_y
+    for line_words, line_word_indices in lines:
+        full_line = " ".join(line_words)
+        full_w = draw.textlength(full_line, font=font)
+        x_start = (size[0] - full_w) / 2
+
+        # Draw word by word for karaoke effect
+        x_cursor = x_start
+        for i, (word, w_idx) in enumerate(zip(line_words, line_word_indices)):
+            is_active = (w_idx == highlight_word_index)
+            use_font = highlight_font if is_active else font
+            color = highlight_color if is_active else normal_color
+            y_offset = -4 if is_active else 0  # Slight lift for active word
+
+            # Draw stroke
+            for adj_x in range(-stroke_width, stroke_width + 1, 2):
+                for adj_y in range(-stroke_width, stroke_width + 1, 2):
+                    draw.text((x_cursor + adj_x, current_y + adj_y + y_offset), word, font=use_font, fill=stroke_color)
+
+            # Draw main text
+            draw.text((x_cursor + 0, current_y + y_offset), word, font=use_font, fill=color)
+
+            # Advance cursor (use normal font width for consistent spacing)
+            word_w = draw.textlength(word + " ", font=font)
+            x_cursor += word_w
+
+        current_y += int(font_size * 1.2) + line_spacing
+
     return np.array(img)
+
+
+def create_text_image_simple(text, size=(1080, 1920), font_size=100):
+    """Simplified subtitle image for fallback — white text with stroke and pill background."""
+    return create_text_image(text, size=size, font_size=font_size, highlight_word_index=-1)
 
 
 def _prepare_visual_clip(visual_path, duration):
@@ -187,52 +249,143 @@ def _prepare_visual_clip(visual_path, duration):
     return clip
 
 
-def _create_hook_overlay(duration=2.5, size=(1080, 1920)):
-    """Create a bold 'WAIT FOR IT 🔥' hook text for the first few seconds."""
-    img = Image.new('RGBA', size, (0, 0, 0, 0))
-    draw = ImageDraw.Draw(img)
-    font = _load_caption_font(80)
+# ── Hook Overlay (Fixed Devanagari rendering) ───────────────────────
 
-    hook_texts = ["👆 SUNNA PADEGA 🔥", "RUKO... 🔥", "WAIT FOR IT 👀", "YE SUNLO 😏"]
-    import random
-    hook_text = random.choice(hook_texts)
-
-    w = draw.textlength(hook_text, font=font)
-    x = (size[0] - w) / 2
-    y = int(size[1] * 0.12)  # Top area
-
-    # Black stroke for readability
-    stroke_w = 6
-    for ax in range(-stroke_w, stroke_w + 1):
-        for ay in range(-stroke_w, stroke_w + 1):
-            draw.text((x + ax, y + ay), hook_text, font=font, fill=(0, 0, 0))
-    draw.text((x, y), hook_text, font=font, fill=(255, 60, 60))
-
-    return ImageClip(np.array(img)).set_duration(duration)
-
-
-def _create_follow_cta(duration=3.0, size=(1080, 1920)):
-    """Create a 'Follow for Part 2 🔥' CTA text for the last few seconds."""
+def _create_hook_overlay(topic="", duration=2.0, size=(1080, 1920)):
+    """Create an animated hook text overlay for the first few seconds."""
     img = Image.new('RGBA', size, (0, 0, 0, 0))
     draw = ImageDraw.Draw(img)
     font = _load_caption_font(70)
 
-    cta_text = "FOLLOW FOR PART 2 🔥"
+    # Topic-aware hook texts in Hindi (uses the same Devanagari font)
+    hook_texts = [
+        "ये सुनना जरूरी है 🔥",
+        "रुको... ये जानो 👀",
+        "ये सच है 😏",
+        "ध्यान से सुनो 🎯",
+        "ये fact उड़ा देगा 💥",
+    ]
+    hook_text = random.choice(hook_texts)
+
+    w = draw.textlength(hook_text, font=font)
+    x = (size[0] - w) / 2
+    y = int(size[1] * 0.10)
+
+    # Semi-transparent background pill
+    pill_pad_x, pill_pad_y = 30, 12
+    _draw_rounded_rect(
+        draw,
+        (x - pill_pad_x, y - pill_pad_y, x + w + pill_pad_x, y + 70 + pill_pad_y),
+        18,
+        (0, 0, 0, 160),
+    )
+
+    # Black stroke for readability
+    stroke_w = 5
+    for ax in range(-stroke_w, stroke_w + 1, 2):
+        for ay in range(-stroke_w, stroke_w + 1, 2):
+            draw.text((x + ax, y + ay), hook_text, font=font, fill=(0, 0, 0))
+
+    # Bright red-orange text
+    draw.text((x, y), hook_text, font=font, fill=(255, 80, 60))
+
+    hook_clip = ImageClip(np.array(img)).set_duration(duration)
+
+    # Fade-in animation: opacity 0 → 1 over 0.3s using crossfadein
+    hook_clip = hook_clip.crossfadein(min(0.3, duration * 0.2))
+
+    return hook_clip
+
+
+# ── CTA Overlay (Fixed Devanagari rendering) ────────────────────────
+
+def _create_follow_cta(duration=2.5, size=(1080, 1920)):
+    """Create a 'Follow for more' CTA text overlay for the last seconds."""
+    img = Image.new('RGBA', size, (0, 0, 0, 0))
+    draw = ImageDraw.Draw(img)
+    font = _load_caption_font(60)
+
+    cta_text = "Follow करो — और आएगा 🔥"
     w = draw.textlength(cta_text, font=font)
     x = (size[0] - w) / 2
-    y = int(size[1] * 0.15)  # Top area, below hook position
+    y = int(size[1] * 0.12)
+
+    # Semi-transparent background pill
+    pill_pad_x, pill_pad_y = 30, 12
+    _draw_rounded_rect(
+        draw,
+        (x - pill_pad_x, y - pill_pad_y, x + w + pill_pad_x, y + 60 + pill_pad_y),
+        18,
+        (0, 0, 0, 160),
+    )
 
     # Black stroke
     stroke_w = 5
-    for ax in range(-stroke_w, stroke_w + 1):
-        for ay in range(-stroke_w, stroke_w + 1):
+    for ax in range(-stroke_w, stroke_w + 1, 2):
+        for ay in range(-stroke_w, stroke_w + 1, 2):
             draw.text((x + ax, y + ay), cta_text, font=font, fill=(0, 0, 0))
-    draw.text((x, y), cta_text, font=font, fill=(0, 255, 100))
+    draw.text((x, y), cta_text, font=font, fill=(0, 255, 120))
 
     return ImageClip(np.array(img)).set_duration(duration)
 
 
-def _maybe_download_bg_music(target_path):
+# ── Background Music — Theme-Aware Selection ────────────────────────
+
+_BG_MUSIC_POOL = {
+    "horror": {
+        "url": None,  # Will be read from env: HORROR_BG_MUSIC_URL
+        "filename": "bg_music_horror.mp3",
+        "volume": 0.14,
+    },
+    "girl": {
+        "url": None,  # Will be read from env: GIRL_BG_MUSIC_URL
+        "filename": "bg_music_girl.mp3",
+        "volume": 0.12,
+    },
+    "default": {
+        "url": "https://cdn.pixabay.com/audio/2024/11/01/audio_1f6b285aea.mp3",
+        "filename": "bg_music_default.mp3",
+        "volume": 0.12,
+    },
+}
+
+
+def _resolve_music_url(theme):
+    """Get the music URL for a theme, reading from env vars if available."""
+    if theme == "horror":
+        env_url = os.getenv("HORROR_BG_MUSIC_URL", "").strip()
+        if env_url:
+            return env_url
+    elif theme == "girl":
+        env_url = os.getenv("GIRL_BG_MUSIC_URL", "").strip()
+        if env_url:
+            return env_url
+
+    config = _BG_MUSIC_POOL.get(theme, _BG_MUSIC_POOL["default"])
+    return config.get("url") or _BG_MUSIC_POOL["default"]["url"]
+
+
+def _detect_content_theme(scenes=None, domain=""):
+    """Detect whether content is horror-themed, girl-themed, or general."""
+    combined = (domain + " " + " ".join(
+        s.get("text", "") + " " + s.get("visual_keyword", "")
+        for s in (scenes or [])
+    )).lower()
+
+    horror_signals = ["horror", "ghost", "bhoot", "darr", "scary", "haunted", "paranormal", "raat", "mystery", "dark"]
+    girl_signals = ["girl", "ladki", "woman", "attract", "dating", "seduc", "love", "relationship", "body language"]
+
+    horror_score = sum(1 for s in horror_signals if s in combined)
+    girl_score = sum(1 for s in girl_signals if s in combined)
+
+    if horror_score > girl_score:
+        return "horror"
+    elif girl_score > 0:
+        return "girl"
+    return "default"
+
+
+def _maybe_download_bg_music(target_path, url):
     """Download a royalty-free background beat if not already cached."""
     if os.path.exists(target_path):
         return target_path
@@ -241,10 +394,8 @@ def _maybe_download_bg_music(target_path):
         return None
 
     os.makedirs(os.path.dirname(target_path), exist_ok=True)
-    # Free royalty-free lo-fi beat from Pixabay (CC0 license).
-    url = "https://cdn.pixabay.com/audio/2024/11/01/audio_1f6b285aea.mp3"
     try:
-        print("Downloading background music...")
+        print(f"Downloading background music to {target_path}...")
         urllib.request.urlretrieve(url, target_path)
         print("Background music downloaded.")
         return target_path
@@ -253,10 +404,15 @@ def _maybe_download_bg_music(target_path):
         return None
 
 
-def _mix_background_music(narration_audio, total_duration):
-    """Mix a low-volume background beat under the narration for energy."""
-    bg_path = os.path.join("assets", "audio", "bg_music.mp3")
-    bg_path = _maybe_download_bg_music(bg_path)
+def _mix_background_music(narration_audio, total_duration, content_theme="default"):
+    """Mix a theme-appropriate background beat under the narration."""
+    config = _BG_MUSIC_POOL.get(content_theme, _BG_MUSIC_POOL["default"])
+    bg_filename = config["filename"]
+    bg_volume = config["volume"]
+    bg_url = _resolve_music_url(content_theme)
+
+    bg_path = os.path.join("assets", "audio", bg_filename)
+    bg_path = _maybe_download_bg_music(bg_path, bg_url)
     if not bg_path:
         return narration_audio
 
@@ -268,14 +424,16 @@ def _mix_background_music(narration_audio, total_duration):
             from moviepy.editor import concatenate_audioclips
             bg_music = concatenate_audioclips([bg_music] * loops_needed)
         bg_music = bg_music.subclip(0, total_duration)
-        # Keep background music at 12% volume so voice stays clear.
-        bg_music = bg_music.volumex(0.12)
+        # Theme-appropriate volume level
+        bg_music = bg_music.volumex(bg_volume)
         mixed = CompositeAudioClip([narration_audio, bg_music])
         return mixed
     except Exception as e:
         print(f"Could not mix background music: {e}")
         return narration_audio
 
+
+# ── Scene Duration Helpers ───────────────────────────────────────────
 
 def _scene_durations_from_word_weights(scenes, total_duration, min_duration=2.0):
     """Distribute total narration time across scenes by word count with a floor."""
@@ -360,11 +518,13 @@ def _scene_durations_from_timeline(scene_word_events, total_duration):
     return durations
 
 
-def _build_dynamic_subtitle_clips(events, scene_start, scene_duration, words_per_chunk=3):
-    """Create rolling subtitle clips aligned to spoken word boundaries.
+# ── Karaoke Dynamic Subtitle Clips ──────────────────────────────────
+
+def _build_karaoke_subtitle_clips(events, scene_start, scene_duration, words_per_chunk=3):
+    """Create karaoke-style rolling subtitle clips with per-word highlighting.
     
-    Shows 2-3 words at a time in big bold font, synced to when the voice
-    speaks them — the standard viral reel caption style.
+    Shows 2-3 words at a time. Each word gets highlighted in sequence while 
+    the others stay white — premium viral reel caption style.
     """
     clips = []
     if not events:
@@ -378,27 +538,60 @@ def _build_dynamic_subtitle_clips(events, scene_start, scene_duration, words_per
             index += words_per_chunk
             continue
 
-        first_start = float(chunk[0].get('start', 0.0))
-        last_end = float(chunk[-1].get('end', first_start + 0.3))
-        local_start = max(0.0, first_start - scene_start)
-        local_end = min(scene_duration, max(local_start + 0.35, last_end - scene_start))
-        local_duration = max(0.2, local_end - local_start)
+        chunk_words = [str(item.get('word', '')).strip() for item in chunk]
 
-        # Big bold font for word-synced captions — easy to read on mobile.
-        text_img = create_text_image(chunk_text, font_size=100)
-        txt_clip = (
-            ImageClip(text_img)
-            .set_start(local_start)
-            .set_duration(local_duration)
-        )
-        clips.append(txt_clip)
+        # Create a separate clip for each word being highlighted within the chunk
+        for word_pos, word_event in enumerate(chunk):
+            word_start = float(word_event.get('start', 0.0))
+            word_end = float(word_event.get('end', word_start + 0.3))
+            
+            local_start = max(0.0, word_start - scene_start)
+            local_end = min(scene_duration, max(local_start + 0.15, word_end - scene_start))
+            
+            # If this is the last word in chunk, extend until next chunk starts
+            if word_pos == len(chunk) - 1:
+                next_chunk_start = None
+                if index + words_per_chunk < len(events):
+                    next_chunk_start = float(events[index + words_per_chunk].get('start', 0.0))
+                    local_end = min(scene_duration, max(local_end, next_chunk_start - scene_start))
+            
+            local_duration = max(0.12, local_end - local_start)
+
+            # Render the full chunk text with this word highlighted
+            full_chunk = " ".join(chunk_words)
+            text_img = create_text_image(
+                full_chunk,
+                font_size=100,
+                highlight_word_index=word_pos,
+            )
+            txt_clip = (
+                ImageClip(text_img)
+                .set_start(local_start)
+                .set_duration(local_duration)
+            )
+            clips.append(txt_clip)
+
         index += words_per_chunk
 
     return clips
 
-def create_video(scenes, voiceovers, visuals, output_file, word_timeline=None):
-    """Combines voiceovers and visuals into a final video."""
+
+def _build_dynamic_subtitle_clips(events, scene_start, scene_duration, words_per_chunk=3):
+    """Backward-compatible wrapper — uses karaoke style."""
+    return _build_karaoke_subtitle_clips(events, scene_start, scene_duration, words_per_chunk)
+
+
+# ── Main Video Assembly ──────────────────────────────────────────────
+
+def create_video(scenes, voiceovers, visuals, output_file, word_timeline=None, content_theme="default"):
+    """Combines voiceovers and visuals into a final video with karaoke subtitles."""
     clips = []
+
+    # Detect content theme for music selection if not provided
+    if content_theme == "default":
+        domain = os.getenv("CONTENT_DOMAIN", "")
+        content_theme = _detect_content_theme(scenes, domain)
+    print(f"Content theme detected: {content_theme}")
 
     # Continuous narration mode: one TTS file over multiple visual scenes.
     if isinstance(voiceovers, str):
@@ -422,27 +615,30 @@ def create_video(scenes, voiceovers, visuals, output_file, word_timeline=None):
 
             subtitle_layers = []
             if i < len(scene_word_events) and scene_word_events[i]:
-                subtitle_layers = _build_dynamic_subtitle_clips(
+                subtitle_layers = _build_karaoke_subtitle_clips(
                     scene_word_events[i],
                     scene_starts[i],
                     duration,
                 )
             if not subtitle_layers:
-                text_img = create_text_image(scene['text'], font_size=100)
+                text_img = create_text_image_simple(scene['text'], font_size=100)
                 subtitle_layers = [ImageClip(text_img).set_duration(duration)]
 
-            # Add hook text overlay on first scene (first 2.5 seconds).
+            # Hook overlay on first scene (first 2 seconds) — now with fixed Devanagari font
             extra_overlays = []
-            # Hook and CTA overlays are commented out to remove the top box symbols (tofu/font rendering issues).
-            # if i == 0:
-            #     hook_overlay = _create_hook_overlay(duration=min(2.5, duration))
-            #     extra_overlays.append(hook_overlay)
+            if i == 0:
+                hook_duration = min(2.0, duration * 0.4)
+                hook_overlay = _create_hook_overlay(
+                    topic=scene.get("text", ""),
+                    duration=hook_duration,
+                )
+                extra_overlays.append(hook_overlay)
 
-            # Add "Follow for Part 2" CTA on last scene (last 3 seconds).
-            # if i == len(scenes) - 1:
-            #     cta_dur = min(3.0, duration)
-            #     cta_overlay = _create_follow_cta(duration=cta_dur).set_start(max(0, duration - cta_dur))
-            #     extra_overlays.append(cta_overlay)
+            # CTA overlay on last scene (last 2.5 seconds)
+            if i == len(scenes) - 1:
+                cta_dur = min(2.5, duration * 0.5)
+                cta_overlay = _create_follow_cta(duration=cta_dur).set_start(max(0, duration - cta_dur))
+                extra_overlays.append(cta_overlay)
 
             video_scene = CompositeVideoClip([clip] + subtitle_layers + extra_overlays)
             clips.append(video_scene)
@@ -450,8 +646,8 @@ def create_video(scenes, voiceovers, visuals, output_file, word_timeline=None):
         print("Concatenating clips...")
         final_video = concatenate_videoclips(clips, method="compose")
 
-        # Mix background music under the narration for energy.
-        mixed_audio = _mix_background_music(narration, narration.duration)
+        # Mix theme-appropriate background music under the narration.
+        mixed_audio = _mix_background_music(narration, narration.duration, content_theme)
         final_video = final_video.set_audio(mixed_audio)
         final_video = final_video.set_duration(narration.duration)
 
@@ -467,17 +663,16 @@ def create_video(scenes, voiceovers, visuals, output_file, word_timeline=None):
         )
         return output_file
     
+    # Legacy per-scene voiceover mode
     for i, scene in enumerate(scenes):
         print(f"Processing clip {i+1}...")
         audio = AudioFileClip(voiceovers[i])
         duration = audio.duration
 
         clip = _prepare_visual_clip(visuals[i], duration)
-        
         clip = clip.set_audio(audio)
         
-        # Add subtitle using PIL
-        text_img = create_text_image(scene['text'], font_size=100)
+        text_img = create_text_image_simple(scene['text'], font_size=100)
         txt_clip = ImageClip(text_img).set_duration(duration)
         
         video_scene = CompositeVideoClip([clip, txt_clip])

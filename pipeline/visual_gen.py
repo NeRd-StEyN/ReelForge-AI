@@ -1,5 +1,6 @@
 import requests
 import os
+import json
 import random
 from dotenv import load_dotenv
 from PIL import Image, ImageDraw
@@ -9,43 +10,110 @@ load_dotenv()
 _USED_PEXELS_VIDEO_IDS = set()
 _USED_PEXELS_IMAGE_IDS = set()
 
-# Bold Pexels search terms that return eye-catching attractive woman clips.
-# Used as fallbacks when the AI-generated visual_keyword returns zero results.
-_GIRL_FALLBACK_QUERIES = [
-    "sexy woman dancing slow motion",
-    "hot girl bikini beach cinematic",
-    "attractive model lingerie photoshoot",
-    "sexy girl dance moves aesthetic",
-    "beautiful woman body fitness gym",
-    "hot indian girl dancing bollywood",
-    "sexy woman pool summer cinematic",
-    "attractive girl lip bite close up",
-    "woman dancing club neon lights",
-    "hot model fashion runway slow motion",
-    "sexy girl twerking dance party",
-    "beautiful woman shower water cinematic",
-    "attractive woman bedroom morning aesthetic",
-    "hot girl car lifestyle luxury",
-    "sexy dancer woman body movement",
+# Persistent blacklist file to avoid repeating visuals across runs
+_BLACKLIST_FILE = os.path.join("data", "pexels_used_ids.json")
+
+
+def _load_persistent_blacklist():
+    """Load previously used Pexels IDs from disk to avoid visual repetition."""
+    global _USED_PEXELS_VIDEO_IDS, _USED_PEXELS_IMAGE_IDS
+    try:
+        if os.path.exists(_BLACKLIST_FILE):
+            with open(_BLACKLIST_FILE, "r") as f:
+                data = json.load(f)
+            _USED_PEXELS_VIDEO_IDS.update(data.get("video_ids", []))
+            _USED_PEXELS_IMAGE_IDS.update(data.get("image_ids", []))
+    except Exception:
+        pass
+
+
+def _save_persistent_blacklist():
+    """Save used Pexels IDs to disk for cross-run deduplication."""
+    try:
+        os.makedirs(os.path.dirname(_BLACKLIST_FILE), exist_ok=True)
+        # Keep only the last 500 IDs to prevent the list from growing forever
+        video_ids = list(_USED_PEXELS_VIDEO_IDS)[-500:]
+        image_ids = list(_USED_PEXELS_IMAGE_IDS)[-500:]
+        with open(_BLACKLIST_FILE, "w") as f:
+            json.dump({"video_ids": video_ids, "image_ids": image_ids}, f)
+    except Exception:
+        pass
+
+
+# Load blacklist on module import
+_load_persistent_blacklist()
+
+
+# ── Diverse visual fallback queries with mood/color variety ──────────
+# Each entry has a different visual mood to prevent same-looking thumbnails
+_DIVERSE_FALLBACK_QUERIES = [
+    # Warm/golden mood
+    "woman walking golden hour city street cinematic",
+    "beautiful woman sunset beach golden light portrait",
+    "confident woman cafe window warm light aesthetic",
+    # Cool/neon mood
+    "woman neon lights city night cinematic portrait",
+    "attractive woman dark moody blue lighting portrait",
+    "girl dancing club neon purple lights slow motion",
+    # Natural/bright mood
+    "beautiful woman garden flowers natural light portrait",
+    "woman laughing bright daylight outdoor candid",
+    "girl running through field bright sun cinematic",
+    # Dark/dramatic mood
+    "woman silhouette dramatic lighting studio portrait",
+    "mysterious woman dark background spotlight cinematic",
+    "woman rain night street moody cinematic slow motion",
+    # Elegant/luxury mood
+    "elegant woman fashion photoshoot studio lighting",
+    "woman luxury car lifestyle cinematic golden",
+    "model walking runway slow motion dramatic lighting",
+    # Energetic/action mood
+    "woman dancing energetic movement colorful background",
+    "fit woman gym workout cinematic slow motion",
+    "woman spinning dress wind movement aesthetic",
 ]
 
+# Mood-specific visual modifiers to inject variety into AI-generated keywords
+_MOOD_MODIFIERS = {
+    "mysterious": ["moody dark lighting", "mysterious shadows", "dim blue tones", "fog atmosphere"],
+    "confident": ["bright natural light", "golden hour warm", "strong pose cinematic", "urban street style"],
+    "dramatic": ["dramatic spotlight", "high contrast", "rain cinematic", "silhouette backlit"],
+    "warm": ["golden hour", "warm tones sunset", "cozy aesthetic lighting", "candlelight intimate"],
+    "dark": ["dark moody", "shadow play", "night neon", "low key lighting"],
+    "energetic": ["vibrant colors", "dynamic movement", "fast paced", "colorful neon"],
+    "elegant": ["studio lighting", "luxury aesthetic", "fashion editorial", "minimalist clean"],
+    "neutral": ["cinematic natural", "soft lighting", "aesthetic portrait", "clean composition"],
+}
 
-def _build_realistic_query(query):
-    """Bias stock search toward beautiful woman/girl footage with cinematic quality."""
+
+def _build_realistic_query(query, visual_mood="neutral", scene_index=0):
+    """Build a diverse stock search query with mood-aware modifiers."""
     base = " ".join(str(query or "").split())
-    # Quality tokens without over-constraining — Pexels handles natural language well.
-    quality_tokens = "cinematic beautiful aesthetic"
+
     if not base:
-        return random.choice(_GIRL_FALLBACK_QUERIES)
+        return random.choice(_DIVERSE_FALLBACK_QUERIES)
+
     lowered = base.lower()
-    if "cartoon" in lowered or "anime" in lowered or "illustration" in lowered:
-        base = base.replace("cartoon", "").replace("anime", "").replace("illustration", "")
-    # If the query already mentions woman/girl/female/lady, just add quality tokens.
-    # Otherwise inject "beautiful woman" to guarantee girl-focused results.
-    has_girl_term = any(w in lowered for w in ["woman", "girl", "female", "lady", "model", "couple"])
-    if not has_girl_term:
-        base = f"{base} beautiful woman"
-    return f"{base} {quality_tokens}".strip()
+
+    # Remove cartoon/anime/illustration terms
+    for remove_term in ["cartoon", "anime", "illustration", "drawing", "sketch"]:
+        if remove_term in lowered:
+            base = base.replace(remove_term, "").strip()
+            lowered = base.lower()
+
+    # Ensure we have people-related terms
+    has_person_term = any(w in lowered for w in ["woman", "girl", "female", "lady", "model", "couple", "man", "person", "people"])
+    if not has_person_term:
+        base = f"{base} woman portrait"
+
+    # Add mood-specific modifiers for visual variety
+    mood_mods = _MOOD_MODIFIERS.get(visual_mood, _MOOD_MODIFIERS["neutral"])
+    selected_mod = random.choice(mood_mods)
+
+    # Add scene-index-based color bias to prevent same-looking consecutive scenes
+    color_variety = ["", "warm tones", "cool tones", "high contrast", "soft pastel"][scene_index % 5]
+
+    return f"{base} {selected_mod} {color_variety} cinematic".strip()
 
 
 def _pick_diverse_pexels_item(items, used_ids):
@@ -58,6 +126,7 @@ def _pick_diverse_pexels_item(items, used_ids):
     item_id = choice.get("id")
     if item_id is not None:
         used_ids.add(item_id)
+        _save_persistent_blacklist()  # Persist after each pick
     return choice
 
 def _try_fetch_pexels_video(search_query, output_path, headers):
@@ -92,24 +161,27 @@ def _try_fetch_pexels_video(search_query, output_path, headers):
     return None
 
 
-def fetch_pexels_video(query, output_path):
-    """Fetches a stock video from Pexels. Falls back to beautiful-girl queries if primary fails."""
+def fetch_pexels_video(query, output_path, visual_mood="neutral", scene_index=0):
+    """Fetches a stock video from Pexels with mood-aware diversity. Falls back to varied queries."""
     api_key = os.getenv("PEXELS_API_KEY")
     if not api_key:
         print("PEXELS_API_KEY not found. Skipping video fetch.")
         return None
     
     headers = {"Authorization": api_key}
-    search_query = _build_realistic_query(query)
+    search_query = _build_realistic_query(query, visual_mood, scene_index)
+    print(f"  Pexels video search: '{search_query}' (mood: {visual_mood})")
 
     # Try primary query first
     result = _try_fetch_pexels_video(search_query, output_path, headers)
     if result:
         return result
 
-    # Fallback: try 2 random proven beautiful-girl queries
-    for fallback_q in random.sample(_GIRL_FALLBACK_QUERIES, min(2, len(_GIRL_FALLBACK_QUERIES))):
-        print(f"Primary video query failed. Retrying with fallback: '{fallback_q}'")
+    # Fallback: try 2 random diverse queries (mood-filtered if possible)
+    mood_filtered = [q for q in _DIVERSE_FALLBACK_QUERIES if any(m in q.lower() for m in _MOOD_MODIFIERS.get(visual_mood, ["cinematic"]))]
+    fallback_pool = mood_filtered if mood_filtered else _DIVERSE_FALLBACK_QUERIES
+    for fallback_q in random.sample(fallback_pool, min(2, len(fallback_pool))):
+        print(f"  Primary video query failed. Retrying with fallback: '{fallback_q}'")
         result = _try_fetch_pexels_video(fallback_q, output_path, headers)
         if result:
             return result
@@ -141,24 +213,27 @@ def _try_fetch_pexels_image(search_query, output_path, headers):
     return None
 
 
-def fetch_pexels_image(query, output_path):
-    """Fetches a stock image from Pexels. Falls back to beautiful-girl queries if primary fails."""
+def fetch_pexels_image(query, output_path, visual_mood="neutral", scene_index=0):
+    """Fetches a stock image from Pexels with mood-aware diversity."""
     api_key = os.getenv("PEXELS_API_KEY")
     if not api_key:
         print("PEXELS_API_KEY not found. Skipping image fetch.")
         return None
     
     headers = {"Authorization": api_key}
-    search_query = _build_realistic_query(query)
+    search_query = _build_realistic_query(query, visual_mood, scene_index)
+    print(f"  Pexels image search: '{search_query}' (mood: {visual_mood})")
 
     # Try primary query first
     result = _try_fetch_pexels_image(search_query, output_path, headers)
     if result:
         return result
 
-    # Fallback: try 2 random proven beautiful-girl queries
-    for fallback_q in random.sample(_GIRL_FALLBACK_QUERIES, min(2, len(_GIRL_FALLBACK_QUERIES))):
-        print(f"Primary image query failed. Retrying with fallback: '{fallback_q}'")
+    # Fallback: try 2 random diverse queries
+    mood_filtered = [q for q in _DIVERSE_FALLBACK_QUERIES if any(m in q.lower() for m in _MOOD_MODIFIERS.get(visual_mood, ["cinematic"]))]
+    fallback_pool = mood_filtered if mood_filtered else _DIVERSE_FALLBACK_QUERIES
+    for fallback_q in random.sample(fallback_pool, min(2, len(fallback_pool))):
+        print(f"  Primary image query failed. Retrying with fallback: '{fallback_q}'")
         result = _try_fetch_pexels_image(fallback_q, output_path, headers)
         if result:
             return result

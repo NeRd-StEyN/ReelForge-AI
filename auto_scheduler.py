@@ -81,7 +81,7 @@ def run_scheduler_loop():
     print(f"Scheduler configured for {reels_per_day} reels/day")
     print(f"Posting times: {times_to_run}")
 
-    run_now = (os.getenv("RUN_FIRST_REEL_NOW", "true").strip().lower() == "true")
+    run_now = _env_flag("RUN_FIRST_REEL_NOW", "false")
     if run_now:
         create_and_post_one_reel()
 
