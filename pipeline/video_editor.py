@@ -396,7 +396,12 @@ def _maybe_download_bg_music(target_path, url):
     os.makedirs(os.path.dirname(target_path), exist_ok=True)
     try:
         print(f"Downloading background music to {target_path}...")
-        urllib.request.urlretrieve(url, target_path)
+        req = urllib.request.Request(
+            url, 
+            headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'}
+        )
+        with urllib.request.urlopen(req) as response, open(target_path, 'wb') as out_file:
+            out_file.write(response.read())
         print("Background music downloaded.")
         return target_path
     except Exception as e:
