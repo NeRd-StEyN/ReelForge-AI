@@ -157,10 +157,10 @@ def generate_script(topic, analytics_data=None):
     language = _get_content_language()
     language_rules = """
     Language rules:
-    - Narration text must be in Hindi using Devanagari script.
-    - Avoid English words unless absolutely unavoidable proper nouns.
+    - Narration text MUST be in pure Hindi using STRICTLY Devanagari script (e.g. "लड़कियां" NOT "ladkiyan").
+    - DO NOT use Roman/Latin letters for the narration text. This is a hard requirement.
     - Keep pronunciation natural for Hindi TTS.
-    - Title can be Hindi or Hinglish, but scene narration must stay Devanagari Hindi.
+    - Title can be English or Hinglish, but scene text MUST be Devanagari.
     """ if language in {"hindi", "hi", "hi-in"} else ""
 
     instructions = ""
