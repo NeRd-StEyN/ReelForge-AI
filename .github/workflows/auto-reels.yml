@@ -16,8 +16,7 @@ jobs:
     timeout-minutes: 90
     env:
       OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
-      OPENROUTER_MODEL: ${{ secrets.OPENROUTER_MODEL }}
-      OPENROUTER_FALLBACK_MODELS: ${{ secrets.OPENROUTER_FALLBACK_MODELS }}
+
       PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
       MAKE_WEBHOOK_URL: ${{ secrets.MAKE_WEBHOOK_URL }}
       CONTENT_DOMAIN: ${{ secrets.CONTENT_DOMAIN }}

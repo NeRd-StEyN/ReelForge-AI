@@ -21,21 +21,14 @@ def get_openrouter_client():
 
 
 def _get_model_candidates():
-    primary = (os.getenv("OPENROUTER_MODEL") or "google/gemini-2.5-flash").strip()
-    fallback_raw = (os.getenv("OPENROUTER_FALLBACK_MODELS") or "openrouter/free").strip()
-
-    candidates = [primary]
-    if fallback_raw:
-        candidates.extend([m.strip() for m in fallback_raw.split(",") if m.strip()])
-
-    # Preserve order while removing duplicates.
-    unique = []
-    seen = set()
-    for model in candidates:
-        if model not in seen:
-            unique.append(model)
-            seen.add(model)
-    return unique
+    # Use a hardcoded list of 100% valid, reliable free models.
+    # We prioritize the latest Gemini models and a highly capable Llama 3 model for fallback.
+    return [
+        "google/gemini-2.0-flash-lite-preview-02-05:free",
+        "google/gemini-2.0-flash-thinking-exp:free",
+        "meta-llama/llama-3.3-70b-instruct:free",
+        "openrouter/free"
+    ]
 
 
 def _normalize_content(content):
@@ -96,6 +89,8 @@ def _parse_script_payload(raw_text):
         raise ValueError("Script payload is not a JSON object")
     if "scenes" not in payload or not isinstance(payload["scenes"], list):
         raise ValueError("Script payload missing list field: scenes")
+    if len(payload["scenes"]) == 0:
+        raise ValueError("Script payload contains 0 scenes")
     return payload
 
 
