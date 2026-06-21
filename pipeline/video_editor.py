@@ -335,17 +335,17 @@ _BG_MUSIC_POOL = {
     "horror": {
         "url": None,  # Will be read from env: HORROR_BG_MUSIC_URL
         "filename": "bg_music_horror.mp3",
-        "volume": 0.14,
+        "volume": 0.35,
     },
     "girl": {
         "url": None,  # Will be read from env: GIRL_BG_MUSIC_URL
         "filename": "bg_music_girl.mp3",
-        "volume": 0.12,
+        "volume": 0.30,
     },
     "default": {
-        "url": "https://cdn.pixabay.com/audio/2024/11/01/audio_1f6b285aea.mp3",
+        "url": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Chill%20Wave.mp3",
         "filename": "bg_music_default.mp3",
-        "volume": 0.12,
+        "volume": 0.30,
     },
 }
 
