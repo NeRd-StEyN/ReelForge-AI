@@ -259,11 +259,11 @@ def _create_hook_overlay(topic="", duration=2.0, size=(1080, 1920)):
 
     # Topic-aware hook texts in Hindi (uses the same Devanagari font)
     hook_texts = [
-        "ये सुनना जरूरी है 🔥",
-        "रुको... ये जानो 👀",
-        "ये सच है 😏",
-        "ध्यान से सुनो 🎯",
-        "ये fact उड़ा देगा 💥",
+        "ये सुनना जरूरी है!",
+        "रुको... ये जानो!",
+        "ये सच है!",
+        "ध्यान से सुनो!",
+        "ये fact उड़ा देगा!",
     ]
     hook_text = random.choice(hook_texts)
 
@@ -305,7 +305,7 @@ def _create_follow_cta(duration=2.5, size=(1080, 1920)):
     draw = ImageDraw.Draw(img)
     font = _load_caption_font(60)
 
-    cta_text = "Follow करो — और आएगा 🔥"
+    cta_text = "Follow करो — और आएगा!"
     w = draw.textlength(cta_text, font=font)
     x = (size[0] - w) / 2
     y = int(size[1] * 0.12)
