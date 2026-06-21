@@ -15,3 +15,5 @@ output_videoTEMP_MPY_wvf_snd.mp4
 *.mp3
 *.wav
 *.mov
+
+video_metadata.json
