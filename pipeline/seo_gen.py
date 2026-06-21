@@ -1,6 +1,6 @@
 import json
 import random
-from pipeline.script_gen import _groq_prompt
+from pipeline.script_gen import _llm_prompt
 
 
 def _generate_ai_caption(topic, script_data):
@@ -30,7 +30,7 @@ Rules:
 
 Return ONLY the caption text, no quotes, no markdown.
 """
-    return _groq_prompt(prompt).strip()
+    return _llm_prompt(prompt).strip()
 
 
 def _generate_ai_hashtags(topic, script_data):
@@ -56,7 +56,7 @@ Good examples of effective hashtags:
 
 Return ONLY the hashtags, nothing else.
 """
-    raw = _groq_prompt(prompt).strip()
+    raw = _llm_prompt(prompt).strip()
     # Parse hashtags from the response
     hashtags = [tag.strip() for tag in raw.replace("\n", " ").split() if tag.strip().startswith("#")]
     

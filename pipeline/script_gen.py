@@ -1,7 +1,7 @@
 import os
 import json
 import random
-from openai import OpenAI
+import google.generativeai as genai
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -10,27 +10,8 @@ load_dotenv()
 def _get_content_language():
     return (os.getenv("CONTENT_LANGUAGE") or "hindi").strip().lower()
 
-def get_groq_client():
-    api_key = os.getenv("GROQ_API_KEY")
-    if not api_key:
-        raise ValueError("GROQ_API_KEY not found in environment variables. Please add it to your .env file.")
-    return OpenAI(
-        base_url="https://api.groq.com/openai/v1",
-        api_key=api_key,
-    )
-
-
-def _get_model_candidates():
-    # Use a hardcoded list of 100% valid, reliable free models on Groq.
-    return [
-        "llama-3.3-70b-versatile",
-        "llama3-70b-8192",
-        "llama3-8b-8192",
-        "mixtral-8x7b-32768"
-    ]
-
-
 def _normalize_content(content):
+
     if isinstance(content, list):
         parts = []
         for item in content:
@@ -38,7 +19,8 @@ def _normalize_content(content):
                 parts.append(item.get("text", ""))
             elif isinstance(item, str):
                 parts.append(item)
-        content = "\n".join(parts)
+        content = "
+".join(parts)
 
     text = str(content or "").strip()
     if text.startswith("```json"):
@@ -50,27 +32,24 @@ def _normalize_content(content):
     return text.strip()
 
 
-def _groq_prompt(prompt):
-    client = get_groq_client()
-    last_error = None
-    max_tokens = int(os.getenv("GROQ_MAX_TOKENS", "1000"))
-    max_tokens = max(256, min(max_tokens, 16000))
+return text.strip()
 
-    for model in _get_model_candidates():
-        try:
-            response = client.chat.completions.create(
-                model=model,
-                messages=[
-                    {"role": "user", "content": prompt}
-                ],
-                max_tokens=max_tokens,
-            )
-            return _normalize_content(response.choices[0].message.content)
-        except Exception as exc:
-            last_error = exc
-            print(f"Groq model failed ({model}): {exc}")
 
-    raise RuntimeError(f"All Groq models failed. Last error: {last_error}")
+def _get_gemini_model():
+    api_key = os.getenv("GEMINI_API_KEY")
+    if not api_key:
+        raise ValueError("GEMINI_API_KEY not found in environment variables. Please add it to your .env file.")
+    genai.configure(api_key=api_key)
+    return genai.GenerativeModel("gemini-2.5-flash")
+
+def _llm_prompt(prompt):
+    model = _get_gemini_model()
+    try:
+        response = model.generate_content(prompt)
+        return _normalize_content(response.text)
+    except Exception as exc:
+        print(f"Gemini model failed: {exc}")
+        raise RuntimeError(f"Gemini model failed. Last error: {exc}")
 
 
 def _extract_json_block(text):
@@ -109,7 +88,7 @@ Previous parser error:
 Malformed content:
 {raw_text}
 """
-    return _groq_prompt(prompt)
+    return _llm_prompt(prompt)
 
 
 def _normalize_scene_text(text):
@@ -244,7 +223,7 @@ def generate_script(topic, analytics_data=None):
     Provide only the valid JSON, no markdown formatting blocks.
     """
 
-    return _groq_prompt(prompt)
+    return _llm_prompt(prompt)
 
 
 def generate_script_payload(topic, analytics_data=None, max_repairs=2):
@@ -317,7 +296,7 @@ Great topic examples (for inspiration, don't copy exactly):
 Return only a single plain-text topic line, max 12 words, no quotes, no numbering.
 """
 
-    content = _groq_prompt(prompt)
+    content = _llm_prompt(prompt)
     lines = content.splitlines()
     if not lines:
         raise ValueError("Groq returned empty topic")
