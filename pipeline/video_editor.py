@@ -106,6 +106,12 @@ def _draw_rounded_rect(draw, xy, radius, fill):
     draw.pieslice([x2 - 2 * r, y2 - 2 * r, x2, y2], 0, 90, fill=fill)
 
 
+import re
+
+def _strip_unsupported_chars(text):
+    """Strip emojis to prevent tofu boxes (missing glyphs) in font rendering."""
+    return re.sub(r'[\U00010000-\U0010ffff\u2600-\u27BF]', '', str(text))
+
 def create_text_image(text, size=(1080, 1920), font_size=100, highlight_word_index=-1):
     """Create premium karaoke-style subtitles with highlighted active word.
     
@@ -113,6 +119,7 @@ def create_text_image(text, size=(1080, 1920), font_size=100, highlight_word_ind
     - Semi-transparent dark pill background for readability
     - Bold stroke for contrast against any footage
     """
+    text = _strip_unsupported_chars(text)
     img = Image.new('RGBA', size, (0, 0, 0, 0))
     draw = ImageDraw.Draw(img)
 

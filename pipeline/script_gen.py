@@ -214,6 +214,7 @@ def generate_script(topic, analytics_data=None):
     - Focus on psychology, body language, behavioral insights, confidence, and attraction dynamics
     - Avoid overly suggestive or sexual language — Instagram's content classifier will suppress reach
     - Think "Psychology Today meets street wisdom" not "clickbait"
+    - CRITICAL: DO NOT use any emojis in the text. Our custom font does not support emojis and will display broken square symbols.
     
     VISUAL KEYWORDS:
     - Each scene must have a visual_keyword for stock footage search
