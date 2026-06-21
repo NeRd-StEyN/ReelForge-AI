@@ -11,7 +11,6 @@ def _get_content_language():
     return (os.getenv("CONTENT_LANGUAGE") or "hindi").strip().lower()
 
 def _normalize_content(content):
-
     if isinstance(content, list):
         parts = []
         for item in content:
@@ -19,8 +18,7 @@ def _normalize_content(content):
                 parts.append(item.get("text", ""))
             elif isinstance(item, str):
                 parts.append(item)
-        content = "
-".join(parts)
+        content = "\\n".join(parts)
 
     text = str(content or "").strip()
     if text.startswith("```json"):
@@ -30,11 +28,6 @@ def _normalize_content(content):
     if text.endswith("```"):
         text = text[:-3]
     return text.strip()
-
-
-return text.strip()
-
-
 def _get_gemini_model():
     api_key = os.getenv("GEMINI_API_KEY")
     if not api_key:
