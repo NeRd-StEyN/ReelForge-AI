@@ -23,7 +23,6 @@ jobs:
       INSTA_USERNAME: ${{ secrets.INSTA_USERNAME }}
       INSTA_PASSWORD: ${{ secrets.INSTA_PASSWORD }}
       INSTA_SESSION_ID: ${{ secrets.INSTA_SESSION_ID }}
-      INSTA_SESSION: ${{ secrets.INSTA_SESSION }}
       ENABLE_INSTAGRAM_ANALYTICS: ${{ secrets.ENABLE_INSTAGRAM_ANALYTICS }}
     steps:
       - name: Checkout
