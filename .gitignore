@@ -17,3 +17,6 @@ output_videoTEMP_MPY_wvf_snd.mp4
 *.mov
 
 video_metadata.json
+
+# Instagram Session File
+insta_session.json

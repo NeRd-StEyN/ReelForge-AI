@@ -2,9 +2,10 @@ import os
 from instagrapi import Client
 
 def get_insta_client():
-    """Logs into Instagram and returns the client."""
+    """Logs into Instagram and returns the client using session persistence."""
     username = os.getenv("INSTA_USERNAME")
     password = os.getenv("INSTA_PASSWORD")
+    session_json_str = os.getenv("INSTA_SESSION")
     
     if not username or not password:
         print("Warning: Missing INSTA_USERNAME or INSTA_PASSWORD in .env")
@@ -13,8 +14,20 @@ def get_insta_client():
     cl = Client()
     
     try:
-        print(f"Logging into Instagram as {username}...")
-        # Optional: Set a proxy here if needed when deploying
+        if session_json_str:
+            print(f"Loading saved Instagram session token for {username}...")
+            import json
+            session_data = json.loads(session_json_str)
+            cl.set_settings(session_data)
+            return cl
+            
+        import os.path
+        if os.path.exists("insta_session.json"):
+            print(f"Loading local Instagram session file for {username}...")
+            cl.load_settings("insta_session.json")
+            return cl
+
+        print(f"Logging into Instagram via password for {username} (Warning: might be blocked on cloud servers)...")
         cl.login(username, password)
         return cl
     except Exception as e:
