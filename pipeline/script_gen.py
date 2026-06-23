@@ -34,7 +34,7 @@ def _get_gemini_model():
     if not api_key:
         raise ValueError("GEMINI_API_KEY not found in environment variables. Please add it to your .env file.")
     genai.configure(api_key=api_key)
-    return genai.GenerativeModel("gemini-1.5-flash")
+    return genai.GenerativeModel("gemini-2.5-flash")
 
 def _llm_prompt(prompt):
     model = _get_gemini_model()
