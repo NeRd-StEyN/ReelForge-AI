@@ -634,8 +634,19 @@ def create_video(scenes, voiceovers, visuals, output_file, word_timeline=None, c
                     duration,
                 )
             if not subtitle_layers:
-                text_img = create_text_image_simple(scene['text'], font_size=100)
-                subtitle_layers = [ImageClip(text_img).set_duration(duration)]
+                words = str(scene.get('text', '')).replace("\n", " ").split()
+                if words:
+                    fake_events = []
+                    dur_per_word = duration / len(words)
+                    for idx, w in enumerate(words):
+                        fake_events.append({
+                            "word": w,
+                            "start": scene_starts[i] + idx * dur_per_word,
+                            "end": scene_starts[i] + (idx + 1) * dur_per_word
+                        })
+                    subtitle_layers = _build_karaoke_subtitle_clips(fake_events, scene_starts[i], duration, words_per_chunk=1)
+                else:
+                    subtitle_layers = []
 
             # Hook overlay on first scene (first 2 seconds) — now with fixed Devanagari font
             extra_overlays = []
@@ -685,10 +696,31 @@ def create_video(scenes, voiceovers, visuals, output_file, word_timeline=None, c
         clip = _prepare_visual_clip(visuals[i], duration)
         clip = clip.set_audio(audio)
         
-        text_img = create_text_image_simple(scene['text'], font_size=100)
-        txt_clip = ImageClip(text_img).set_duration(duration)
-        
-        video_scene = CompositeVideoClip([clip, txt_clip])
+        words = str(scene.get('text', '')).replace("\n", " ").split()
+        if words:
+            fake_events = []
+            dur_per_word = duration / len(words)
+            for idx, w in enumerate(words):
+                fake_events.append({
+                    "word": w,
+                    "start": idx * dur_per_word,
+                    "end": (idx + 1) * dur_per_word
+                })
+            subtitle_layers = _build_karaoke_subtitle_clips(fake_events, 0.0, duration, words_per_chunk=1)
+        else:
+            subtitle_layers = []
+            
+        extra_overlays = []
+        if i == 0:
+            hook_duration = min(2.0, duration * 0.4)
+            hook_overlay = _create_hook_overlay(topic=scene.get("text", ""), duration=hook_duration)
+            extra_overlays.append(hook_overlay)
+        if i == len(scenes) - 1:
+            cta_dur = min(2.5, duration * 0.5)
+            cta_overlay = _create_follow_cta(duration=cta_dur).set_start(max(0, duration - cta_dur))
+            extra_overlays.append(cta_overlay)
+
+        video_scene = CompositeVideoClip([clip] + subtitle_layers + extra_overlays)
         clips.append(video_scene)
     
     print("Concatenating clips...")
