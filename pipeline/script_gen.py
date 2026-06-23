@@ -1,6 +1,7 @@
 import os
 import json
 import random
+import time
 import google.generativeai as genai
 from dotenv import load_dotenv
 
@@ -37,12 +38,23 @@ def _get_gemini_model():
 
 def _llm_prompt(prompt):
     model = _get_gemini_model()
-    try:
-        response = model.generate_content(prompt)
-        return _normalize_content(response.text)
-    except Exception as exc:
-        print(f"Gemini model failed: {exc}")
-        raise RuntimeError(f"Gemini model failed. Last error: {exc}")
+    max_retries = 4
+    base_delay = 16  # start by waiting 16 seconds
+    
+    for attempt in range(max_retries):
+        try:
+            response = model.generate_content(prompt)
+            return _normalize_content(response.text)
+        except Exception as exc:
+            error_str = str(exc)
+            if "429" in error_str or "quota" in error_str.lower():
+                if attempt < max_retries - 1:
+                    wait_time = base_delay * (attempt + 1)
+                    print(f"Gemini rate limit hit. Waiting for {wait_time} seconds before retrying...")
+                    time.sleep(wait_time)
+                    continue
+            print(f"Gemini model failed on attempt {attempt + 1}: {exc}")
+            raise RuntimeError(f"Gemini model failed. Last error: {exc}")
 
 
 def _extract_json_block(text):

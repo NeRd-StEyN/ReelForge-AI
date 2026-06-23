@@ -109,8 +109,9 @@ def _draw_rounded_rect(draw, xy, radius, fill):
 import re
 
 def _strip_unsupported_chars(text):
-    """Strip emojis to prevent tofu boxes (missing glyphs) in font rendering."""
-    return re.sub(r'[\U00010000-\U0010ffff\u2600-\u27BF]', '', str(text))
+    """Strip anything that isn't Devanagari, Basic Latin, or standard punctuation to prevent tofu boxes."""
+    # This aggressive whitelist removes ALL emojis, complex symbols, and unsupported foreign alphabets.
+    return re.sub(r'[^\n\r\u0020-\u007E\u0900-\u097F\u2000-\u20CF]', '', str(text))
 
 def create_text_image(text, size=(1080, 1920), font_size=100, highlight_word_index=-1):
     """Create premium karaoke-style subtitles with highlighted active word.
@@ -270,7 +271,7 @@ def _create_hook_overlay(topic="", duration=2.0, size=(1080, 1920)):
         "रुको... ये जानो!",
         "ये सच है!",
         "ध्यान से सुनो!",
-        "ये fact उड़ा देगा!",
+        "ये सच उड़ा देगा!",
     ]
     hook_text = random.choice(hook_texts)
 
@@ -312,7 +313,7 @@ def _create_follow_cta(duration=2.5, size=(1080, 1920)):
     draw = ImageDraw.Draw(img)
     font = _load_caption_font(60)
 
-    cta_text = "Follow करो — और आएगा!"
+    cta_text = "फॉलो करो — और आएगा!"
     w = draw.textlength(cta_text, font=font)
     x = (size[0] - w) / 2
     y = int(size[1] * 0.12)
@@ -532,7 +533,7 @@ def _scene_durations_from_timeline(scene_word_events, total_duration):
 
 # ── Karaoke Dynamic Subtitle Clips ──────────────────────────────────
 
-def _build_karaoke_subtitle_clips(events, scene_start, scene_duration, words_per_chunk=3):
+def _build_karaoke_subtitle_clips(events, scene_start, scene_duration, words_per_chunk=1):
     """Create karaoke-style rolling subtitle clips with per-word highlighting.
     
     Shows 2-3 words at a time. Each word gets highlighted in sequence while 
@@ -588,7 +589,7 @@ def _build_karaoke_subtitle_clips(events, scene_start, scene_duration, words_per
     return clips
 
 
-def _build_dynamic_subtitle_clips(events, scene_start, scene_duration, words_per_chunk=3):
+def _build_dynamic_subtitle_clips(events, scene_start, scene_duration, words_per_chunk=1):
     """Backward-compatible wrapper — uses karaoke style."""
     return _build_karaoke_subtitle_clips(events, scene_start, scene_duration, words_per_chunk)
 
