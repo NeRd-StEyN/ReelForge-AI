@@ -19,7 +19,6 @@ def get_insta_client():
             cl.login_by_sessionid(sessionid_cookie)
             return cl
             
-        import os.path
         if os.path.exists("insta_session.json"):
             print(f"Loading local Instagram session file for {username}...")
             cl.load_settings("insta_session.json")
