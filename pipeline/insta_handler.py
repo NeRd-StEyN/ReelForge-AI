@@ -6,14 +6,20 @@ def get_insta_client():
     username = os.getenv("INSTA_USERNAME")
     password = os.getenv("INSTA_PASSWORD")
     session_json_str = os.getenv("INSTA_SESSION")
+    sessionid_cookie = os.getenv("INSTA_SESSION_ID")
     
-    if not username or not password:
-        print("Warning: Missing INSTA_USERNAME or INSTA_PASSWORD in .env")
+    if not username:
+        print("Warning: Missing INSTA_USERNAME in .env")
         return None
         
     cl = Client()
     
     try:
+        if sessionid_cookie:
+            print(f"Bypassing login screen using raw sessionid cookie for {username}...")
+            cl.login_by_sessionid(sessionid_cookie)
+            return cl
+            
         if session_json_str:
             print(f"Loading saved Instagram session token for {username}...")
             import json
