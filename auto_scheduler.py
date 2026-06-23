@@ -49,29 +49,45 @@ def _read_schedule_times(reels_per_day):
 
 
 def create_and_post_one_reel():
-    domain = _get_domain()
-    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    print(f"[{now}] Starting automated reel cycle for domain: {domain}")
+    max_retries = 3
+    for attempt in range(1, max_retries + 1):
+        try:
+            domain = _get_domain()
+            now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            print(f"[{now}] Starting automated reel cycle for domain: {domain} (Attempt {attempt}/{max_retries})")
 
-    analytics_data = "Instagram analytics disabled by config."
-    if _env_flag("ENABLE_INSTAGRAM_ANALYTICS", "false"):
-        cl = get_insta_client()
-        analytics_data = get_performance_data(cl)
-    else:
-        print("Skipping Instagram analytics login (ENABLE_INSTAGRAM_ANALYTICS=false).")
+            analytics_data = "Instagram analytics disabled by config."
+            if _env_flag("ENABLE_INSTAGRAM_ANALYTICS", "false"):
+                cl = get_insta_client()
+                analytics_data = get_performance_data(cl)
+            else:
+                print("Skipping Instagram analytics login (ENABLE_INSTAGRAM_ANALYTICS=false).")
 
-    append_analytics_snapshot(domain, analytics_data)
-    feedback_summary = summarize_feedback(limit=30)
+            append_analytics_snapshot(domain, analytics_data)
+            feedback_summary = summarize_feedback(limit=30)
 
-    topic = generate_topic_from_domain(
-        domain=domain,
-        analytics_data=analytics_data,
-        feedback_summary=feedback_summary,
-    )
-    print(f"Selected topic: {topic}")
+            topic = generate_topic_from_domain(
+                domain=domain,
+                analytics_data=analytics_data,
+                feedback_summary=feedback_summary,
+            )
+            print(f"Selected topic: {topic}")
 
-    run_pipeline(topic)
-    print("Automated reel cycle finished.")
+            run_pipeline(topic)
+            print("Automated reel cycle finished successfully.")
+            return  # Success! Exit the loop
+            
+        except Exception as e:
+            print(f"\n[ERROR] Pipeline crashed on attempt {attempt}/{max_retries}: {e}")
+            import traceback
+            traceback.print_exc()
+            
+            if attempt < max_retries:
+                print("Waiting 60 seconds before retrying from scratch...")
+                time.sleep(60)
+            else:
+                print("[FATAL ERROR] Max retries reached. Pipeline failed permanently.")
+                raise e  # Let it crash completely on the final attempt
 
 
 def run_scheduler_loop():
