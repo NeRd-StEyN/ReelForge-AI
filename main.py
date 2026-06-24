@@ -56,9 +56,10 @@ def cleanup_generated_assets():
 
     print(f"Cleanup complete. Removed {removed} old generated files.")
 
-def main(topic, feedback_summary=""):
+def main(topic, feedback_summary="", tts_voice_override=None):
     print(f"Starting pipeline...")
-    tts_voice = _get_tts_voice()
+    tts_voice = tts_voice_override or _get_tts_voice()
+    print(f"[Voice] TTS voice: {tts_voice}")
 
     if _env_flag("AUTO_CLEANUP_ASSETS", "true"):
         cleanup_generated_assets()

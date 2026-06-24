@@ -19,18 +19,28 @@ Reel topic: "{topic}"
 Script preview: {scene_texts}
 
 Rules:
-- First line: 1 provocative hook sentence (under 15 words) that makes people STOP and read. Use an emoji at the start.
+- CRITICAL: The VERY FIRST LINE must be under 90 characters total (including spaces and emoji).
+  Instagram cuts off captions at ~125 chars before "more" — the hook MUST land fully in the first line.
+  Example of a good first line (under 90 chars): "🔥 90% ladke ek cheez nahi karte jo attract karti hai"
+- First line: 1 provocative hook sentence that makes people STOP and read. Use an emoji at the start.
 - Second line: A controversial question that forces people to comment and debate (under 12 words). End with 👇
 - Third line: ONE specific CTA tied to the topic (e.g., "Save this for your next date 📌" or "Tag someone who needs to hear this 💬")
 - Fourth line: "Follow @itsun.known6969 for daily mind-blowing facts 🧠"
-- Keep it under 200 characters total (before hashtags)
 - Write in Hinglish (mix of Hindi and English) — natural Gen-Z Indian Instagram style
 - Do NOT use generic phrases like "Tag a bro", "Double tap", "Share with bestie"
 - Make it feel like a REAL person wrote it, not a bot
 
 Return ONLY the caption text, no quotes, no markdown.
 """
-    return _llm_prompt(prompt).strip()
+    raw = _llm_prompt(prompt).strip()
+
+    # Guard: ensure first line fits before Instagram's 'more' cutoff
+    lines = raw.split("\n")
+    if lines and len(lines[0]) > 120:
+        lines[0] = lines[0][:117] + "..."
+        raw = "\n".join(lines)
+
+    return raw
 
 
 def _generate_ai_hashtags(topic, script_data):

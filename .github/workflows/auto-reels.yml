@@ -31,10 +31,13 @@ jobs:
       - name: Restore feedback history cache
         uses: actions/cache/restore@v4
         with:
-          path: data/insta_analytics_history.jsonl
-          key: analytics-history-${{ github.ref_name }}-${{ github.run_id }}
+          path: |
+            data/insta_analytics_history.jsonl
+            data/pexels_used_ids.json
+            data/used_topics.jsonl
+          key: reelforge-data-${{ github.ref_name }}-${{ github.run_id }}
           restore-keys: |
-            analytics-history-${{ github.ref_name }}-
+            reelforge-data-${{ github.ref_name }}-
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -58,7 +61,11 @@ jobs:
           python auto_scheduler.py --mode batch --count 1
 
       - name: Save feedback history cache
+        if: always()
         uses: actions/cache/save@v4
         with:
-          path: data/insta_analytics_history.jsonl
-          key: analytics-history-${{ github.ref_name }}-${{ github.run_id }}
+          path: |
+            data/insta_analytics_history.jsonl
+            data/pexels_used_ids.json
+            data/used_topics.jsonl
+          key: reelforge-data-${{ github.ref_name }}-${{ github.run_id }}

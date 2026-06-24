@@ -210,39 +210,41 @@ def generate_script(topic, analytics_data=None, feedback_summary=""):
     Your audience is young men (18-30) on Indian Instagram who love bold, intriguing content about psychology, attraction, relationships, and human behavior.
     {instructions}
     {language_rules}
-    
+
     Create a PUNCHY, fast-paced reel script for this topic: "{topic}".
-    
+
     HOOK FRAMEWORK (you MUST use this style):
     {hook_framework['instruction']}
 
-    ──── CRITICAL RULES FOR MAXIMUM VIEWS ────
-    
-    DURATION: This reel MUST be 15-22 seconds when spoken. This is NON-NEGOTIABLE.
-    - Total word count: 45-65 words ONLY
-    - Return exactly 2 scenes
-    - Scene 1 (Hook + Setup): 20-30 words — grab attention + tease the revelation
-    - Scene 2 (Payoff + Twist): 20-35 words — deliver the insight + end with a rewatch trigger
-    
+    ──── 3-ACT STRUCTURE FOR MAXIMUM RETENTION ────
+
+    DURATION: This reel MUST be 25-35 seconds when spoken. NON-NEGOTIABLE.
+    - Total word count: 70-100 words ONLY
+    - Return EXACTLY 3 scenes
+    - Scene 1 (Hook): 20-28 words — impossible-to-skip opening, bold claim or shocking reveal
+    - Scene 2 (Build): 22-32 words — deepen the intrigue, give one specific insight that surprises
+    - Scene 3 (Payoff + Rewatch Trigger): 20-28 words — drop the mindblowing conclusion, end with a line that makes them watch again
+
     RETENTION TACTICS:
-    - First 2 seconds must be IMPOSSIBLE to skip — bold claim, shocking fact, or mid-story entrance
-    - Scene 1 must create an open loop that Scene 2 closes
-    - Scene 2 must end with a detail that makes the viewer want to watch AGAIN (rewatch trigger)
-    - Keep language conversational, raw, street-smart — like a friend sharing secrets, not a textbook
-    - Build tension: Scene 1 is the tease, Scene 2 is the mindblowing reveal
-    
+    - Scene 1 must hook within 2 seconds — start mid-sentence, mid-story, or with a shocking stat
+    - Scene 2 creates an open loop that makes skipping feel like missing out
+    - Scene 3 closes the loop AND adds one extra twist that rewards rewatching
+    - Keep language conversational, raw, street-smart — like a friend sharing secrets
+    - Each scene should feel like a new revelation, not a continuation
+
     PATTERN INTERRUPT:
-    - Scene 1 and Scene 2 must feel VISUALLY and TONALLY different
-    - Scene 1: mysterious, teasing energy
-    - Scene 2: confident, revealing energy
-    
+    - Each scene MUST feel visually and tonally distinct from the others
+    - Scene 1: mysterious/teasing energy
+    - Scene 2: building tension/revealing energy
+    - Scene 3: confident/mindblowing energy
+
     CONTENT BOUNDARIES:
     - Be intriguing and bold but stay Instagram-safe — NO explicit content
     - Focus on psychology, body language, behavioral insights, confidence, and attraction dynamics
     - Avoid overly suggestive or sexual language — Instagram's content classifier will suppress reach
     - Think "Psychology Today meets street wisdom" not "clickbait"
     - CRITICAL: DO NOT use any emojis in the text. Our custom font does not support emojis and will display broken square symbols.
-    
+
     VISUAL KEYWORDS:
     - Each scene must have a visual_keyword for stock footage search
     - Keywords should describe the MOOD and SETTING, not just "hot girl"
@@ -250,21 +252,27 @@ def generate_script(topic, analytics_data=None, feedback_summary=""):
     - Include lighting/mood descriptors: neon, golden hour, moody dark, bright aesthetic, cinematic
     - Each scene MUST have a different visual_mood (one of: mysterious, confident, dramatic, warm, dark, energetic, elegant)
     - Avoid repetitive stock-looking keywords — make each scene feel visually distinct
-    
+
     Format the output as strict JSON:
     {{
         "title": "A catchy viral title (max 8 words)",
         "scenes": [
             {{
                 "id": 1,
-                "text": "The spoken narration for this scene",
+                "text": "Scene 1 narration (Hook)",
                 "visual_keyword": "Descriptive visual search term with mood and lighting",
                 "visual_mood": "mysterious"
             }},
             {{
                 "id": 2,
-                "text": "The spoken narration for this scene",
+                "text": "Scene 2 narration (Build)",
                 "visual_keyword": "Different visual search term with contrasting mood",
+                "visual_mood": "dramatic"
+            }},
+            {{
+                "id": 3,
+                "text": "Scene 3 narration (Payoff)",
+                "visual_keyword": "Third unique visual search term with final mood",
                 "visual_mood": "confident"
             }}
         ]
@@ -309,9 +317,18 @@ _TOPIC_SUBCATEGORIES = [
 ]
 
 
-def generate_topic_from_domain(domain, analytics_data=None, feedback_summary=""):
-    """Generate the next reel topic inside one domain using recent performance feedback."""
-    analytics_text = analytics_data if analytics_data else "No analytics yet"
+def generate_topic_from_domain(domain, analytics_data=None, feedback_summary="", used_topics=None):
+    """Generate the next reel topic, avoiding recently used ones."""
+    # Build deduplication context for the LLM
+    used_topics_set = used_topics or set()
+    avoid_block = ""
+    if used_topics_set:
+        recent_list = ", ".join(f'"{t}"' for t in list(used_topics_set)[-15:])
+        avoid_block = f"""
+CRITICAL: DO NOT suggest any of these recently used topics (they were already posted):
+{recent_list}
+The new topic must be clearly different in angle and hook style from all of the above.
+"""
 
     # Rotate through sub-categories for content variety
     subcategory = random.choice(_TOPIC_SUBCATEGORIES)
@@ -322,9 +339,8 @@ Your target audience is young men (18-30) on Indian Instagram.
 
 Primary domain: "{domain}"
 Today's angle/subcategory to focus on: "{subcategory}"
-Recent post analytics data: {analytics_text}
-Historical feedback summary: {feedback_summary}
-
+Historical feedback summary: {feedback_summary or 'No data yet'}
+{avoid_block}
 Task:
 Propose exactly ONE topic idea for the next Instagram Reel that:
 1. Stays within the primary domain
@@ -333,6 +349,7 @@ Propose exactly ONE topic idea for the next Instagram Reel that:
 4. Has VERY strong hook potential — must create instant curiosity
 5. Focuses on psychology, body language, attraction science, or behavioral insights
 6. Is bold and intriguing WITHOUT being sexually explicit (Instagram-safe)
+7. Is DIFFERENT from the recently used topics listed above
 
 Great topic examples (for inspiration, don't copy exactly):
 - Ek cheez jo ladkiyon ko turant attract karti hai
@@ -350,5 +367,6 @@ Return only a single plain-text topic line, max 12 words, no quotes, no numberin
     content = _llm_prompt(prompt)
     lines = content.splitlines()
     if not lines:
-        raise ValueError("Groq returned empty topic")
+        raise ValueError("LLM returned empty topic")
     return lines[0].strip()
+

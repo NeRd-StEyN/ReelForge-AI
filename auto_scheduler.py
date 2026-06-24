@@ -6,7 +6,13 @@ from datetime import datetime
 from dotenv import load_dotenv
 
 from main import main as run_pipeline
-from pipeline.feedback_loop import append_analytics_snapshot, summarize_feedback
+from pipeline.feedback_loop import (
+    append_analytics_snapshot,
+    summarize_feedback,
+    get_optimal_posting_times,
+    load_used_topics,
+    save_used_topic,
+)
 from pipeline.insta_handler import get_insta_client, get_performance_data
 from pipeline.script_gen import generate_topic_from_domain
 
@@ -48,6 +54,23 @@ def _read_schedule_times(reels_per_day):
     return times[:reels_per_day]
 
 
+# Fix 4: TTS voice A/B rotation
+_TTS_VOICES = [
+    "hi-IN-MadhurNeural",   # Male — deeper, authoritative
+    "hi-IN-SwaraNeural",    # Female — warm, engaging
+]
+_voice_index = 0
+
+def _pick_next_voice():
+    """Rotate TTS voice each reel for variety and A/B testing."""
+    global _voice_index
+    voice = _TTS_VOICES[_voice_index % len(_TTS_VOICES)]
+    _voice_index += 1
+    print(f"[Voice] Using TTS voice: {voice}")
+    return voice
+
+
+
 def create_and_post_one_reel():
     max_retries = 3
     for attempt in range(1, max_retries + 1):
@@ -77,16 +100,29 @@ def create_and_post_one_reel():
             else:
                 print("[Feedback] No history yet — starting fresh.")
 
-            # Generate topic informed by real feedback
+            # Fix 1: Load used topics for deduplication
+            used_topics = load_used_topics(limit=100)
+            print(f"[Dedup] {len(used_topics)} topics in history — will avoid repeats.")
+
+            # Generate topic informed by real feedback + dedup
             topic = generate_topic_from_domain(
                 domain=domain,
                 analytics_data=analytics_data,
                 feedback_summary=feedback_summary,
+                used_topics=used_topics,
             )
             print(f"Selected topic: {topic}")
 
-            # Run full pipeline — pass feedback_summary so script LLM also learns from history
-            run_pipeline(topic, feedback_summary=feedback_summary)
+            # Fix 4: Pick rotating TTS voice
+            voice = _pick_next_voice()
+
+            # Run full pipeline — pass feedback_summary + voice
+            run_pipeline(topic, feedback_summary=feedback_summary, tts_voice_override=voice)
+
+            # Fix 1: Save used topic after successful run
+            save_used_topic(topic)
+            print(f"[Dedup] Topic saved to history: '{topic}'")
+
             print("Automated reel cycle finished successfully.")
             return  # Success!
 
@@ -103,12 +139,21 @@ def create_and_post_one_reel():
                 raise e
 
 
+
 def run_scheduler_loop():
     reels_per_day = int(os.getenv("REELS_PER_DAY", "2"))
-    times_to_run = _read_schedule_times(reels_per_day)
+
+    # Fix 3: Use analytics-optimal times if available, else fall back to .env
+    fallback_times = _read_schedule_times(reels_per_day)
+    times_to_run = get_optimal_posting_times(fallback_times=fallback_times)
+    # Ensure we have exactly reels_per_day slots
+    times_to_run = times_to_run[:reels_per_day]
+    if len(times_to_run) < reels_per_day:
+        times_to_run = fallback_times[:reels_per_day]
 
     print(f"Scheduler configured for {reels_per_day} reels/day")
     print(f"Posting times: {times_to_run}")
+
 
     run_now = _env_flag("RUN_FIRST_REEL_NOW", "false")
     if run_now:

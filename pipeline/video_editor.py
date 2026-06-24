@@ -608,6 +608,71 @@ def _build_dynamic_subtitle_clips(events, scene_start, scene_duration, words_per
 
 # ── Main Video Assembly ──────────────────────────────────────────────
 
+def generate_thumbnail(title, output_path="output_thumbnail.jpg", size=(1080, 1920)):
+    """
+    Generate a bold text-on-gradient thumbnail image for the reel cover.
+    This is shown as the static preview before anyone taps play.
+    """
+    title = _strip_unsupported_chars(str(title or "").strip())
+    img = Image.new("RGB", size, (10, 10, 20))  # Dark base
+    draw = ImageDraw.Draw(img)
+
+    # Gradient background — dark purple to black
+    for y in range(size[1]):
+        ratio = y / size[1]
+        r = int(25 * (1 - ratio))
+        g = int(10 * (1 - ratio))
+        b = int(60 * (1 - ratio) + 10)
+        draw.line([(0, y), (size[0], y)], fill=(r, g, b))
+
+    # Neon accent stripe at top
+    draw.rectangle([0, 0, size[0], 12], fill=(0, 220, 120))
+
+    font_large = _load_caption_font(88)
+    font_small = _load_caption_font(52)
+
+    # Word-wrap title
+    words = title.split()
+    lines = []
+    current = []
+    for word in words:
+        current.append(word)
+        if draw.textlength(" ".join(current), font=font_large) > size[0] - 120:
+            current.pop()
+            if current:
+                lines.append(" ".join(current))
+            current = [word]
+    if current:
+        lines.append(" ".join(current))
+
+    total_h = len(lines) * 110
+    start_y = (size[1] // 2) - (total_h // 2) - 60
+
+    for line in lines:
+        w = draw.textlength(line, font=font_large)
+        x = (size[0] - w) / 2
+        # Shadow
+        draw.text((x + 4, start_y + 4), line, font=font_large, fill=(0, 0, 0))
+        # White text
+        draw.text((x, start_y), line, font=font_large, fill=(255, 255, 255))
+        start_y += 110
+
+    # Neon green subtext
+    sub = "Psychology Secrets"
+    sub_w = draw.textlength(sub, font=font_small)
+    draw.text(((size[0] - sub_w) / 2, start_y + 30), sub, font=font_small, fill=(0, 220, 120))
+
+    # Bottom branding
+    brand = "@itsun.known6969"
+    brand_font = _load_caption_font(44)
+    bw = draw.textlength(brand, font=brand_font)
+    draw.text(((size[0] - bw) / 2, size[1] - 100), brand, font=brand_font, fill=(180, 180, 180))
+
+    img.save(output_path, "JPEG", quality=95)
+    print(f"[Thumbnail] Saved cover thumbnail: {output_path}")
+    return output_path
+
+
 def create_video(scenes, voiceovers, visuals, output_file, word_timeline=None, content_theme="default"):
     """Combines voiceovers and visuals into a final video with karaoke subtitles."""
     clips = []
@@ -697,6 +762,15 @@ def create_video(scenes, voiceovers, visuals, output_file, word_timeline=None, c
             threads=4,
             preset="medium",
         )
+
+        # Generate cover thumbnail from first scene title
+        title = scenes[0].get("text", "")[:60] if scenes else ""
+        thumb_path = output_file.replace(".mp4", "_thumbnail.jpg")
+        try:
+            generate_thumbnail(title, output_path=thumb_path)
+        except Exception as e:
+            print(f"[Thumbnail] Warning: could not generate thumbnail: {e}")
+
         return output_file
     
     # Legacy per-scene voiceover mode

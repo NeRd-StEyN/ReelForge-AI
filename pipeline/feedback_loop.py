@@ -5,15 +5,17 @@ from datetime import datetime
 
 DATA_DIR = "data"
 HISTORY_FILE = os.path.join(DATA_DIR, "insta_analytics_history.jsonl")
+USED_TOPICS_FILE = os.path.join(DATA_DIR, "used_topics.jsonl")
 
 
 def _ensure_data_dir():
     os.makedirs(DATA_DIR, exist_ok=True)
 
 
+# ── Analytics Snapshots ──────────────────────────────────────────────
+
 def append_analytics_snapshot(domain, analytics_data):
     """Persist one analytics snapshot — only saves real list data, never error strings."""
-    # Guard: only save when analytics_data is a real non-empty list of post metrics
     if not isinstance(analytics_data, list) or not analytics_data:
         print("[Feedback] Skipping snapshot save — no real analytics data to persist.")
         return
@@ -100,3 +102,92 @@ def summarize_feedback(limit=30):
     lines.append("Use this data: create a hook similar to the top performers. Avoid the style of the bottom performers.")
 
     return "\n".join(lines)
+
+
+# ── Fix 3: Optimal Posting Times ─────────────────────────────────────
+
+def get_optimal_posting_times(fallback_times=None):
+    """
+    Analyze saved analytics history to find which posting hours get the most views.
+    Returns a list of HH:MM strings for the best times to post.
+    Falls back to provided default times if not enough data.
+    """
+    rows = _read_history(limit=60)
+    fallback = fallback_times or ["11:30", "19:30"]
+
+    if not rows:
+        return fallback
+
+    # Build hour → [view counts] mapping from snapshot timestamps
+    hour_views = {}
+    for row in rows:
+        ts = row.get("timestamp_utc", "")
+        analytics = row.get("analytics")
+        if not ts or not isinstance(analytics, list):
+            continue
+
+        try:
+            hour = int(ts[11:13])  # Extract hour from ISO timestamp
+        except (ValueError, IndexError):
+            continue
+
+        total_views = sum(p.get("views", 0) for p in analytics)
+        if hour not in hour_views:
+            hour_views[hour] = []
+        hour_views[hour].append(total_views)
+
+    if not hour_views:
+        return fallback
+
+    # Compute average views per hour and rank
+    avg_by_hour = {h: sum(v) / len(v) for h, v in hour_views.items()}
+    sorted_hours = sorted(avg_by_hour, key=avg_by_hour.get, reverse=True)
+
+    # Pick top N distinct hours spaced at least 3h apart
+    count = len(fallback)
+    chosen = []
+    for h in sorted_hours:
+        if all(abs(h - c) >= 3 for c in chosen):
+            chosen.append(h)
+        if len(chosen) == count:
+            break
+
+    if len(chosen) < count:
+        # Fill remaining slots with fallback times
+        return fallback
+
+    # Convert to IST-friendly HH:MM strings (round to :00 or :30)
+    chosen.sort()
+    result = [f"{h:02d}:00" for h in chosen]
+    print(f"[Scheduler] Optimal posting times from analytics: {result}")
+    return result
+
+
+# ── Fix 1: Topic Deduplication ────────────────────────────────────────
+
+def load_used_topics(limit=100):
+    """Load the most recent N used topics to avoid repetition."""
+    if not os.path.exists(USED_TOPICS_FILE):
+        return set()
+
+    with open(USED_TOPICS_FILE, "r", encoding="utf-8") as f:
+        lines = [line.strip() for line in f if line.strip()]
+
+    topics = set()
+    for line in lines[-limit:]:
+        try:
+            topics.add(json.loads(line).get("topic", "").lower().strip())
+        except json.JSONDecodeError:
+            continue
+    return topics
+
+
+def save_used_topic(topic):
+    """Append a newly used topic to the deduplication log."""
+    _ensure_data_dir()
+    entry = {
+        "timestamp_utc": datetime.utcnow().isoformat(timespec="seconds") + "Z",
+        "topic": topic.strip(),
+    }
+    with open(USED_TOPICS_FILE, "a", encoding="utf-8") as f:
+        f.write(json.dumps(entry, ensure_ascii=False) + "\n")
