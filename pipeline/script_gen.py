@@ -2,10 +2,18 @@ import os
 import json
 import random
 import time
-import google.generativeai as genai
+import requests
 from dotenv import load_dotenv
 
 load_dotenv()
+
+# ── OpenRouter model config (hardcoded) ──────────────────────────────
+_OPENROUTER_PRIMARY_MODEL = "google/gemini-2.5-flash"
+_OPENROUTER_FALLBACK_MODELS = [
+    "openai/gpt-4o-mini",
+    "meta-llama/llama-3.1-8b-instruct:free",
+]
+_OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1/chat/completions"
 
 
 def _get_content_language():
@@ -29,32 +37,55 @@ def _normalize_content(content):
     if text.endswith("```"):
         text = text[:-3]
     return text.strip()
-def _get_gemini_model():
-    api_key = os.getenv("GEMINI_API_KEY")
+def _call_openrouter(prompt, model):
+    """Call OpenRouter API with a given model. Returns response text."""
+    api_key = os.getenv("OPENROUTER_API_KEY")
     if not api_key:
-        raise ValueError("GEMINI_API_KEY not found in environment variables. Please add it to your .env file.")
-    genai.configure(api_key=api_key)
-    return genai.GenerativeModel("gemini-2.5-flash")
+        raise ValueError("OPENROUTER_API_KEY not found in environment variables.")
+
+    headers = {
+        "Authorization": f"Bearer {api_key}",
+        "Content-Type": "application/json",
+        "HTTP-Referer": "https://reelforge.ai",
+        "X-Title": "ReelForge AI",
+    }
+    payload = {
+        "model": model,
+        "messages": [{"role": "user", "content": prompt}],
+        "max_tokens": 1200,
+    }
+    resp = requests.post(_OPENROUTER_BASE_URL, headers=headers, json=payload, timeout=60)
+    resp.raise_for_status()
+    data = resp.json()
+    return data["choices"][0]["message"]["content"]
+
 
 def _llm_prompt(prompt):
-    model = _get_gemini_model()
-    max_retries = 4
-    base_delay = 16  # start by waiting 16 seconds
-    
-    for attempt in range(max_retries):
-        try:
-            response = model.generate_content(prompt)
-            return _normalize_content(response.text)
-        except Exception as exc:
-            error_str = str(exc)
-            if "429" in error_str or "quota" in error_str.lower():
-                if attempt < max_retries - 1:
-                    wait_time = base_delay * (attempt + 1)
-                    print(f"Gemini rate limit hit. Waiting for {wait_time} seconds before retrying...")
+    """Call LLM via OpenRouter with primary model and automatic fallback."""
+    models_to_try = [_OPENROUTER_PRIMARY_MODEL] + _OPENROUTER_FALLBACK_MODELS
+    last_error = None
+
+    for model in models_to_try:
+        max_retries = 3
+        for attempt in range(max_retries):
+            try:
+                print(f"[OpenRouter] Using model: {model} (attempt {attempt + 1})")
+                raw = _call_openrouter(prompt, model)
+                return _normalize_content(raw)
+            except Exception as exc:
+                error_str = str(exc)
+                last_error = exc
+                if "429" in error_str or "rate" in error_str.lower():
+                    wait_time = 10 * (attempt + 1)
+                    print(f"[OpenRouter] Rate limit on {model}. Waiting {wait_time}s...")
                     time.sleep(wait_time)
                     continue
-            print(f"Gemini model failed on attempt {attempt + 1}: {exc}")
-            raise RuntimeError(f"Gemini model failed. Last error: {exc}")
+                # Non-rate-limit error — skip to next model
+                print(f"[OpenRouter] {model} failed: {exc}. Trying next model...")
+                break
+
+    raise RuntimeError(f"All OpenRouter models failed. Last error: {last_error}")
+
 
 
 def _extract_json_block(text):
