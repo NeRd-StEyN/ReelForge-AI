@@ -16,7 +16,7 @@ jobs:
     timeout-minutes: 90
     env:
       GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-
+      OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
       PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
       MAKE_WEBHOOK_URL: ${{ secrets.MAKE_WEBHOOK_URL }}
       CONTENT_DOMAIN: ${{ secrets.CONTENT_DOMAIN }}
