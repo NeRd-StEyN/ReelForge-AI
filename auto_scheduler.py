@@ -56,16 +56,28 @@ def create_and_post_one_reel():
             now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             print(f"[{now}] Starting automated reel cycle for domain: {domain} (Attempt {attempt}/{max_retries})")
 
-            analytics_data = "Instagram analytics disabled by config."
+            # Fetch live Instagram analytics
+            analytics_data = None
             if _env_flag("ENABLE_INSTAGRAM_ANALYTICS", "false"):
                 cl = get_insta_client()
                 analytics_data = get_performance_data(cl)
             else:
                 print("Skipping Instagram analytics login (ENABLE_INSTAGRAM_ANALYTICS=false).")
 
-            append_analytics_snapshot(domain, analytics_data)
-            feedback_summary = summarize_feedback(limit=30)
+            # Only persist real analytics — never save error strings
+            if isinstance(analytics_data, list) and analytics_data:
+                append_analytics_snapshot(domain, analytics_data)
+            else:
+                print("[Feedback] No live data to save. Will rely on existing history for feedback.")
 
+            # Build enriched feedback summary from all saved history
+            feedback_summary = summarize_feedback(limit=30)
+            if feedback_summary:
+                print(f"[Feedback] History loaded: {feedback_summary.splitlines()[0]}")
+            else:
+                print("[Feedback] No history yet — starting fresh.")
+
+            # Generate topic informed by real feedback
             topic = generate_topic_from_domain(
                 domain=domain,
                 analytics_data=analytics_data,
@@ -73,21 +85,22 @@ def create_and_post_one_reel():
             )
             print(f"Selected topic: {topic}")
 
-            run_pipeline(topic)
+            # Run full pipeline — pass feedback_summary so script LLM also learns from history
+            run_pipeline(topic, feedback_summary=feedback_summary)
             print("Automated reel cycle finished successfully.")
-            return  # Success! Exit the loop
-            
+            return  # Success!
+
         except Exception as e:
             print(f"\n[ERROR] Pipeline crashed on attempt {attempt}/{max_retries}: {e}")
             import traceback
             traceback.print_exc()
-            
+
             if attempt < max_retries:
                 print("Waiting 60 seconds before retrying from scratch...")
                 time.sleep(60)
             else:
                 print("[FATAL ERROR] Max retries reached. Pipeline failed permanently.")
-                raise e  # Let it crash completely on the final attempt
+                raise e
 
 
 def run_scheduler_loop():

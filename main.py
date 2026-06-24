@@ -56,25 +56,29 @@ def cleanup_generated_assets():
 
     print(f"Cleanup complete. Removed {removed} old generated files.")
 
-def main(topic):
+def main(topic, feedback_summary=""):
     print(f"Starting pipeline...")
     tts_voice = _get_tts_voice()
 
     if _env_flag("AUTO_CLEANUP_ASSETS", "true"):
         cleanup_generated_assets()
-    
+
     # 0. Optional: Fetch Instagram analytics for feedback-based scripting.
-    analytics_data = "Instagram analytics disabled by config."
+    analytics_data = None
     if _env_flag("ENABLE_INSTAGRAM_ANALYTICS", "false"):
         cl = get_insta_client()
         analytics_data = get_performance_data(cl)
+        if analytics_data:
+            print(f"[Analytics] Live data fetched: {len(analytics_data)} reels.")
+        else:
+            print("[Analytics] Live fetch failed — script will use saved history if available.")
     else:
         print("Skipping Instagram analytics login (ENABLE_INSTAGRAM_ANALYTICS=false).")
 
     # 1. Generate Script using AI Feedback
     print(f"Brainstorming script using topic: '{topic}' and past performance data...")
-    script_json = generate_script_payload(topic, analytics_data)
-    
+    script_json = generate_script_payload(topic, analytics_data=analytics_data, feedback_summary=feedback_summary)
+
     scenes = script_json['scenes']
     print(f"Done Script generated with {len(scenes)} scenes.")
     

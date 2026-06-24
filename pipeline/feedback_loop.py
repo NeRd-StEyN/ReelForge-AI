@@ -12,9 +12,13 @@ def _ensure_data_dir():
 
 
 def append_analytics_snapshot(domain, analytics_data):
-    """Persist one analytics snapshot so strategy can improve over time."""
-    _ensure_data_dir()
+    """Persist one analytics snapshot — only saves real list data, never error strings."""
+    # Guard: only save when analytics_data is a real non-empty list of post metrics
+    if not isinstance(analytics_data, list) or not analytics_data:
+        print("[Feedback] Skipping snapshot save — no real analytics data to persist.")
+        return
 
+    _ensure_data_dir()
     snapshot = {
         "timestamp_utc": datetime.utcnow().isoformat(timespec="seconds") + "Z",
         "domain": domain,
@@ -23,6 +27,8 @@ def append_analytics_snapshot(domain, analytics_data):
 
     with open(HISTORY_FILE, "a", encoding="utf-8") as f:
         f.write(json.dumps(snapshot, ensure_ascii=True) + "\n")
+
+    print(f"[Feedback] Saved analytics snapshot ({len(analytics_data)} reels) to history.")
 
 
 def _read_history(limit=30):
@@ -45,7 +51,7 @@ def summarize_feedback(limit=30):
     """Build a compact summary of what style/topics are working recently."""
     rows = _read_history(limit=limit)
     if not rows:
-        return "No historical analytics snapshots yet."
+        return ""
 
     posts = []
     for row in rows:
@@ -64,25 +70,33 @@ def summarize_feedback(limit=30):
                 })
 
     if not posts:
-        return "Historical snapshots exist but no reel metrics were available."
+        return ""
 
     posts.sort(key=lambda x: x["score"], reverse=True)
     top = posts[:5]
+    bottom = posts[-3:] if len(posts) > 5 else []
 
     avg_views = int(sum(p["views"] for p in posts) / len(posts))
     avg_likes = int(sum(p["likes"] for p in posts) / len(posts))
 
     lines = [
-        f"Recent sample size: {len(posts)} reels",
-        f"Average views: {avg_views}",
-        f"Average likes: {avg_likes}",
-        "Top performing caption snippets:",
+        f"PERFORMANCE DATA ({len(posts)} reels tracked):",
+        f"Average: {avg_views} views, {avg_likes} likes per reel.",
+        "",
+        "TOP PERFORMING CONTENT (replicate these hooks/angles):",
     ]
-
     for idx, p in enumerate(top, start=1):
-        snippet = p["caption"][:100] if p["caption"] else "(no caption text)"
-        lines.append(
-            f"{idx}. {snippet} | views={p['views']} likes={p['likes']} score={p['score']}"
-        )
+        snippet = p["caption"][:110] if p["caption"] else "(no caption)"
+        lines.append(f"  {idx}. \"{snippet}\" → {p['views']} views, {p['likes']} likes")
+
+    if bottom:
+        lines.append("")
+        lines.append("LOWEST PERFORMING CONTENT (avoid these angles):")
+        for p in bottom:
+            snippet = p["caption"][:80] if p["caption"] else "(no caption)"
+            lines.append(f"  - \"{snippet}\" → {p['views']} views, {p['likes']} likes")
+
+    lines.append("")
+    lines.append("Use this data: create a hook similar to the top performers. Avoid the style of the bottom performers.")
 
     return "\n".join(lines)

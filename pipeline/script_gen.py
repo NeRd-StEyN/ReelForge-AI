@@ -167,7 +167,7 @@ _HOOK_FRAMEWORKS = [
 ]
 
 
-def generate_script(topic, analytics_data=None):
+def generate_script(topic, analytics_data=None, feedback_summary=""):
     """Generates a highly viral, SHORT video script optimized for completion rate."""
     language = _get_content_language()
     language_rules = """
@@ -178,15 +178,28 @@ def generate_script(topic, analytics_data=None):
     - Title can be English or Hinglish, but scene text MUST be Devanagari.
     """ if language in {"hindi", "hi", "hi-in"} else ""
 
+    # Build performance feedback block for the LLM
     instructions = ""
-    if analytics_data and analytics_data != "No previous reels found. Start fresh!" and "Error" not in analytics_data:
+    if feedback_summary and feedback_summary.strip():
         instructions = f"""
-    CRITICAL ANALYTICS FEEDBACK:
-    Here is the performance data for my recent videos: 
-    {analytics_data}
-    
-    Look at which topics or styles got the HIGHEST views and likes. 
-    Use that knowledge to brainstorm a hook and topic that expands on what the audience already loves!
+    ══ REAL PERFORMANCE DATA FROM YOUR ACCOUNT ══
+    {feedback_summary}
+    ══════════════════════════════════════════════
+    Use this data to write a BETTER script:
+    - Model your hook style after the TOP performers above.
+    - Avoid angles or tones used in the LOWEST performers.
+    - The goal is to beat your current average view count.
+    """
+    elif isinstance(analytics_data, list) and analytics_data:
+        # Fallback: raw list (no summarized history yet)
+        raw_str = "; ".join(
+            f"{p.get('topic_snippet', '')[:60]} ({p.get('views', 0)} views, {p.get('likes', 0)} likes)"
+            for p in analytics_data[:5]
+        )
+        instructions = f"""
+    RECENT POST DATA (use to improve hook angle):
+    {raw_str}
+    Write a hook that outperforms these.
     """
 
     # Rotate hook framework randomly for variety
@@ -262,9 +275,11 @@ def generate_script(topic, analytics_data=None):
     return _llm_prompt(prompt)
 
 
-def generate_script_payload(topic, analytics_data=None, max_repairs=2):
+def generate_script_payload(topic, analytics_data=None, feedback_summary="", max_repairs=2):
     """Generate script and return a validated JSON payload with auto-repair retries."""
-    raw = generate_script(topic, analytics_data)
+    if feedback_summary:
+        print(f"[Feedback] Injecting performance history into script prompt.")
+    raw = generate_script(topic, analytics_data=analytics_data, feedback_summary=feedback_summary)
 
     for attempt in range(max_repairs + 1):
         try:
