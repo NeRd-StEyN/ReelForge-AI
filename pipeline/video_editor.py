@@ -533,6 +533,12 @@ def _scene_durations_from_timeline(scene_word_events, total_duration):
 
 # ── Karaoke Dynamic Subtitle Clips ──────────────────────────────────
 
+# Edge TTS WordBoundary events fire slightly before the word is actually
+# heard in the rendered audio. This offset (in seconds) delays subtitle
+# appearance so the caption and voice land at the exact same moment.
+# Tune via env var SUBTITLE_SYNC_OFFSET_MS (default = 80ms).
+_SUBTITLE_SYNC_OFFSET = float(os.getenv("SUBTITLE_SYNC_OFFSET_MS", "80")) / 1000.0
+
 def _build_karaoke_subtitle_clips(events, scene_start, scene_duration, words_per_chunk=1):
     """Create karaoke-style rolling subtitle clips with per-word highlighting.
     
@@ -557,17 +563,23 @@ def _build_karaoke_subtitle_clips(events, scene_start, scene_duration, words_per
         for word_pos, word_event in enumerate(chunk):
             word_start = float(word_event.get('start', 0.0))
             word_end = float(word_event.get('end', word_start + 0.3))
-            
-            local_start = max(0.0, word_start - scene_start)
-            local_end = min(scene_duration, max(local_start + 0.15, word_end - scene_start))
-            
+
+            # Apply sync offset: Edge TTS WordBoundary events arrive slightly
+            # early relative to audible playback. Shift forward so the caption
+            # appears exactly when the word is heard, not before.
+            synced_start = word_start + _SUBTITLE_SYNC_OFFSET
+            synced_end   = word_end   + _SUBTITLE_SYNC_OFFSET
+
+            local_start = max(0.0, synced_start - scene_start)
+            local_end = min(scene_duration, max(local_start + 0.15, synced_end - scene_start))
+
             # If this is the last word in chunk, extend until next chunk starts
             if word_pos == len(chunk) - 1:
                 next_chunk_start = None
                 if index + words_per_chunk < len(events):
-                    next_chunk_start = float(events[index + words_per_chunk].get('start', 0.0))
+                    next_chunk_start = float(events[index + words_per_chunk].get('start', 0.0)) + _SUBTITLE_SYNC_OFFSET
                     local_end = min(scene_duration, max(local_end, next_chunk_start - scene_start))
-            
+
             local_duration = max(0.12, local_end - local_start)
 
             # Render the full chunk text with this word highlighted
