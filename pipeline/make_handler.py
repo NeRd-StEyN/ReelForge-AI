@@ -48,7 +48,7 @@ def upload_video_to_tmpfiles(video_path: str) -> Optional[str]:
         return None
 
 
-def send_to_make_webhook(video_path: str, title: str, text: str) -> bool:
+def send_to_make_webhook(video_path: str, title: str, text: str, thumbnail_path: Optional[str] = None) -> bool:
     """Send reel URL and caption parts to a Make.com webhook as JSON."""
     webhook_url = os.getenv("MAKE_WEBHOOK_URL")
 
@@ -62,6 +62,11 @@ def send_to_make_webhook(video_path: str, title: str, text: str) -> bool:
         if not video_url:
             return False
 
+        cover_url = None
+        if thumbnail_path and os.path.exists(thumbnail_path):
+            print("Preparing public thumbnail URL for Make.com webhook...")
+            cover_url = upload_video_to_tmpfiles(thumbnail_path)
+
         safe_title = _safe_text(title, "AI Video")
         safe_text = _safe_text(text, "")
         caption = f"{safe_title}\n\n{safe_text}".strip()
@@ -74,6 +79,9 @@ def send_to_make_webhook(video_path: str, title: str, text: str) -> bool:
             "text": safe_text,
             "caption": caption,
         }
+        
+        if cover_url:
+            payload["cover_url"] = cover_url
 
         print("Sending JSON payload to Make.com webhook...")
         response = requests.post(webhook_url, json=payload, timeout=60)

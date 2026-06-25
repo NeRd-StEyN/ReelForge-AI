@@ -66,7 +66,7 @@ def main(topic, feedback_summary="", tts_voice_override=None):
 
     # 0. Optional: Fetch Instagram analytics for feedback-based scripting.
     analytics_data = None
-    if _env_flag("ENABLE_INSTAGRAM_ANALYTICS", "false"):
+    if _env_flag("ENABLE_INSTAGRAM_ANALYTICS", "true"):
         cl = get_insta_client()
         analytics_data = get_performance_data(cl)
         if analytics_data:
@@ -168,7 +168,8 @@ def main(topic, feedback_summary="", tts_voice_override=None):
     caption_tags = metadata.get('hashtags') or metadata.get('tags') or []
     caption_text = f"{metadata.get('description', '')}".strip()
     from pipeline.make_handler import send_to_make_webhook
-    send_to_make_webhook(output_file, metadata.get('title', 'AI Video'), caption_text)
+    thumb_path = output_file.replace(".mp4", "_thumbnail.jpg")
+    send_to_make_webhook(output_file, metadata.get('title', 'AI Video'), caption_text, thumbnail_path=thumb_path)
     
     print(f"Pipeline complete! Video saved to: {output_file}")
     print(f"Metadata saved to: video_metadata.json")

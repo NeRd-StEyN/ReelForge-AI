@@ -304,16 +304,16 @@ def generate_script_payload(topic, analytics_data=None, feedback_summary="", max
 
 # ── Topic sub-category rotation for content variety ──────────────────
 _TOPIC_SUBCATEGORIES = [
-    "dark psychology tricks to make someone instantly obsessed with you",
-    "body language secrets that reveal hidden feelings",
-    "harsh truths about attraction and why being 'too nice' destroys it",
-    "alpha body language and psychology hacks that command instant respect",
+    "psychological facts about attraction and human connection",
+    "body language secrets that reveal hidden feelings safely",
+    "how to build unshakeable confidence in social situations",
+    "positive body language habits that command instant respect",
     "surprising psychological facts about human behavior and desire",
-    "dating mistakes that silently kill attraction",
-    "how to literally read someone's mind through their micro-expressions",
-    "things people find attractive but never talk about",
-    "subtle signs someone is secretly manipulating or using you",
-    "psychology of attraction and what makes someone irresistible",
+    "common communication mistakes and how to fix them",
+    "how to read micro-expressions and understand people better",
+    "psychology of charisma and what makes someone naturally magnetic",
+    "subtle signs someone genuinely respects and values you",
+    "the psychology of building strong, healthy relationships",
 ]
 
 
