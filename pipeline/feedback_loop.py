@@ -63,7 +63,7 @@ def summarize_feedback(limit=30):
                 views = item.get("views") or 0
                 likes = item.get("likes") or 0
                 caption = (item.get("topic_snippet") or "").strip()
-                score = views + (likes * 8)
+                score = views + (likes * 3)
                 posts.append({
                     "caption": caption,
                     "views": views,
