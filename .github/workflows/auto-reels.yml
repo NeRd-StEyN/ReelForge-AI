@@ -33,6 +33,7 @@ jobs:
             data/insta_analytics_history.jsonl
             data/pexels_used_ids.json
             data/used_topics.jsonl
+            data/voice_index.txt
           key: reelforge-data-${{ github.ref_name }}-${{ github.run_id }}
           restore-keys: |
             reelforge-data-${{ github.ref_name }}-
@@ -69,4 +70,5 @@ jobs:
             data/insta_analytics_history.jsonl
             data/pexels_used_ids.json
             data/used_topics.jsonl
+            data/voice_index.txt
           key: reelforge-data-${{ github.ref_name }}-${{ github.run_id }}

@@ -462,40 +462,63 @@ def _create_follow_cta(duration=2.5, size=(1080, 1920)):
     return ImageClip(np.array(img)).set_duration(duration)
 
 
-# ── Background Music — Theme-Aware Selection ────────────────────────
-
+# ── Background Music — Theme-Aware Multi-Track Pool ────────────────────────
+# Each theme has a pool of 5 royalty-free tracks. A random one is picked each run.
+# Each track has its own cached filename so all get cached after first download.
 _BG_MUSIC_POOL = {
-    "horror": {
-        "url": None,  # Will be read from env: HORROR_BG_MUSIC_URL
-        "filename": "bg_music_horror.mp3",
-        "volume": 0.35,
-    },
-    "girl": {
-        "url": None,  # Will be read from env: GIRL_BG_MUSIC_URL
-        "filename": "bg_music_girl.mp3",
-        "volume": 0.30,
-    },
-    "default": {
-        "url": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Chill%20Wave.mp3",
-        "filename": "bg_music_default.mp3",
-        "volume": 0.30,
-    },
+    "horror": [
+        # Track 1: from env var (user-configured)
+        {"url_env": "HORROR_BG_MUSIC_URL", "filename": "bg_horror_1.mp3", "volume": 0.35,
+         "fallback_url": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Gathering%20Darkness.mp3"},
+        # Track 2-5: royalty-free horror/dark tracks
+        {"url": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Dark%20Fog.mp3",
+         "filename": "bg_horror_2.mp3", "volume": 0.35},
+        {"url": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Exhilarate.mp3",
+         "filename": "bg_horror_3.mp3", "volume": 0.30},
+        {"url": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Floating%20Cities.mp3",
+         "filename": "bg_horror_4.mp3", "volume": 0.30},
+        {"url": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Night%20Cave.mp3",
+         "filename": "bg_horror_5.mp3", "volume": 0.35},
+    ],
+    "girl": [
+        # Track 1: from env var (user-configured, currently Mesmerize)
+        {"url_env": "GIRL_BG_MUSIC_URL", "filename": "bg_girl_1.mp3", "volume": 0.28,
+         "fallback_url": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Mesmerize.mp3"},
+        # Track 2-5: royalty-free romantic/chill/atmospheric tracks
+        {"url": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Chill%20Wave.mp3",
+         "filename": "bg_girl_2.mp3", "volume": 0.28},
+        {"url": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Heartbreaking.mp3",
+         "filename": "bg_girl_3.mp3", "volume": 0.25},
+        {"url": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Midnight%20Ride.mp3",
+         "filename": "bg_girl_4.mp3", "volume": 0.28},
+        {"url": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Relaxing%20Piano%20Music.mp3",
+         "filename": "bg_girl_5.mp3", "volume": 0.22},
+    ],
+    "default": [
+        {"url": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Chill%20Wave.mp3",
+         "filename": "bg_default_1.mp3", "volume": 0.28},
+        {"url": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Mesmerize.mp3",
+         "filename": "bg_default_2.mp3", "volume": 0.28},
+        {"url": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Floating%20Cities.mp3",
+         "filename": "bg_default_3.mp3", "volume": 0.28},
+    ],
 }
 
 
-def _resolve_music_url(theme):
-    """Get the music URL for a theme, reading from env vars if available."""
-    if theme == "horror":
-        env_url = os.getenv("HORROR_BG_MUSIC_URL", "").strip()
-        if env_url:
-            return env_url
-    elif theme == "girl":
-        env_url = os.getenv("GIRL_BG_MUSIC_URL", "").strip()
-        if env_url:
-            return env_url
+def _resolve_music_track(theme):
+    """Pick a random music track from the theme pool. Returns (url, filename, volume)."""
+    pool = _BG_MUSIC_POOL.get(theme) or _BG_MUSIC_POOL["default"]
+    track = random.choice(pool)
 
-    config = _BG_MUSIC_POOL.get(theme, _BG_MUSIC_POOL["default"])
-    return config.get("url") or _BG_MUSIC_POOL["default"]["url"]
+    # Resolve URL: check env var first, then direct url, then fallback
+    url_env_key = track.get("url_env")
+    if url_env_key:
+        env_url = os.getenv(url_env_key, "").strip()
+        url = env_url if env_url else track.get("fallback_url", _BG_MUSIC_POOL["default"][0]["url"])
+    else:
+        url = track.get("url", _BG_MUSIC_POOL["default"][0]["url"])
+
+    return url, track["filename"], track["volume"]
 
 
 def _detect_content_theme(scenes=None, domain=""):
@@ -543,15 +566,17 @@ def _maybe_download_bg_music(target_path, url):
 
 
 def _mix_background_music(narration_audio, total_duration, content_theme="default"):
-    """Mix a theme-appropriate background beat under the narration."""
-    config = _BG_MUSIC_POOL.get(content_theme, _BG_MUSIC_POOL["default"])
-    bg_filename = config["filename"]
-    bg_volume = config["volume"]
-    bg_url = _resolve_music_url(content_theme)
+    """Mix a randomly selected theme-appropriate background beat under the narration."""
+    if os.getenv("ENABLE_BG_MUSIC", "true").strip().lower() not in {"1", "true", "yes", "on"}:
+        return narration_audio
 
+    bg_url, bg_filename, bg_volume = _resolve_music_track(content_theme)
     bg_path = os.path.join("assets", "audio", bg_filename)
     bg_path = _maybe_download_bg_music(bg_path, bg_url)
+    print(f"[BGMusic] Theme: {content_theme} | Track: {bg_filename} | Volume: {bg_volume}")
+
     if not bg_path:
+        print("[BGMusic] No music available — using narration only.")
         return narration_audio
 
     try:
@@ -562,12 +587,11 @@ def _mix_background_music(narration_audio, total_duration, content_theme="defaul
             from moviepy.editor import concatenate_audioclips
             bg_music = concatenate_audioclips([bg_music] * loops_needed)
         bg_music = bg_music.subclip(0, total_duration)
-        # Theme-appropriate volume level
         bg_music = bg_music.volumex(bg_volume)
         mixed = CompositeAudioClip([narration_audio, bg_music])
         return mixed
     except Exception as e:
-        print(f"Could not mix background music: {e}")
+        print(f"[BGMusic] Could not mix background music: {e}")
         return narration_audio
 
 

@@ -56,19 +56,44 @@ def _read_schedule_times(reels_per_day):
     return times[:reels_per_day]
 
 
-# Fix 4: TTS voice A/B rotation
+# TTS voice pool — mix of male and female Hindi voices for variety
+# Persisted across GitHub Actions runs via data/voice_index.txt
 _TTS_VOICES = [
-    "hi-IN-MadhurNeural",   # Male — deeper, authoritative
+    "hi-IN-MadhurNeural",   # Male — deep, authoritative
     "hi-IN-SwaraNeural",    # Female — warm, engaging
+    "hi-IN-RehaanNeural",   # Male — younger, energetic tone
+    "hi-IN-AnanyaNeural",   # Female — clear, confident
 ]
-_voice_index = 0
+_VOICE_INDEX_FILE = os.path.join("data", "voice_index.txt")
+
+
+def _load_voice_index():
+    """Load the current voice rotation index from disk."""
+    try:
+        if os.path.exists(_VOICE_INDEX_FILE):
+            with open(_VOICE_INDEX_FILE, "r") as f:
+                return int(f.read().strip())
+    except (ValueError, OSError):
+        pass
+    return 0
+
+
+def _save_voice_index(index):
+    """Persist voice index to disk so rotation survives across runs."""
+    try:
+        os.makedirs(os.path.dirname(_VOICE_INDEX_FILE), exist_ok=True)
+        with open(_VOICE_INDEX_FILE, "w") as f:
+            f.write(str(index))
+    except OSError:
+        pass
+
 
 def _pick_next_voice():
-    """Rotate TTS voice each reel for variety and A/B testing."""
-    global _voice_index
-    voice = _TTS_VOICES[_voice_index % len(_TTS_VOICES)]
-    _voice_index += 1
-    print(f"[Voice] Using TTS voice: {voice}")
+    """Rotate TTS voice each reel. Persisted to disk — works across GitHub Actions runs."""
+    idx = _load_voice_index()
+    voice = _TTS_VOICES[idx % len(_TTS_VOICES)]
+    _save_voice_index(idx + 1)
+    print(f"[Voice] Using TTS voice: {voice} (slot {idx % len(_TTS_VOICES) + 1}/{len(_TTS_VOICES)})")
     return voice
 
 
