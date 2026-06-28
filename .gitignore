@@ -5,6 +5,14 @@ dist
 .DS_Store
 *.log
 
+# Python cache — never commit
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.py[cod]
+
 # Generated media assets
 assets/audio/
 assets/video/
@@ -16,7 +24,18 @@ output_videoTEMP_MPY_wvf_snd.mp4
 *.wav
 *.mov
 
+# Runtime data — generated per-run, not source code
+data/insta_analytics_history.jsonl
+data/pexels_used_ids.json
+data/used_topics.jsonl
+data/voice_index.txt
+
+# Generated per-run pipeline outputs
 video_metadata.json
 
 # Instagram Session File
 insta_session.json
+
+# Dev/test scripts — not part of production pipeline
+test_*.py
+upload_to_make.py
