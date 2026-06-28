@@ -6,10 +6,27 @@ from datetime import datetime
 DATA_DIR = "data"
 HISTORY_FILE = os.path.join(DATA_DIR, "insta_analytics_history.jsonl")
 USED_TOPICS_FILE = os.path.join(DATA_DIR, "used_topics.jsonl")
+REEL_OUTCOMES_FILE = os.path.join(DATA_DIR, "reel_outcomes.jsonl")
 
 
 def _ensure_data_dir():
     os.makedirs(DATA_DIR, exist_ok=True)
+
+
+def _read_jsonl(file_path, limit=30):
+    if not os.path.exists(file_path):
+        return []
+
+    with open(file_path, "r", encoding="utf-8") as f:
+        lines = [line.strip() for line in f if line.strip()]
+
+    rows = []
+    for line in lines[-limit:]:
+        try:
+            rows.append(json.loads(line))
+        except json.JSONDecodeError:
+            continue
+    return rows
 
 
 # ── Analytics Snapshots ──────────────────────────────────────────────
@@ -34,26 +51,18 @@ def append_analytics_snapshot(domain, analytics_data):
 
 
 def _read_history(limit=30):
-    if not os.path.exists(HISTORY_FILE):
-        return []
+    return _read_jsonl(HISTORY_FILE, limit=limit)
 
-    with open(HISTORY_FILE, "r", encoding="utf-8") as f:
-        lines = [line.strip() for line in f if line.strip()]
 
-    rows = []
-    for line in lines[-limit:]:
-        try:
-            rows.append(json.loads(line))
-        except json.JSONDecodeError:
-            continue
-    return rows
+def _read_outcomes(limit=30):
+    return _read_jsonl(REEL_OUTCOMES_FILE, limit=limit)
 
 
 def summarize_feedback(limit=30):
     """Build a compact summary of what style/topics are working recently."""
     rows = _read_history(limit=limit)
     if not rows:
-        return ""
+        rows = []
 
     posts = []
     for row in rows:
@@ -78,47 +87,89 @@ def summarize_feedback(limit=30):
                 })
 
     if not posts:
-        return ""
+        posts = []
 
-    posts.sort(key=lambda x: x["score"], reverse=True)
-    top = posts[:5]
-    bottom = posts[-3:] if len(posts) > 5 else []
-
-    avg_views = int(sum(p["views"] for p in posts) / len(posts))
-    avg_likes = int(sum(p["likes"] for p in posts) / len(posts))
-    avg_comments = int(sum(p["comments"] for p in posts) / len(posts))
-    avg_saves = int(sum(p["saves"] for p in posts) / len(posts))
+    avg_views = int(sum(p["views"] for p in posts) / len(posts)) if posts else 0
+    avg_likes = int(sum(p["likes"] for p in posts) / len(posts)) if posts else 0
+    avg_comments = int(sum(p["comments"] for p in posts) / len(posts)) if posts else 0
+    avg_saves = int(sum(p["saves"] for p in posts) / len(posts)) if posts else 0
 
     lines = [
         f"PERFORMANCE DATA ({len(posts)} reels tracked):",
         f"Average: {avg_views} views, {avg_likes} likes, {avg_comments} comments, {avg_saves} saves per reel.",
         f"NOTE: Algorithm ranks by: saves (5x weight) > comments (3x) > likes > views",
-        "",
-        "TOP PERFORMING CONTENT (replicate these hooks/angles — they got saves & comments):",
     ]
-    for idx, p in enumerate(top, start=1):
-        snippet = p["caption"][:110] if p["caption"] else "(no caption)"
-        lines.append(
-            f"  {idx}. \"{snippet}\" → {p['views']} views, {p['likes']} likes, "
-            f"{p['comments']} comments, {p['saves']} saves"
-        )
 
-    if bottom:
-        lines.append("")
-        lines.append("LOWEST PERFORMING CONTENT (avoid these angles — low saves/comments = low reach):")
-        for p in bottom:
-            snippet = p["caption"][:80] if p["caption"] else "(no caption)"
+    if posts:
+        posts.sort(key=lambda x: x["score"], reverse=True)
+        top = posts[:5]
+        bottom = posts[-3:] if len(posts) > 5 else []
+
+        lines.extend([
+            "",
+            "TOP PERFORMING CONTENT (replicate these hooks/angles — they got saves & comments):",
+        ])
+        for idx, p in enumerate(top, start=1):
+            snippet = p["caption"][:110] if p["caption"] else "(no caption)"
             lines.append(
-                f"  - \"{snippet}\" → {p['views']} views, {p['comments']} comments, {p['saves']} saves"
+                f"  {idx}. \"{snippet}\" → {p['views']} views, {p['likes']} likes, "
+                f"{p['comments']} comments, {p['saves']} saves"
             )
 
-    lines.append("")
-    lines.append(
-        "Use this data: write hooks that SAVE-worthy (teach something) and COMMENT-worthy (provoke debate). "
-        "These are the signals that make Instagram distribute your reel to non-followers."
-    )
+        if bottom:
+            lines.append("")
+            lines.append("LOWEST PERFORMING CONTENT (avoid these angles — low saves/comments = low reach):")
+            for p in bottom:
+                snippet = p["caption"][:80] if p["caption"] else "(no caption)"
+                lines.append(
+                    f"  - \"{snippet}\" → {p['views']} views, {p['comments']} comments, {p['saves']} saves"
+                )
+
+    outcomes = _read_outcomes(limit=limit)
+    if outcomes:
+        framework_counts = {}
+        for item in outcomes:
+            framework = (item.get("hook_framework") or "").strip()
+            if framework:
+                framework_counts[framework] = framework_counts.get(framework, 0) + 1
+
+        if framework_counts:
+            ranked = sorted(framework_counts.items(), key=lambda pair: pair[1], reverse=True)[:3]
+            lines.extend([
+                "",
+                "HOOK FRAMES USED RECENTLY (use this to avoid repeating the same opener too often):",
+            ])
+            for framework, count in ranked:
+                lines.append(f"  - {framework}: {count} uses")
+
+    if lines:
+        lines.append("")
+        lines.append(
+            "Use this data to write hooks that are SAVE-worthy (teach something) and COMMENT-worthy (provoke debate). "
+            "These are the signals that make Instagram distribute your reel to non-followers."
+        )
 
     return "\n".join(lines)
+
+
+def append_reel_outcome(topic, script_data, metadata):
+    """Persist the generated reel plan so future prompts can avoid stale patterns."""
+    _ensure_data_dir()
+    if not isinstance(script_data, dict):
+        script_data = {}
+    if not isinstance(metadata, dict):
+        metadata = {}
+
+    entry = {
+        "timestamp_utc": datetime.utcnow().isoformat(timespec="seconds") + "Z",
+        "topic": topic.strip(),
+        "title": script_data.get("title") or metadata.get("title") or topic.strip(),
+        "hook_framework": script_data.get("hook_framework") or metadata.get("hook_framework") or "",
+        "first_comment": metadata.get("first_comment") or "",
+        "hashtags": metadata.get("hashtags") or [],
+    }
+    with open(REEL_OUTCOMES_FILE, "a", encoding="utf-8") as f:
+        f.write(json.dumps(entry, ensure_ascii=False) + "\n")
 
 
 # ── Fix 3: Optimal Posting Times ─────────────────────────────────────

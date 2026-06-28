@@ -8,6 +8,7 @@ from dotenv import load_dotenv
 from main import main as run_pipeline
 from pipeline.feedback_loop import (
     append_analytics_snapshot,
+    append_reel_outcome,
     summarize_feedback,
     get_optimal_posting_times,
     load_used_topics,
@@ -144,7 +145,14 @@ def create_and_post_one_reel():
             voice = _pick_next_voice()
 
             # Run full pipeline — pass feedback_summary + voice
-            run_pipeline(topic, feedback_summary=feedback_summary, tts_voice_override=voice)
+            result = run_pipeline(topic, feedback_summary=feedback_summary, tts_voice_override=voice)
+
+            if isinstance(result, dict):
+                append_reel_outcome(
+                    topic=topic,
+                    script_data=result.get("script") or {},
+                    metadata=result.get("metadata") or {},
+                )
 
             # Fix 1: Save used topic after successful run
             save_used_topic(topic)

@@ -169,10 +169,22 @@ def main(topic, feedback_summary="", tts_voice_override=None):
     caption_text = f"{metadata.get('description', '')}".strip()
     from pipeline.make_handler import send_to_make_webhook
     thumb_path = output_file.replace(".mp4", "_thumbnail.jpg")
-    send_to_make_webhook(output_file, metadata.get('title', 'AI Video'), caption_text, thumbnail_path=thumb_path)
+    send_to_make_webhook(
+        output_file,
+        metadata.get('title', 'AI Video'),
+        caption_text,
+        thumbnail_path=thumb_path,
+        metadata=metadata,
+    )
     
     print(f"Pipeline complete! Video saved to: {output_file}")
     print(f"Metadata saved to: video_metadata.json")
+    return {
+        "topic": topic,
+        "script": script_json,
+        "metadata": metadata,
+        "output_file": output_file,
+    }
 
 if __name__ == "__main__":
     import sys

@@ -167,6 +167,22 @@ _HOOK_FRAMEWORKS = [
 ]
 
 
+def _pick_hook_framework(analytics_data=None, feedback_summary=""):
+    """Choose a hook framework with a small bias toward what has worked recently."""
+    if feedback_summary:
+        if "saves" in feedback_summary.lower() or "comments" in feedback_summary.lower():
+            preferred = ["curiosity_gap", "challenge", "story_open"]
+        else:
+            preferred = ["shock_stat", "controversial_take", "curiosity_gap"]
+
+        for framework_name in preferred:
+            for framework in _HOOK_FRAMEWORKS:
+                if framework["name"] == framework_name:
+                    return framework
+
+    return random.choice(_HOOK_FRAMEWORKS)
+
+
 def generate_script(topic, analytics_data=None, feedback_summary=""):
     """Generates a highly viral, SHORT video script optimized for completion rate."""
     language = _get_content_language()
@@ -203,7 +219,7 @@ def generate_script(topic, analytics_data=None, feedback_summary=""):
     """
 
     # Rotate hook framework randomly for variety
-    hook_framework = random.choice(_HOOK_FRAMEWORKS)
+    hook_framework = _pick_hook_framework(analytics_data=analytics_data, feedback_summary=feedback_summary)
 
     prompt = f"""
     You are an expert Instagram Reels strategist. Your goal: maximum completion rate and engagement.
@@ -271,6 +287,7 @@ def generate_script(topic, analytics_data=None, feedback_summary=""):
     Format the output as strict JSON:
     {{
         "title": "A catchy viral title (max 8 words)",
+        "hook_framework": "curiosity_gap",
         "scenes": [
             {{
                 "id": 1,
@@ -310,7 +327,13 @@ def generate_script_payload(topic, analytics_data=None, feedback_summary="", max
     for attempt in range(max_repairs + 1):
         try:
             payload = _parse_script_payload(raw)
-            return _postprocess_script_payload(payload)
+            payload = _postprocess_script_payload(payload)
+            if "hook_framework" not in payload:
+                payload["hook_framework"] = _pick_hook_framework(
+                    analytics_data=analytics_data,
+                    feedback_summary=feedback_summary,
+                )["name"]
+            return payload
         except Exception as exc:
             if attempt >= max_repairs:
                 raise RuntimeError(

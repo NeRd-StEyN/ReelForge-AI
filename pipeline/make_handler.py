@@ -48,7 +48,13 @@ def upload_video_to_tmpfiles(video_path: str) -> Optional[str]:
         return None
 
 
-def send_to_make_webhook(video_path: str, title: str, text: str, thumbnail_path: Optional[str] = None) -> bool:
+def send_to_make_webhook(
+    video_path: str,
+    title: str,
+    text: str,
+    thumbnail_path: Optional[str] = None,
+    metadata: Optional[dict] = None,
+) -> bool:
     """Send reel URL and caption parts to a Make.com webhook as JSON."""
     webhook_url = os.getenv("MAKE_WEBHOOK_URL")
 
@@ -70,6 +76,9 @@ def send_to_make_webhook(video_path: str, title: str, text: str, thumbnail_path:
         safe_title = _safe_text(title, "AI Video")
         safe_text = _safe_text(text, "")
         caption = f"{safe_title}\n\n{safe_text}".strip()
+        metadata = metadata if isinstance(metadata, dict) else {}
+        hashtags = metadata.get("hashtags") or []
+        first_comment = _safe_text(metadata.get("first_comment"), "")
 
         payload = {
             "url": video_url,
@@ -78,10 +87,21 @@ def send_to_make_webhook(video_path: str, title: str, text: str, thumbnail_path:
             },
             "text": safe_text,
             "caption": caption,
+            "title": safe_title,
         }
         
         if cover_url:
             payload["cover_url"] = cover_url
+
+        if hashtags:
+            payload["hashtags"] = hashtags
+
+        if first_comment:
+            payload["first_comment"] = first_comment
+
+        hook_framework = _safe_text(metadata.get("hook_framework"), "")
+        if hook_framework:
+            payload["hook_framework"] = hook_framework
 
         print("Sending JSON payload to Make.com webhook...")
         response = requests.post(webhook_url, json=payload, timeout=60)

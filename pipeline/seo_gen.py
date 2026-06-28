@@ -6,6 +6,7 @@ from pipeline.script_gen import _llm_prompt
 def _generate_ai_caption(topic, script_data):
     """Use LLM to generate a short, engaging, topic-specific caption with a debate-starter CTA."""
     title = script_data.get("title", topic)
+    hook_framework = script_data.get("hook_framework", "")
     scene_texts = " | ".join(
         s.get("text", "")[:60] for s in script_data.get("scenes", [])
     )
@@ -16,6 +17,7 @@ Write a SHORT, punchy caption for this reel about relationship psychology.
 
 Reel title: "{title}"
 Reel topic: "{topic}"
+Hook framework: "{hook_framework or 'not specified'}"
 Script preview: {scene_texts}
 
 Rules:
@@ -38,6 +40,7 @@ Rules:
 - Write in Hinglish (mix of Hindi and English) — natural Gen-Z Indian Instagram style
 - Do NOT use generic phrases like "Tag a bro", "Double tap", "Share with bestie"
 - Make it feel like a REAL person wrote it, not a bot
+- If the hook framework suggests curiosity or controversy, keep the first line sharper and more specific.
 
 Return ONLY the caption text, no quotes, no markdown.
 """
