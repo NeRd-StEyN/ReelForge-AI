@@ -29,12 +29,14 @@ def _get_domain():
 
 
 def _default_times_for_count(count):
+    # Peak IST posting times for Indian Instagram audience (18-30 yr olds)
+    # 12:00 PM IST = lunch break scroll time | 19:00 = 7 PM IST = prime evening engagement
     presets = {
-        1: ["12:00"],
-        2: ["10:00", "19:00"],
-        3: ["09:00", "14:00", "20:00"],
+        1: ["19:00"],
+        2: ["12:00", "19:00"],
+        3: ["09:30", "13:00", "19:30"],
     }
-    return presets.get(count, ["09:00", "13:00", "17:00", "21:00"][:count])
+    return presets.get(count, ["09:30", "13:00", "17:00", "19:30"][:count])
 
 
 def _read_schedule_times(reels_per_day):

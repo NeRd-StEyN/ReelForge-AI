@@ -260,22 +260,99 @@ def _prepare_visual_clip(visual_path, duration):
 # ── Hook Overlay (Fixed Devanagari rendering) ───────────────────────
 
 def _create_hook_overlay(topic="", duration=2.0, size=(1080, 1920)):
-    """Create an animated hook text overlay for the first few seconds."""
+    """Create a bold title-card hook overlay for the first few seconds.
+    
+    Shows the reel's actual topic/title so viewers instantly know what it's about.
+    This is the most critical fix: the first frame must communicate the VALUE
+    within 1 second, even without audio.
+    """
     img = Image.new('RGBA', size, (0, 0, 0, 0))
     draw = ImageDraw.Draw(img)
-    font = _load_caption_font(70)
 
-    # Topic-aware hook texts in Hindi (uses the same Devanagari font)
-    hook_texts = [
-        "ये सुनना जरूरी है!",
-        "रुको... ये जानो!",
-        "ये सच है!",
-        "ध्यान से सुनो!",
-        "ये सच उड़ा देगा!",
+    # Use the topic/scene text as the hook card — max 5 words so it reads instantly
+    if topic and topic.strip():
+        # Trim to first 5 words for instant readability on the hook card
+        words = _strip_unsupported_chars(topic.strip()).split()
+        hook_text = " ".join(words[:5])
+        if len(words) > 5:
+            hook_text += "..."
+    else:
+        hook_text = "\u092f\u0947 \u091c\u093e\u0928\u094b!"  # "ये जानो!" fallback
+
+    font_size = 80
+    font = _load_caption_font(font_size)
+
+    # Word-wrap hook text to fit within frame
+    words_list = hook_text.split()
+    lines = []
+    current = []
+    for word in words_list:
+        current.append(word)
+        if draw.textlength(" ".join(current), font=font) > size[0] - 160:
+            current.pop()
+            if current:
+                lines.append(" ".join(current))
+            current = [word]
+    if current:
+        lines.append(" ".join(current))
+    if not lines:
+        lines = [hook_text]
+
+    line_h = int(font_size * 1.25)
+    total_h = len(lines) * line_h
+    # Position in upper area — prominent but not blocking subtitles
+    base_y = int(size[1] * 0.08)
+
+    # Calculate pill bounds
+    max_w = max(draw.textlength(l, font=font) for l in lines)
+    pill_pad_x, pill_pad_y = 40, 16
+    pill_x1 = (size[0] - max_w) / 2 - pill_pad_x
+    pill_y1 = base_y - pill_pad_y
+    pill_x2 = (size[0] + max_w) / 2 + pill_pad_x
+    pill_y2 = base_y + total_h + pill_pad_y
+    # Dark semi-transparent pill for readability over any background
+    _draw_rounded_rect(draw, (pill_x1, pill_y1, pill_x2, pill_y2), 22, (0, 0, 0, 185))
+
+    # Neon green accent bar on top of pill
+    draw.rectangle([pill_x1 + 22, pill_y1, pill_x2 - 22, pill_y1 + 5], fill=(0, 240, 120))
+
+    # Draw each line centered
+    stroke_w = 5
+    current_y = base_y
+    for line in lines:
+        w = draw.textlength(line, font=font)
+        x = (size[0] - w) / 2
+        # Black stroke for legibility
+        for ax in range(-stroke_w, stroke_w + 1, 2):
+            for ay in range(-stroke_w, stroke_w + 1, 2):
+                draw.text((x + ax, current_y + ay), line, font=font, fill=(0, 0, 0))
+        # Bright white main text
+        draw.text((x, current_y), line, font=font, fill=(255, 255, 255))
+        current_y += line_h
+
+    hook_clip = ImageClip(np.array(img)).set_duration(duration)
+    # Smooth fade-in over first 0.3s
+    hook_clip = hook_clip.crossfadein(min(0.3, duration * 0.2))
+    return hook_clip
+
+
+# ── CTA Overlay (Fixed Devanagari rendering) ────────────────────────
+
+def _create_follow_cta(duration=2.5, size=(1080, 1920)):
+    """Create a niche-specific 'Follow for more' CTA text overlay for the last seconds."""
+    img = Image.new('RGBA', size, (0, 0, 0, 0))
+    draw = ImageDraw.Draw(img)
+    font = _load_caption_font(58)
+
+    # Niche-specific CTAs — rotated for variety
+    cta_options = [
+        "\u092b\u093c\u0949\u0932\u094b \u0915\u0930\u094b \u2014 \u0906\u0930 \u0938\u0940\u0915\u094d\u0930\u0947\u091f \u0906\u090f\u0902\u0917\u0947!",   # "फ़ॉलो करो — और सीक्रेट आएंगे!"
+        "\u0930\u094b\u091c \u0928\u092f\u0940 psychology \u2014 follow karo!",  # "रोज नयी psychology — follow karo!"
+        "\u0938\u0940\u0916\u094b psychology \u2014 @itsun.known6969!",  # "सीखो psychology — @itsun.known6969!"
     ]
-    hook_text = random.choice(hook_texts)
+    cta_text = random.choice(cta_options)
 
-    w = draw.textlength(hook_text, font=font)
+    w = draw.textlength(cta_text, font=font)
     x = (size[0] - w) / 2
     y = int(size[1] * 0.10)
 
@@ -283,49 +360,14 @@ def _create_hook_overlay(topic="", duration=2.0, size=(1080, 1920)):
     pill_pad_x, pill_pad_y = 30, 12
     _draw_rounded_rect(
         draw,
-        (x - pill_pad_x, y - pill_pad_y, x + w + pill_pad_x, y + 70 + pill_pad_y),
+        (x - pill_pad_x, y - pill_pad_y, x + w + pill_pad_x, y + 65 + pill_pad_y),
         18,
-        (0, 0, 0, 160),
+        (0, 0, 0, 175),
     )
 
-    # Black stroke for readability
-    stroke_w = 5
-    for ax in range(-stroke_w, stroke_w + 1, 2):
-        for ay in range(-stroke_w, stroke_w + 1, 2):
-            draw.text((x + ax, y + ay), hook_text, font=font, fill=(0, 0, 0))
-
-    # Bright red-orange text
-    draw.text((x, y), hook_text, font=font, fill=(255, 80, 60))
-
-    hook_clip = ImageClip(np.array(img)).set_duration(duration)
-
-    # Fade-in animation: opacity 0 → 1 over 0.3s using crossfadein
-    hook_clip = hook_clip.crossfadein(min(0.3, duration * 0.2))
-
-    return hook_clip
-
-
-# ── CTA Overlay (Fixed Devanagari rendering) ────────────────────────
-
-def _create_follow_cta(duration=2.5, size=(1080, 1920)):
-    """Create a 'Follow for more' CTA text overlay for the last seconds."""
-    img = Image.new('RGBA', size, (0, 0, 0, 0))
-    draw = ImageDraw.Draw(img)
-    font = _load_caption_font(60)
-
-    cta_text = "फॉलो करो — और आएगा!"
-    w = draw.textlength(cta_text, font=font)
-    x = (size[0] - w) / 2
-    y = int(size[1] * 0.12)
-
-    # Semi-transparent background pill
-    pill_pad_x, pill_pad_y = 30, 12
-    _draw_rounded_rect(
-        draw,
-        (x - pill_pad_x, y - pill_pad_y, x + w + pill_pad_x, y + 60 + pill_pad_y),
-        18,
-        (0, 0, 0, 160),
-    )
+    # Neon green accent bar on top
+    draw.rectangle([x - pill_pad_x + 18, y - pill_pad_y, x + w + pill_pad_x - 18, y - pill_pad_y + 5],
+                   fill=(0, 240, 120))
 
     # Black stroke
     stroke_w = 5

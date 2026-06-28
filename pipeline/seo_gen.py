@@ -11,8 +11,8 @@ def _generate_ai_caption(topic, script_data):
     )
 
     prompt = f"""
-You are an Instagram caption specialist for viral Reels. 
-Write a SHORT, punchy caption for this reel.
+You are an Instagram caption specialist for viral Reels.
+Write a SHORT, punchy caption for this reel about relationship psychology.
 
 Reel title: "{title}"
 Reel topic: "{topic}"
@@ -23,9 +23,18 @@ Rules:
   Instagram cuts off captions at ~125 chars before "more" — the hook MUST land fully in the first line.
   Example of a good first line (under 90 chars): "🔥 90% ladke ek cheez nahi karte jo attract karti hai"
 - First line: 1 provocative hook sentence that makes people STOP and read. Use an emoji at the start.
-- Second line: A controversial question that forces people to comment and debate (under 12 words). End with 👇
-- Third line: A SAVE-focused CTA — saving is the most powerful signal to Instagram's algorithm. Examples: "Save this before your next conversation 📌", "Screenshot karo, baad mein kaam aayega 📌", "Save this — tumhara future self shukriya karega 📌"
-- Fourth line: "Follow @itsun.known6969 for daily mind-blowing facts 🧠"
+- Second line: A MANDATORY comment-bait question that sparks debate and forces viewers to reply.
+  This is the MOST IMPORTANT line for algorithm reach. Examples:
+    "Kya tumhare saath bhi aisa hua hai? Drop a 🔥 neeche 👇"
+    "Agree ho? Ya nahi? Comment karo 👇"
+    "Kitno ke saath ye ho chuka hai? 👇"
+  The question MUST end with an emoji + 👇 to drive comments.
+- Third line: A SPECIFIC, urgent SAVE-focused CTA. Examples:
+    "Save this — agli baar kaam aayega jab wo ignore kare 📌"
+    "Save this so you never misread her signals again 📌"
+    "Screenshot karo, apne aap ko remind karo 📌"
+  Make the reason for saving feel PERSONAL and SPECIFIC to this topic, not generic.
+- Fourth line (exact, do not change): "Follow @itsun.known6969 for daily relationship psychology secrets 🔑"
 - Write in Hinglish (mix of Hindi and English) — natural Gen-Z Indian Instagram style
 - Do NOT use generic phrases like "Tag a bro", "Double tap", "Share with bestie"
 - Make it feel like a REAL person wrote it, not a bot
@@ -50,19 +59,22 @@ Generate Instagram hashtags for a Reel about: "{topic}"
 The content is in Hindi/Hinglish targeting young Indian men (18-30) interested in psychology, attraction, and relationships.
 
 Rules:
-- Return EXACTLY 30 hashtags
-- Mix: 10 niche hashtags (10k-100k posts), 10 medium (100k-1M posts), 10 broad (1M-10M posts)
-- Include 4-5 Hindi hashtags (e.g., #लड़कियां, #दिलकीबात, #रिश्ते, #आकर्षण)
-- Include topic-specific hashtags (not generic ones)
-- DO NOT use: #Viral, #ExplorePage, #ForYou, #Trending, #FYP — these are useless for small accounts
-- DO NOT use: #Reels — too broad
+- Return EXACTLY 15 hashtags — no more, no less. Research shows 12-15 targeted tags outperform 28-30 for reach on small accounts.
+- Mix: 5 niche hashtags (10k-100k posts), 5 medium (100k-1M posts), 5 broad (1M-10M posts)
+- Include 2-3 Hindi hashtags only (e.g., #लड़कियां, #दिलकीबात, #रिश्ते, #आकर्षण, #मनोविज्ञान)
+- ALL hashtags must be directly relevant to this specific topic — no generic lifestyle tags
+- DO NOT use: #Viral, #ExplorePage, #ForYou, #Trending, #FYP — useless for small accounts
+- DO NOT use: #Reels, #Instagram, #Love — too broad
+- DO NOT use: #MensJournal, #MensHealth — these are magazine brands, completely irrelevant
+- DO NOT use slang or offensive tags like #लड़कीपटाओ — Instagram may suppress reach for these
+- DO NOT use celebrity or brand hashtags unrelated to the content
 - Each hashtag must start with #
 - Format: space-separated on a single line
 
-Good examples of effective hashtags:
-#GirlPsychology #AttractionScience #BodyLanguageTips #DatingIndia #MaleSelfImprovement
-#RelationshipAdvice #HumanBehavior #ConfidenceTips #IndianReels #MentalHealth
-#लड़कियां #आकर्षण #दिलकीबात #रिश्ते
+Good examples of quality hashtags for this niche:
+#GirlPsychology #AttractionPsychology #BodyLanguageTips #DatingAdviceIndia #MaleSelfImprovement
+#RelationshipDecoding #HumanBehavior #ConfidenceTips #IndianDatingAdvice
+#लड़कियां #आकर्षण #मनोविज्ञान
 
 Return ONLY the hashtags, nothing else.
 """
@@ -70,19 +82,27 @@ Return ONLY the hashtags, nothing else.
     # Parse hashtags from the response
     hashtags = [tag.strip() for tag in raw.replace("\n", " ").split() if tag.strip().startswith("#")]
     
+    # Block known irrelevant or spammy hashtags regardless of LLM output
+    _BLOCKED_HASHTAGS = {
+        "#mensjounal", "#mensjournal", "#mensheath", "#menshealth",
+        "#लड़कीपटाओ", "#ladkipatao", "#viral", "#explorepage",
+        "#foryou", "#fyp", "#trending", "#reels", "#instagram",
+        "#love", "#instagood", "#photooftheday", "#fashion",
+    }
+    hashtags = [tag for tag in hashtags if tag.lower() not in _BLOCKED_HASHTAGS]
+
     # Ensure we have a reasonable number
     if len(hashtags) < 5:
-        # Fallback hashtags if LLM fails
+        # Fallback hashtags if LLM fails — 15 quality, niche-specific tags
         hashtags = [
-            "#GirlPsychology", "#AttractionFacts", "#BodyLanguage",
-            "#DatingTips", "#RelationshipAdvice", "#MaleSelfImprovement",
-            "#HumanBehavior", "#ConfidenceBoost", "#IndianReels",
-            "#MindBlown", "#PsychologyFacts", "#AttractHer",
-            "#लड़कियां", "#आकर्षण", "#दिलकीबात",
-            "#SelfImprovement", "#MentalStrength", "#DatingIndia",
+            "#GirlPsychology", "#AttractionPsychology", "#BodyLanguageTips",
+            "#DatingAdviceIndia", "#MaleSelfImprovement", "#RelationshipDecoding",
+            "#HumanBehavior", "#ConfidenceTips", "#IndianDatingAdvice",
+            "#PsychologyFacts", "#MentalStrength",
+            "#लड़कियां", "#आकर्षण", "#मनोविज्ञान", "#दिलकीबात",
         ]
-    
-    return hashtags[:30]  # Cap at 30 hashtags max
+
+    return hashtags[:15]  # Cap at 15 hashtags — quality over quantity
 
 
 def generate_seo_metadata(topic, script_data):
@@ -102,16 +122,16 @@ def generate_seo_metadata(topic, script_data):
     except Exception as e:
         print(f"AI hashtag generation failed, using fallback: {e}")
         hashtags = [
-            "#GirlPsychology", "#AttractionFacts", "#BodyLanguage",
-            "#DatingTips", "#RelationshipAdvice", "#MaleSelfImprovement",
-            "#HumanBehavior", "#ConfidenceBoost", "#IndianReels",
-            "#MindBlown", "#PsychologyFacts", "#AttractHer",
-            "#लड़कियां", "#आकर्षण", "#दिलकीबात",
-            "#SelfImprovement", "#MentalStrength", "#DatingIndia",
+            "#GirlPsychology", "#AttractionPsychology", "#BodyLanguageTips",
+            "#DatingAdviceIndia", "#MaleSelfImprovement", "#RelationshipDecoding",
+            "#HumanBehavior", "#ConfidenceTips", "#IndianDatingAdvice",
+            "#PsychologyFacts", "#MentalStrength",
+            "#लड़कियां", "#आकर्षण", "#मनोविज्ञान", "#दिलकीबात",
         ]
 
-    # Build the full description: caption + line break + hashtags below the fold
-    description = f"{caption_body}\n.\n.\n.\n{' '.join(hashtags)}"
+    # Build the full description: caption + enough line breaks to push hashtags below the fold
+    # Using 5 dots ensures hashtags stay hidden behind the "more" button
+    description = f"{caption_body}\n.\n.\n.\n.\n.\n{' '.join(hashtags)}"
 
     tags = [topic, "Psychology", "Attraction", "Body Language", "Reels", "India"]
     

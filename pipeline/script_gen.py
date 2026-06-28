@@ -248,10 +248,16 @@ def generate_script(topic, analytics_data=None, feedback_summary=""):
     VISUAL KEYWORDS:
     - Each scene must have a visual_keyword for stock footage search
     - Keywords should describe the MOOD and SETTING, not just "hot girl"
+    - CRITICAL FOR SCENE 1: The first scene's visual MUST be high-contrast and instantly readable.
+      Use bright, clear settings like: "woman face close up neon light portrait", "bold text glitch aesthetic", 
+      "person confident city street golden hour", "dramatic studio portrait bright lighting".
+      NEVER use dark, ambiguous indoor scenes (warehouses, dim tents, unlit rooms) for Scene 1.
+      The viewer must immediately understand the visual context within 1 second — even with sound off.
     - Good examples: "confident woman walking city street cinematic", "close up eyes mysterious lighting", "couple coffee shop candid moment"
     - Include lighting/mood descriptors: neon, golden hour, moody dark, bright aesthetic, cinematic
     - Each scene MUST have a different visual_mood (one of: mysterious, confident, dramatic, warm, dark, energetic, elegant)
     - Avoid repetitive stock-looking keywords — make each scene feel visually distinct
+    - Scene 1 visual_mood should be: mysterious OR energetic OR dramatic — never "dark" alone
 
     Format the output as strict JSON:
     {{
