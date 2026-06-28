@@ -62,12 +62,18 @@ def summarize_feedback(limit=30):
             for item in analytics:
                 views = item.get("views") or 0
                 likes = item.get("likes") or 0
+                comments = item.get("comments") or 0
+                saves = item.get("saves") or 0
                 caption = (item.get("topic_snippet") or "").strip()
-                score = views + (likes * 3)
+                # Instagram algorithm weights: saves (5x) > comments (3x) > likes (1x) > views (0.1x)
+                # Optimizing for saves and comments = maximum distribution
+                score = (saves * 5) + (comments * 3) + likes + int(views * 0.1)
                 posts.append({
                     "caption": caption,
                     "views": views,
                     "likes": likes,
+                    "comments": comments,
+                    "saves": saves,
                     "score": score,
                 })
 
@@ -80,26 +86,37 @@ def summarize_feedback(limit=30):
 
     avg_views = int(sum(p["views"] for p in posts) / len(posts))
     avg_likes = int(sum(p["likes"] for p in posts) / len(posts))
+    avg_comments = int(sum(p["comments"] for p in posts) / len(posts))
+    avg_saves = int(sum(p["saves"] for p in posts) / len(posts))
 
     lines = [
         f"PERFORMANCE DATA ({len(posts)} reels tracked):",
-        f"Average: {avg_views} views, {avg_likes} likes per reel.",
+        f"Average: {avg_views} views, {avg_likes} likes, {avg_comments} comments, {avg_saves} saves per reel.",
+        f"NOTE: Algorithm ranks by: saves (5x weight) > comments (3x) > likes > views",
         "",
-        "TOP PERFORMING CONTENT (replicate these hooks/angles):",
+        "TOP PERFORMING CONTENT (replicate these hooks/angles — they got saves & comments):",
     ]
     for idx, p in enumerate(top, start=1):
         snippet = p["caption"][:110] if p["caption"] else "(no caption)"
-        lines.append(f"  {idx}. \"{snippet}\" → {p['views']} views, {p['likes']} likes")
+        lines.append(
+            f"  {idx}. \"{snippet}\" → {p['views']} views, {p['likes']} likes, "
+            f"{p['comments']} comments, {p['saves']} saves"
+        )
 
     if bottom:
         lines.append("")
-        lines.append("LOWEST PERFORMING CONTENT (avoid these angles):")
+        lines.append("LOWEST PERFORMING CONTENT (avoid these angles — low saves/comments = low reach):")
         for p in bottom:
             snippet = p["caption"][:80] if p["caption"] else "(no caption)"
-            lines.append(f"  - \"{snippet}\" → {p['views']} views, {p['likes']} likes")
+            lines.append(
+                f"  - \"{snippet}\" → {p['views']} views, {p['comments']} comments, {p['saves']} saves"
+            )
 
     lines.append("")
-    lines.append("Use this data: create a hook similar to the top performers. Avoid the style of the bottom performers.")
+    lines.append(
+        "Use this data: write hooks that SAVE-worthy (teach something) and COMMENT-worthy (provoke debate). "
+        "These are the signals that make Instagram distribute your reel to non-followers."
+    )
 
     return "\n".join(lines)
 

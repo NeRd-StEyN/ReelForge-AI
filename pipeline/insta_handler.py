@@ -58,6 +58,10 @@ def get_performance_data(cl):
                     "topic_snippet": (post.caption_text or "")[:120].replace("\n", " ").strip(),
                     "views": post.view_count or 0,
                     "likes": post.like_count or 0,
+                    # Saves and comments are the highest-weight algorithm signals
+                    # Instagram weights: saves (5x) > comments (3x) > likes (1x) > views (0.1x)
+                    "comments": post.comment_count or 0,
+                    "saves": getattr(post, "saved_count", None) or 0,
                 })
 
         if not analytics:

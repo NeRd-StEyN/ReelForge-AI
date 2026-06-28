@@ -216,14 +216,23 @@ def generate_script(topic, analytics_data=None, feedback_summary=""):
     HOOK FRAMEWORK (you MUST use this style):
     {hook_framework['instruction']}
 
-    ──── 3-ACT STRUCTURE FOR MAXIMUM RETENTION ────
+    ──── 3-ACT EMOTIONAL ESCALATION ARC ────
 
     DURATION: This reel MUST be 25-35 seconds when spoken. NON-NEGOTIABLE.
     - Total word count: 70-100 words ONLY
     - Return EXACTLY 3 scenes
-    - Scene 1 (Hook): 20-28 words — impossible-to-skip opening, bold claim or shocking reveal
-    - Scene 2 (Build): 22-32 words — deepen the intrigue, give one specific insight that surprises
-    - Scene 3 (Payoff + Rewatch Trigger): 20-28 words — drop the mindblowing conclusion, end with a line that makes them watch again
+    - Scene 1 (Hook — emotional_beat: "curious"): 20-28 words
+        Impossible-to-skip opening. Bold claim or shocking reveal.
+        Emotion goal: make the viewer feel a sudden jolt of curiosity — they NEED to know more.
+    - Scene 2 (Build — emotional_beat: "tense"): 22-32 words
+        Deepen the intrigue. Reveal one specific, surprising insight.
+        Emotion goal: build anxiety or suspense — make skipping feel like missing out on a secret.
+    - Scene 3 (Payoff + Rewatch Trigger — emotional_beat: "shocked"): 20-28 words
+        Drop the mind-blowing conclusion.
+        MANDATORY REWATCH TRIGGER: The LAST LINE of Scene 3 MUST loop back to something said in
+        Scene 1 — a callback, a twist, or a re-framing of Scene 1's opening claim.
+        This creates an involuntary "wait, let me watch again" reaction.
+        Emotion goal: deliver a satisfying shock + leave a dangling thread that rewards rewatching.
 
     RETENTION TACTICS:
     - Scene 1 must hook within 2 seconds — start mid-sentence, mid-story, or with a shocking stat
@@ -265,21 +274,24 @@ def generate_script(topic, analytics_data=None, feedback_summary=""):
         "scenes": [
             {{
                 "id": 1,
-                "text": "Scene 1 narration (Hook)",
+                "text": "Scene 1 narration (Hook — curious energy)",
                 "visual_keyword": "Descriptive visual search term with mood and lighting",
-                "visual_mood": "mysterious"
+                "visual_mood": "mysterious",
+                "emotional_beat": "curious"
             }},
             {{
                 "id": 2,
-                "text": "Scene 2 narration (Build)",
+                "text": "Scene 2 narration (Build — tense energy)",
                 "visual_keyword": "Different visual search term with contrasting mood",
-                "visual_mood": "dramatic"
+                "visual_mood": "dramatic",
+                "emotional_beat": "tense"
             }},
             {{
                 "id": 3,
-                "text": "Scene 3 narration (Payoff)",
+                "text": "Scene 3 narration (Payoff — shocked energy, rewatch callback to Scene 1)",
                 "visual_keyword": "Third unique visual search term with final mood",
-                "visual_mood": "confident"
+                "visual_mood": "confident",
+                "emotional_beat": "shocked"
             }}
         ]
     }}

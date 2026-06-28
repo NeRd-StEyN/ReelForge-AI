@@ -247,14 +247,97 @@ def _prepare_visual_clip(visual_path, duration):
         h_new = clip.size[1]
         clip = clip.crop(x1=0, y1=(h_new - 1920) / 2, x2=1080, y2=(h_new + 1920) / 2)
 
-    # Ken Burns slow zoom (1.0x → 1.12x) for dynamic feel — prevents static boring look.
+    # Ken Burns slow zoom (1.0x -> 1.12x) for dynamic feel -- prevents static boring look.
     zoom_start = 1.0
     zoom_end = 1.12
     clip = clip.resize(lambda t: zoom_start + (zoom_end - zoom_start) * (t / max(0.1, duration)))
     # Re-crop to 1080x1920 after zoom to keep frame size consistent.
     clip = clip.resize((1080, 1920))
 
+    # Apply cinematic colour grade for professional look
+    clip = _apply_cinematic_grade(clip)
+
     return clip
+
+
+def _apply_cinematic_grade(clip):
+    """Apply a warm cinematic colour grade to make stock footage look professionally graded.
+    
+    Effect: boost contrast, warm the shadows (red/orange push), cool the highlights (blue push).
+    This makes every clip look intentionally shot, not just pulled from a stock library.
+    Results in a consistent visual identity across all reels.
+    """
+    def grade_frame(frame):
+        # frame is H x W x 3 uint8 numpy array
+        f = frame.astype(np.float32)
+
+        # 1. Contrast boost: stretch luminance away from midpoint
+        f = (f - 128.0) * 1.15 + 128.0
+
+        # 2. Shadow warmth: lift reds and suppress blues in dark areas
+        #    mask = how "dark" the pixel is (0.0 = bright, 1.0 = pure black)
+        luminance = (f[..., 0] * 0.299 + f[..., 1] * 0.587 + f[..., 2] * 0.114)
+        shadow_mask = np.clip(1.0 - luminance / 128.0, 0.0, 1.0)[..., np.newaxis]
+        f[..., 0] += 12.0 * shadow_mask[..., 0]  # warm red in shadows
+        f[..., 2] -= 10.0 * shadow_mask[..., 0]  # reduce blue in shadows
+
+        # 3. Highlight cool: push slight blue in bright areas for cinematic split-tone
+        highlight_mask = np.clip((luminance - 180.0) / 75.0, 0.0, 1.0)[..., np.newaxis]
+        f[..., 2] += 8.0 * highlight_mask[..., 0]  # cool blue in highlights
+        f[..., 1] -= 4.0 * highlight_mask[..., 0]  # slightly desaturate highlights
+
+        # 4. Slight vignette: darken edges to draw eye to centre
+        h, w = frame.shape[:2]
+        cx, cy = w / 2.0, h / 2.0
+        Y, X = np.ogrid[:h, :w]
+        dist = np.sqrt(((X - cx) / cx) ** 2 + ((Y - cy) / cy) ** 2)
+        vignette = np.clip(1.0 - dist * 0.30, 0.55, 1.0)[..., np.newaxis]
+        f = f * vignette
+
+        return np.clip(f, 0, 255).astype(np.uint8)
+
+    return clip.fl_image(grade_frame)
+
+
+def _create_progress_bar_clip(total_duration, size=(1080, 1920), bar_height=8, color=(0, 240, 120)):
+    """Create an animated neon progress bar that fills left-to-right over total_duration.
+    
+    Psychologically proven to increase watch time: viewers subconsciously want
+    to 'finish' the bar. Placed at the very bottom edge of the frame.
+    """
+    def make_bar_frame(t):
+        img = Image.new('RGBA', size, (0, 0, 0, 0))
+        draw = ImageDraw.Draw(img)
+        progress = min(1.0, t / max(0.1, total_duration))
+        bar_width = int(size[0] * progress)
+        bar_y = size[1] - bar_height - 2
+        if bar_width > 0:
+            # Main bar
+            draw.rectangle([0, bar_y, bar_width, bar_y + bar_height], fill=color + (220,))
+            # Bright leading edge glow
+            glow_x = max(0, bar_width - 6)
+            draw.rectangle([glow_x, bar_y - 1, bar_width, bar_y + bar_height + 1],
+                           fill=(255, 255, 255, 160))
+        return np.array(img)
+
+    bar_clip = (
+        ImageClip(make_bar_frame, ismask=False, duration=total_duration)
+        .set_duration(total_duration)
+    )
+    return bar_clip
+
+
+def _create_flash_frame(duration=0.08, size=(1080, 1920)):
+    """Create a brief white flash clip used as a pattern-interrupt between scenes.
+    
+    A 3-4 frame white flash at scene boundaries prevents scroll-away at cut points
+    (the most common viewer drop-off moment). Keeps attention locked.
+    """
+    img = Image.new('RGBA', size, (255, 255, 255, 200))
+    flash = ImageClip(np.array(img)).set_duration(duration)
+    flash = flash.crossfadein(duration * 0.4).crossfadeout(duration * 0.4)
+    return flash
+
 
 
 # ── Hook Overlay (Fixed Devanagari rendering) ───────────────────────
@@ -783,11 +866,25 @@ def create_video(scenes, voiceovers, visuals, output_file, word_timeline=None, c
                 cta_overlay = _create_follow_cta(duration=cta_dur).set_start(max(0, duration - cta_dur))
                 extra_overlays.append(cta_overlay)
 
+            # Flash transition between scenes (pattern interrupt at cut points)
+            if i > 0:
+                flash = _create_flash_frame(duration=0.08)
+                clips.append(flash)
+
             video_scene = CompositeVideoClip([clip] + subtitle_layers + extra_overlays)
             clips.append(video_scene)
 
         print("Concatenating clips...")
         final_video = concatenate_videoclips(clips, method="compose")
+
+        # Add neon progress bar across full video duration (proven watch-time booster)
+        total_dur = narration.duration
+        try:
+            progress_bar = _create_progress_bar_clip(total_dur)
+            final_video = CompositeVideoClip([final_video, progress_bar])
+            print("[ProgressBar] Neon progress bar added.")
+        except Exception as e:
+            print(f"[ProgressBar] Warning: could not add progress bar: {e}")
 
         # Mix theme-appropriate background music under the narration.
         mixed_audio = _mix_background_music(narration, narration.duration, content_theme)

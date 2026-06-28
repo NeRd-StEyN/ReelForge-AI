@@ -105,6 +105,46 @@ Return ONLY the hashtags, nothing else.
     return hashtags[:15]  # Cap at 15 hashtags — quality over quantity
 
 
+def _generate_first_comment(topic, script_data):
+    """Generate a punchy self-comment to seed engagement immediately after posting.
+    
+    The FIRST comment on a reel creates social proof and invites others to reply.
+    A reel with 0 comments feels dead — a seeded question makes it feel alive.
+    Post this as the account's own first comment right after uploading.
+    """
+    title = script_data.get("title", topic)
+    prompt = f"""
+You are writing the FIRST comment that the account owner will post on their own reel immediately after uploading.
+This comment is the most important comment — it sets the tone and invites others to engage.
+
+Reel title: "{title}"
+Reel topic: "{topic}"
+
+Rules:
+- Write a SHORT, punchy question that makes people WANT to reply (max 15 words)
+- Must be in Hinglish (mix of Hindi + English) — Gen-Z Indian style
+- End with an emoji that signals a reply is expected (e.g., 👇, 🔥, 💬, ❤️)
+- Make it personal/relatable — like the account owner is genuinely curious about viewers' opinions
+- Do NOT just repeat the caption — ask something specific about their personal experience
+- Examples:
+    "Kitno ke saath aisa hua hai? Batao 👇"
+    "Agree? Ya tumhara experience alag tha? 🔥"
+    "Maine yahi feel kiya tha — tumhara kya? 💬"
+
+Return ONLY the comment text, nothing else.
+"""
+    try:
+        return _llm_prompt(prompt).strip()
+    except Exception:
+        # Fallback comment options
+        fallbacks = [
+            "Kya tumhare saath bhi aisa hua hai? Batao 👇",
+            "Agree ho ya nahi? Comment karo 🔥",
+            "Ye experience kitno ka hai? 💬",
+        ]
+        return random.choice(fallbacks)
+
+
 def generate_seo_metadata(topic, script_data):
     """Generates engagement-optimized SEO metadata with AI-written captions and smart hashtags."""
     title = script_data.get('title', f"{topic}")
@@ -129,6 +169,14 @@ def generate_seo_metadata(topic, script_data):
             "#लड़कियां", "#आकर्षण", "#मनोविज्ञान", "#दिलकीबात",
         ]
 
+    # Generate first-comment seed for immediate social proof after posting
+    try:
+        first_comment = _generate_first_comment(topic, script_data)
+        print(f"[SEO] First comment seeded: {first_comment[:60]}...")
+    except Exception as e:
+        print(f"[SEO] First comment generation failed: {e}")
+        first_comment = "Kya tumhare saath bhi aisa hua hai? Batao 👇"
+
     # Build the full description: caption + enough line breaks to push hashtags below the fold
     # Using 5 dots ensures hashtags stay hidden behind the "more" button
     description = f"{caption_body}\n.\n.\n.\n.\n.\n{' '.join(hashtags)}"
@@ -140,6 +188,7 @@ def generate_seo_metadata(topic, script_data):
         "description": description,
         "tags": tags,
         "hashtags": hashtags,
+        "first_comment": first_comment,  # Post this as the account's first comment after upload
     }
 
 def save_metadata(metadata, output_path):
