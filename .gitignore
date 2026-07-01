@@ -6,6 +6,7 @@ dist
 *.log
 
 # Python cache — never commit
+
 __pycache__/
 *.pyc
 *.pyo
@@ -17,6 +18,7 @@ __pycache__/
 assets/audio/
 assets/video/
 assets/images/
+assets/fonts/
 output_video.mp4
 output_videoTEMP_MPY_wvf_snd.mp4
 *.mp4

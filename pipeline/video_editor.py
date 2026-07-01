@@ -31,7 +31,7 @@ def _font_supports_devanagari(font):
         return False
 
 
-def _maybe_download_noto_devanagari_bold(target_path):
+def _maybe_download_poppins_bold(target_path):
     if os.path.exists(target_path):
         return target_path
 
@@ -39,25 +39,29 @@ def _maybe_download_noto_devanagari_bold(target_path):
         return None
 
     os.makedirs(os.path.dirname(target_path), exist_ok=True)
-    url = (
-        "https://github.com/googlefonts/noto-fonts/raw/main/hinted/ttf/"
-        "NotoSansDevanagari/NotoSansDevanagari-Bold.ttf"
-    )
+    url = "https://github.com/google/fonts/raw/main/ofl/poppins/Poppins-Bold.ttf"
     try:
+        print(f"Downloading Poppins font to {target_path}...")
         urllib.request.urlretrieve(url, target_path)
+        print("Poppins font downloaded.")
         return target_path
-    except Exception:
+    except Exception as e:
+        print(f"Failed to download Poppins font: {e}")
         return None
 
 
 def _load_caption_font(font_size):
     """Load a bold Hindi-capable caption font across runners."""
     env_font = (os.getenv("SUBTITLE_FONT_PATH") or "").strip()
+    bundled_poppins = os.path.join("assets", "fonts", "Poppins-Bold.ttf")
+    _maybe_download_poppins_bold(bundled_poppins)
+    
+    # Kept for fallback / backward compatibility
     bundled_noto = os.path.join("assets", "fonts", "NotoSansDevanagari-Bold.ttf")
-    _maybe_download_noto_devanagari_bold(bundled_noto)
 
     font_candidates = [
         env_font,
+        bundled_poppins,
         bundled_noto,
         "C:/Windows/Fonts/KohinoorDevanagari-Bold.ttf",
         "C:/Windows/Fonts/KohinoorDevanagari-Regular.ttf",
@@ -72,6 +76,7 @@ def _load_caption_font(font_size):
         "C:/Windows/Fonts/segoeuib.ttf",
         "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
         "/Library/Fonts/Arial Bold.ttf",
+        "Poppins-Bold.ttf",
         "NotoSansDevanagari-Bold.ttf",
         "Nirmala.ttf",
         "mangal.ttf",
@@ -433,7 +438,7 @@ def _create_follow_cta(duration=2.5, size=(1080, 1920)):
         "\u0930\u094b\u091c \u0928\u092f\u0940 psychology \u2014 follow karo!",  # "रोज नयी psychology — follow karo!"
         "\u0938\u0940\u0916\u094b psychology \u2014 @itsun.known6969!",  # "सीखो psychology — @itsun.known6969!"
     ]
-    cta_text = random.choice(cta_options)
+    cta_text = _strip_unsupported_chars(random.choice(cta_options))
 
     w = draw.textlength(cta_text, font=font)
     x = (size[0] - w) / 2
