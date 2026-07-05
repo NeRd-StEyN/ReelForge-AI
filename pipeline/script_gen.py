@@ -164,16 +164,59 @@ _HOOK_FRAMEWORKS = [
         "name": "controversial_take",
         "instruction": "Lead with a bold, polarizing opinion. Example pattern: 'Acche ladke kabhi attract nahi karte, aur reason ye hai...' — force the viewer to pick a side.",
     },
+    # ── PROVEN VIRAL FRAMEWORK — HIGHEST PERFORMER (2.4K+ views) ──
+    {
+        "name": "kabhii_nahi",
+        "instruction": """
+This is the PROVEN highest-performing hook framework on this account (drove 2.4K views).
+Open with an incomplete 'kabhi nahi...' statement in Devanagari Hindi.
+The sentence MUST be cut off mid-thought so the screen text ends with '...' ellipsis.
+This creates an involuntary open loop — the brain literally cannot scroll away without completing the sentence.
+Pattern structure:
+  Line 1 (on screen): 'लड़कियां कभी सीधे नहीं बतातीं...' (cut off — the '...' is the scroll stopper)
+  Narration: Continue the thought — reveal WHAT they never say directly and WHY.
+Examples of proven-viral openers:
+  - 'ये चीज़ लड़कियां कभी नहीं...'
+  - 'लड़कियां कभी सीधे नहीं बतातीं...'
+  - 'वो signal जो ladkiyan kabhi...'
+MANDATORY: The very first scene text must end with '...' to create the open loop on screen.""",
+    },
+    {
+        "name": "test_format",
+        "instruction": """
+This is the PROVEN second-highest hook framework — 'Test' framing (drove the 2.4K views reel).
+Frame the entire reel as a test or quiz the viewer can take.
+Pattern: 'Friendzone Test: Spot It Or Stay Stuck?' or '[Topic] Test: [Outcome if you fail]'
+This forces the viewer to COMPLETE the video to get their 'result'.
+High completion rate = algorithm pushes it further.
+First sentence must name the test and its stakes.
+Example: 'Ye [topic] test fail kiya toh [consequence] rahoge forever!'""",
+    },
 ]
 
 
 def _pick_hook_framework(analytics_data=None, feedback_summary=""):
-    """Choose a hook framework with a small bias toward what has worked recently."""
+    """Choose a hook framework with a strong bias toward proven viral frameworks.
+    
+    Based on account analytics:
+    - kabhii_nahi: 2x 1.4K-view reels → highest average performer
+    - test_format: 2.4K view reel → top single performer
+    - curiosity_gap: good secondary framework
+    These three get 60% weight; others fill the remainder.
+    """
+    # Always prioritize the proven frameworks first (60% of the time)
+    proven_viral = ["kabhii_nahi", "test_format", "curiosity_gap"]
+    if random.random() < 0.60:
+        preferred_name = random.choice(proven_viral)
+        for framework in _HOOK_FRAMEWORKS:
+            if framework["name"] == preferred_name:
+                return framework
+
     if feedback_summary:
         if "saves" in feedback_summary.lower() or "comments" in feedback_summary.lower():
-            preferred = ["curiosity_gap", "challenge", "story_open"]
+            preferred = ["kabhii_nahi", "curiosity_gap", "challenge", "story_open"]
         else:
-            preferred = ["shock_stat", "controversial_take", "curiosity_gap"]
+            preferred = ["test_format", "shock_stat", "kabhii_nahi", "controversial_take"]
 
         for framework_name in preferred:
             for framework in _HOOK_FRAMEWORKS:
@@ -256,6 +299,21 @@ def generate_script(topic, analytics_data=None, feedback_summary=""):
     - Scene 3 closes the loop AND adds one extra twist that rewards rewatching
     - Keep language conversational, raw, street-smart — like a friend sharing secrets
     - Each scene should feel like a new revelation, not a continuation
+
+    MANDATORY REWATCH TRIGGER (NON-NEGOTIABLE):
+    The FINAL sentence of Scene 3 MUST contain a callback to EXACTLY one specific word or phrase used in Scene 1.
+    This creates an involuntary 'wait, let me watch again' reaction that Instagram's algorithm
+    registers as a rewatch — which is a top-tier distribution signal.
+    Bad example: 'Toh ab tum jaante ho.' (no callback)
+    Good example: Scene 1 said 'woh kabhi seedha nahi bolti' → Scene 3 ends with 'woh seedha kyun nahi bolti — ab tum samajh gaye.'
+    The callback must feel like a satisfying click, not a forced repetition.
+
+    IN-VIDEO LIKE BAIT (MANDATORY):
+    Scene 3 MUST include one direct viewer-addressed line that prompts a like.
+    This should feel natural, not forced. Examples:
+    - 'Agar ye tumhare saath bhi hua hai, toh tum akele nahi ho.'
+    - 'Ye baat sirf wo log samjhenge jo sach mein iske through gaye hain.'
+    This line drives the emotional like-trigger without literally saying 'like karo'.
 
     PATTERN INTERRUPT:
     - Each scene MUST feel visually and tonally distinct from the others
@@ -344,7 +402,18 @@ def generate_script_payload(topic, analytics_data=None, feedback_summary="", max
 
 
 # ── Topic sub-category rotation for content variety ──────────────────
+# ── PROVEN VIRAL TOPIC SERIES (based on actual account performance) ──────────
+# These topics are directly modeled from reels that got 1K+ views on this account.
+# Each is part of a content funnel — each topic leads naturally to a Part 2.
 _TOPIC_SUBCATEGORIES = [
+    # TIER 1 — PROVEN VIRAL (replicate these series)
+    "friendzone psychology — how to spot it, escape it, or use it",           # 2.4K views series
+    "mirror effect psychology — when she copies your behavior it means THIS",  # 1.4K views series
+    "eye contact secrets — what her first glance really reveals",              # 1.4K views series
+    "situationship vs friendzone — how to decode where you really stand",      # Natural Part 2
+    "texting psychology — what her reply speed actually means",
+    "jealousy test — one move to check if she genuinely cares",
+    # TIER 2 — HIGH POTENTIAL (aligned with niche)
     "psychological facts about attraction and human connection",
     "body language secrets that reveal hidden feelings safely",
     "how to build unshakeable confidence in social situations",
@@ -355,6 +424,10 @@ _TOPIC_SUBCATEGORIES = [
     "psychology of charisma and what makes someone naturally magnetic",
     "subtle signs someone genuinely respects and values you",
     "the psychology of building strong, healthy relationships",
+    "signs she's attracted but hiding it — body language tell",
+    "what happens when you go silent — the power of withdrawal",
+    "3 things that instantly kill attraction without you knowing",
+    "the psychology of why being too available destroys attraction",
 ]
 
 

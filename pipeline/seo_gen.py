@@ -11,6 +11,15 @@ def _generate_ai_caption(topic, script_data):
         s.get("text", "")[:60] for s in script_data.get("scenes", [])
     )
 
+    # Extra instruction for test_format framework (our highest performer)
+    test_format_tip = ""
+    if hook_framework in ("test_format", "kabhii_nahi"):
+        test_format_tip = """
+SPECIAL RULE for this hook framework: The first line MUST use either:
+  (a) 'Test' framing: 'Friendzone Test: [short consequence]' style, OR
+  (b) Incomplete sentence with '...' that cuts off: 'लड़कियां कभी नहीं...'
+This is our PROVEN highest-performing opener style on this account."""
+
     prompt = f"""
 You are an Instagram caption specialist for viral Reels.
 Write a SHORT, punchy caption for this reel about relationship psychology.
@@ -19,24 +28,29 @@ Reel title: "{title}"
 Reel topic: "{topic}"
 Hook framework: "{hook_framework or 'not specified'}"
 Script preview: {scene_texts}
+{test_format_tip}
 
 Rules:
 - CRITICAL: The VERY FIRST LINE must be under 90 characters total (including spaces and emoji).
   Instagram cuts off captions at ~125 chars before "more" — the hook MUST land fully in the first line.
   Example of a good first line (under 90 chars): "🔥 90% ladke ek cheez nahi karte jo attract karti hai"
 - First line: 1 provocative hook sentence that makes people STOP and read. Use an emoji at the start.
-- Second line: A MANDATORY comment-bait question that sparks debate and forces viewers to reply.
-  This is the MOST IMPORTANT line for algorithm reach. Examples:
-    "Kya tumhare saath bhi aisa hua hai? Drop a 🔥 neeche 👇"
-    "Agree ho? Ya nahi? Comment karo 👇"
-    "Kitno ke saath ye ho chuka hai? 👇"
-  The question MUST end with an emoji + 👇 to drive comments.
+- Second line: A MANDATORY comment-bait question with a NUMBERED reply prompt.
+  This forces the algorithm to prioritize the reel based on comment volume. Examples:
+    "कितनो के साथ ये हो चुका है? Comment 1 अगर हाँ, 2 अगर नहीं 👇"
+    "आपका kya answer hai? 1 = हाँ, 2 = नहीं, 3 = नहीं पता 👇"
+    The question MUST end with a numbered option list + 👇 emoji.
 - Third line: A SPECIFIC, urgent SAVE-focused CTA. Examples:
     "Save this — agli baar kaam aayega jab wo ignore kare 📌"
     "Save this so you never misread her signals again 📌"
     "Screenshot karo, apne aap ko remind karo 📌"
   Make the reason for saving feel PERSONAL and SPECIFIC to this topic, not generic.
-- Fourth line (exact, do not change): "Follow @itsun.known6969 for daily relationship psychology secrets 🔑"
+- Fourth line: A like-bait line that triggers emotional resonance WITHOUT literally saying 'like karo'.
+  Examples:
+    "Like karo agar ye tumhare saath bhi hua hai 💯"
+    "Agar tumne ye feel kiya hai, double tap karo ❤️"
+    "92% log ye miss karte hain — tum nahi karte agar ye dekh raha hai 🔥"
+- Fifth line (exact, do not change): "Follow @itsun.known6969 for daily relationship psychology secrets 🔑"
 - Write in Hinglish (mix of Hindi and English) — natural Gen-Z Indian Instagram style
 - Do NOT use generic phrases like "Tag a bro", "Double tap", "Share with bestie"
 - Make it feel like a REAL person wrote it, not a bot
@@ -114,6 +128,7 @@ def _generate_first_comment(topic, script_data):
     The FIRST comment on a reel creates social proof and invites others to reply.
     A reel with 0 comments feels dead — a seeded question makes it feel alive.
     Post this as the account's own first comment right after uploading.
+    Uses a NUMBERED reply prompt to maximise comment count (each number = 1 comment).
     """
     title = script_data.get("title", topic)
     prompt = f"""
@@ -125,14 +140,14 @@ Reel topic: "{topic}"
 
 Rules:
 - Write a SHORT, punchy question that makes people WANT to reply (max 15 words)
+- MUST use a NUMBERED reply format. Examples:
+    "কিতনো কা হো चুकা है? 1 = हाँ, 2 = नहीं 👇"
+    "Comment karo: 1 agar relatable, 2 agar nahi 🔥"
+    "1 👍 agree / 2 👎 nahi — tumhara? 👇"
 - Must be in Hinglish (mix of Hindi + English) — Gen-Z Indian style
-- End with an emoji that signals a reply is expected (e.g., 👇, 🔥, 💬, ❤️)
+- End with a number-reply prompt + emoji
 - Make it personal/relatable — like the account owner is genuinely curious about viewers' opinions
 - Do NOT just repeat the caption — ask something specific about their personal experience
-- Examples:
-    "Kitno ke saath aisa hua hai? Batao 👇"
-    "Agree? Ya tumhara experience alag tha? 🔥"
-    "Maine yahi feel kiya tha — tumhara kya? 💬"
 
 Return ONLY the comment text, nothing else.
 """
@@ -141,11 +156,86 @@ Return ONLY the comment text, nothing else.
     except Exception:
         # Fallback comment options
         fallbacks = [
-            "Kya tumhare saath bhi aisa hua hai? Batao 👇",
-            "Agree ho ya nahi? Comment karo 🔥",
-            "Ye experience kitno ka hai? 💬",
+            "Kya tumhare saath bhi aisa hua hai? 1 = haan, 2 = nahi 👇",
+            "Relatable hai? Comment 1 agar haan, 2 agar nahi 🔥",
+            "Ye experience kitno ka hai? 1 = mera bhi, 2 = nahi 💬",
         ]
         return random.choice(fallbacks)
+
+
+def _generate_series_title(topic, script_data):
+    """Generate a series-continuation title for Part 2 planning.
+    
+    When a reel goes viral (1K+ views), the next step is always a Part 2.
+    This function generates what 'Part 2' would be called so it can be
+    logged and auto-suggested in future topic generation cycles.
+    """
+    title = script_data.get("title", topic)
+    hook_framework = script_data.get("hook_framework", "")
+    prompt = f"""
+Given this viral reel title: "{title}" (topic: {topic}),
+generate a single short 'Part 2' title that:
+- Continues the story/revelation naturally
+- Uses the same emotional hook style
+- Starts with 'Part 2:' prefix
+- Is max 8 words
+- Stays in the same niche (relationship psychology, attraction, body language)
+
+Example: If Part 1 was 'Friendzone Test: Spot It Or Stay Stuck?'
+Part 2 could be: 'Part 2: Escape The Friendzone Using This'
+
+Return ONLY the Part 2 title, nothing else.
+"""
+    try:
+        result = _llm_prompt(prompt).strip()
+        # Ensure it starts with Part 2:
+        if not result.lower().startswith("part 2"):
+            result = f"Part 2: {result}"
+        return result[:60]  # cap length
+    except Exception:
+        return f"Part 2: {title[:40]}"
+
+
+def _generate_story_poll(topic, script_data):
+    """Generate a story poll question to drive traffic from Stories back to the reel.
+    
+    After posting a reel, posting a Story with a poll that links back to the reel
+    is one of the most effective ways to amplify reach. The poll forces engagement
+    and Instagram shows it to more people.
+    """
+    title = script_data.get("title", topic)
+    try:
+        prompt = f"""
+Create a simple 2-option Instagram Story poll question for this reel: "{title}" (topic: {topic})
+
+Rules:
+- Question: max 20 words, in Hinglish, provocative
+- Option 1: short (max 3 words), the 'yes/agree' answer
+- Option 2: short (max 3 words), the 'no/disagree' answer  
+- Make the poll force a strong opinion — no neutral answers
+
+Return in this exact format:
+QUESTION: [question text]
+OPTION_1: [yes option]
+OPTION_2: [no option]
+"""
+        raw = _llm_prompt(prompt).strip()
+        lines = {}
+        for line in raw.split("\n"):
+            if ":" in line:
+                key, val = line.split(":", 1)
+                lines[key.strip().upper()] = val.strip()
+        return {
+            "question": lines.get("QUESTION", f"Ye {topic} relatable hai?"),
+            "option_1": lines.get("OPTION_1", "Haan 🔥"),
+            "option_2": lines.get("OPTION_2", "Nahi 🤔"),
+        }
+    except Exception:
+        return {
+            "question": f"Ye {topic[:30]} relatable hai tumhare liye?",
+            "option_1": "Haan 🔥",
+            "option_2": "Nahi 🤔",
+        }
 
 
 def generate_seo_metadata(topic, script_data):
@@ -157,7 +247,7 @@ def generate_seo_metadata(topic, script_data):
         caption_body = _generate_ai_caption(topic, script_data)
     except Exception as e:
         print(f"AI caption generation failed, using fallback: {e}")
-        caption_body = f"🔥 {topic}\n\nSach hai ya nahi? Comment karo 👇\nFollow @itsun.known6969 for more 🧠"
+        caption_body = f"🔥 {topic}\n\nSach hai ya nahi? Comment 1 = haan, 2 = nahi 👇\nFollow @itsun.known6969 for more 🧠"
 
     # AI-generated topic-specific hashtags
     try:
@@ -178,7 +268,23 @@ def generate_seo_metadata(topic, script_data):
         print(f"[SEO] First comment seeded: {first_comment[:60]}...")
     except Exception as e:
         print(f"[SEO] First comment generation failed: {e}")
-        first_comment = "Kya tumhare saath bhi aisa hua hai? Batao 👇"
+        first_comment = "Kya tumhare saath bhi aisa hua hai? 1 = haan, 2 = nahi 👇"
+
+    # Generate Part 2 title for series continuation tracking
+    try:
+        series_next_title = _generate_series_title(topic, script_data)
+        print(f"[SEO] Series Part 2 queued: {series_next_title}")
+    except Exception as e:
+        print(f"[SEO] Series title generation failed: {e}")
+        series_next_title = ""
+
+    # Generate Story poll for cross-promotion
+    try:
+        story_poll = _generate_story_poll(topic, script_data)
+        print(f"[SEO] Story poll: {story_poll.get('question', '')}")
+    except Exception as e:
+        print(f"[SEO] Story poll generation failed: {e}")
+        story_poll = {"question": f"Ye {topic[:30]} relatable hai?", "option_1": "Haan 🔥", "option_2": "Nahi 🤔"}
 
     # Build the full description: caption + enough line breaks to push hashtags below the fold
     # Using 5 dots ensures hashtags stay hidden behind the "more" button
@@ -191,7 +297,9 @@ def generate_seo_metadata(topic, script_data):
         "description": description,
         "tags": tags,
         "hashtags": hashtags,
-        "first_comment": first_comment,  # Post this as the account's first comment after upload
+        "first_comment": first_comment,         # Post as account's first comment after upload
+        "series_next_title": series_next_title,  # Suggested Part 2 title for series continuation
+        "story_poll": story_poll,                # Post as Story poll to drive reel traffic
     }
 
 def save_metadata(metadata, output_path):

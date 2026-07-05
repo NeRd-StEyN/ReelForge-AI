@@ -31,13 +31,15 @@ def _get_domain():
 
 def _default_times_for_count(count):
     # Peak IST posting times for Indian Instagram audience (18-30 yr olds)
-    # 12:00 PM IST = lunch break scroll time | 19:00 = 7 PM IST = prime evening engagement
+    # Based on account analytics: the 2.4K view reel and 1.4K view reels all
+    # got their initial algorithmic push during the 7 PM – 9 PM IST window.
+    # 19:00 = prime evening scroll | 21:00 = second peak (post-dinner lazy scroll)
     presets = {
         1: ["19:00"],
-        2: ["12:00", "19:00"],
-        3: ["09:30", "13:00", "19:30"],
+        2: ["19:00", "21:00"],
+        3: ["12:00", "19:00", "21:00"],
     }
-    return presets.get(count, ["09:30", "13:00", "17:00", "19:30"][:count])
+    return presets.get(count, ["12:00", "19:00", "21:00", "21:30"][:count])
 
 
 def _read_schedule_times(reels_per_day):
@@ -132,13 +134,27 @@ def create_and_post_one_reel():
             used_topics = load_used_topics(limit=100)
             print(f"[Dedup] {len(used_topics)} topics in history — will avoid repeats.")
 
+            # Series continuation: if feedback has a queued Part 2, prioritize it
+            series_topic = None
+            if feedback_summary and "SERIES CONTINUATION QUEUE" in feedback_summary:
+                for line in feedback_summary.splitlines():
+                    if line.strip().startswith("- Part 2:"):
+                        series_topic = line.strip().lstrip("- ").strip()
+                        print(f"[Series] Auto-continuing series: {series_topic}")
+                        break
+
             # Generate topic informed by real feedback + dedup
-            topic = generate_topic_from_domain(
-                domain=domain,
-                analytics_data=analytics_data,
-                feedback_summary=feedback_summary,
-                used_topics=used_topics,
-            )
+            # Use series continuation topic if available, otherwise generate fresh
+            if series_topic and series_topic.lower() not in (t.lower() for t in used_topics):
+                topic = series_topic
+                print(f"[Series] Using continuation topic: {topic}")
+            else:
+                topic = generate_topic_from_domain(
+                    domain=domain,
+                    analytics_data=analytics_data,
+                    feedback_summary=feedback_summary,
+                    used_topics=used_topics,
+                )
             print(f"Selected topic: {topic}")
 
             # Fix 4: Pick rotating TTS voice

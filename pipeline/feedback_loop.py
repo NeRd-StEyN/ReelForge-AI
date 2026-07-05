@@ -74,6 +74,8 @@ def summarize_feedback(limit=30):
                 comments = item.get("comments") or 0
                 saves = item.get("saves") or 0
                 caption = (item.get("topic_snippet") or "").strip()
+                # Like rate = likes/views — target >3% for healthy engagement
+                like_rate = round((likes / views * 100), 1) if views > 0 else 0.0
                 # Instagram algorithm weights: saves (5x) > comments (3x) > likes (1x) > views (0.1x)
                 # Optimizing for saves and comments = maximum distribution
                 score = (saves * 5) + (comments * 3) + likes + int(views * 0.1)
@@ -83,6 +85,7 @@ def summarize_feedback(limit=30):
                     "likes": likes,
                     "comments": comments,
                     "saves": saves,
+                    "like_rate": like_rate,
                     "score": score,
                 })
 
@@ -93,11 +96,18 @@ def summarize_feedback(limit=30):
     avg_likes = int(sum(p["likes"] for p in posts) / len(posts)) if posts else 0
     avg_comments = int(sum(p["comments"] for p in posts) / len(posts)) if posts else 0
     avg_saves = int(sum(p["saves"] for p in posts) / len(posts)) if posts else 0
+    avg_like_rate = round(sum(p["like_rate"] for p in posts) / len(posts), 1) if posts else 0.0
+    peak_views = max((p["views"] for p in posts), default=0)
+
+    # Like rate health check
+    like_rate_status = "HEALTHY" if avg_like_rate >= 3.0 else ("IMPROVING" if avg_like_rate >= 1.5 else "LOW")
 
     lines = [
         f"PERFORMANCE DATA ({len(posts)} reels tracked):",
         f"Average: {avg_views} views, {avg_likes} likes, {avg_comments} comments, {avg_saves} saves per reel.",
+        f"Like Rate: {avg_like_rate}% avg [{like_rate_status}] | Peak single reel: {peak_views} views",
         f"NOTE: Algorithm ranks by: saves (5x weight) > comments (3x) > likes > views",
+        f"Like Rate target: >3% (currently {avg_like_rate}%) — in-video like bait overlay active to improve this.",
     ]
 
     if posts:
@@ -128,10 +138,15 @@ def summarize_feedback(limit=30):
     outcomes = _read_outcomes(limit=limit)
     if outcomes:
         framework_counts = {}
+        series_queue = []  # Part 2s waiting to be made
         for item in outcomes:
             framework = (item.get("hook_framework") or "").strip()
             if framework:
                 framework_counts[framework] = framework_counts.get(framework, 0) + 1
+            # Collect series_next_title suggestions that haven't been made yet
+            series_next = (item.get("series_next_title") or "").strip()
+            if series_next and "Part 2" in series_next:
+                series_queue.append(series_next)
 
         if framework_counts:
             ranked = sorted(framework_counts.items(), key=lambda pair: pair[1], reverse=True)[:3]
@@ -141,6 +156,14 @@ def summarize_feedback(limit=30):
             ])
             for framework, count in ranked:
                 lines.append(f"  - {framework}: {count} uses")
+
+        if series_queue:
+            lines.extend([
+                "",
+                "SERIES CONTINUATION QUEUE (these Part 2s are ready to be made — high conversion potential):",
+            ])
+            for sq in series_queue[-3:]:
+                lines.append(f"  - {sq}")
 
     if lines:
         lines.append("")
@@ -167,6 +190,8 @@ def append_reel_outcome(topic, script_data, metadata):
         "hook_framework": script_data.get("hook_framework") or metadata.get("hook_framework") or "",
         "first_comment": metadata.get("first_comment") or "",
         "hashtags": metadata.get("hashtags") or [],
+        "series_next_title": metadata.get("series_next_title") or "",  # Track Part 2 queue
+        "story_poll": metadata.get("story_poll") or {},               # Track Story poll for cross-promo
     }
     with open(REEL_OUTCOMES_FILE, "a", encoding="utf-8") as f:
         f.write(json.dumps(entry, ensure_ascii=False) + "\n")
