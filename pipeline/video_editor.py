@@ -913,7 +913,48 @@ def generate_thumbnail(title, output_path="output_thumbnail.jpg", size=(1080, 19
     return output_path
 
 
-def create_video(scenes, voiceovers, visuals, output_file, word_timeline=None, content_theme="default"):
+def _create_series_banner(title, duration, size=(1080, 1920)):
+    """Create an elegant persistent header banner at the top of the screen for series Reels.
+    Tells the viewer exactly what the next Part is to drive follows.
+    """
+    import re
+    # Check if this is a part reel
+    match = re.search(r'part\s*(\d+)', title.lower())
+    if not match:
+        return None
+        
+    try:
+        current_part = int(match.group(1))
+    except ValueError:
+        return None
+        
+    next_part = current_part + 1
+    banner_text = f"Follow for Part {next_part} 👇"
+    
+    img = Image.new('RGBA', size, (0, 0, 0, 0))
+    draw = ImageDraw.Draw(img)
+    font = _load_caption_font(42) # Elegant, clean small font size for top of screen
+    
+    w = draw.textlength(banner_text, font=font)
+    x = (size[0] - w) / 2
+    y = int(size[1] * 0.03) # Placed right at the top
+    
+    # Semi-transparent dark pill background for readability
+    pad_x, pad_y = 20, 8
+    _draw_rounded_rect(draw, (x - pad_x, y - pad_y, x + w + pad_x, y + 45 + pad_y), 12, (0, 0, 0, 160))
+    
+    # Draw outline
+    stroke_w = 3
+    for ax in range(-stroke_w, stroke_w + 1, 2):
+        for ay in range(-stroke_w, stroke_w + 1, 2):
+            draw.text((x + ax, y + ay), banner_text, font=font, fill=(0, 0, 0))
+    draw.text((x, y), banner_text, font=font, fill=(255, 255, 255))
+    
+    banner_clip = ImageClip(np.array(img)).set_duration(duration)
+    return banner_clip
+
+
+def create_video(scenes, voiceovers, visuals, output_file, word_timeline=None, content_theme="default", title=""):
     """Combines voiceovers and visuals into a final video with karaoke subtitles."""
     clips = []
 
@@ -992,6 +1033,12 @@ def create_video(scenes, voiceovers, visuals, output_file, word_timeline=None, c
                 except Exception as e:
                     print(f"[LikeBait] Could not add like bait overlay: {e}")
 
+            # Dynamic header banner for series reels (e.g. Follow for Part 2)
+            if title:
+                series_banner = _create_series_banner(title, duration)
+                if series_banner:
+                    extra_overlays.append(series_banner)
+
             # Flash transition between scenes (pattern interrupt at cut points)
             if i > 0:
                 flash = _create_flash_frame(duration=0.08)
@@ -1029,10 +1076,10 @@ def create_video(scenes, voiceovers, visuals, output_file, word_timeline=None, c
         )
 
         # Generate cover thumbnail from first scene title
-        title = scenes[0].get("text", "")[:60] if scenes else ""
+        title_for_thumb = scenes[0].get("text", "")[:60] if scenes else ""
         thumb_path = output_file.replace(".mp4", "_thumbnail.jpg")
         try:
-            generate_thumbnail(title, output_path=thumb_path)
+            generate_thumbnail(title_for_thumb, output_path=thumb_path)
         except Exception as e:
             print(f"[Thumbnail] Warning: could not generate thumbnail: {e}")
 
@@ -1070,6 +1117,12 @@ def create_video(scenes, voiceovers, visuals, output_file, word_timeline=None, c
             cta_dur = min(2.5, duration * 0.5)
             cta_overlay = _create_follow_cta(duration=cta_dur).set_start(max(0, duration - cta_dur))
             extra_overlays.append(cta_overlay)
+
+        # Dynamic header banner for series reels (legacy mode)
+        if title:
+            series_banner = _create_series_banner(title, duration)
+            if series_banner:
+                extra_overlays.append(series_banner)
 
         video_scene = CompositeVideoClip([clip] + subtitle_layers + extra_overlays)
         clips.append(video_scene)

@@ -237,6 +237,31 @@ def generate_script(topic, analytics_data=None, feedback_summary=""):
     - Title can be English or Hinglish, but scene text MUST be Devanagari.
     """ if language in {"hindi", "hi", "hi-in"} else ""
 
+    # Check if this is a continuation part and retrieve the previous script to ensure continuity
+    previous_script_context = ""
+    try:
+        from pipeline.feedback_loop import get_previous_part_script
+        prev_script = get_previous_part_script(topic)
+        if prev_script:
+            scenes_text = "\n".join(
+                f"  Scene {s.get('id', idx)}: {s.get('text', '')}"
+                for idx, s in enumerate(prev_script.get("scenes", []), 1)
+            )
+            previous_script_context = f"""
+    ══ PREVIOUS PART SCRIPT (CONTAINS CONTEXT FROM PART 1 / PART 2) ══
+    This reel is a direct continuation of the previous part.
+    Here is the exact script narration from the PREVIOUS part:
+    {scenes_text}
+    ═════════════════════════════════════════════════════════════════
+    CRITICAL INSTRUCTIONS FOR THIS SEQUEL SCRIPT:
+    1. Your new script MUST continue the story, signs, logic, or advice directly from the previous part.
+    2. DO NOT repeat the same tips, signs, or facts. The audience wants to learn the next steps.
+    3. Ensure the transition between the parts feels continuous and logical.
+    """
+            print(f"[Series] Sequenced continuation detected! Injected previous script context (length: {len(scenes_text)}).")
+    except Exception as e:
+        print(f"[Series] Warning check: could not fetch previous script context: {e}")
+
     # Build performance feedback block for the LLM
     instructions = ""
     if feedback_summary and feedback_summary.strip():
@@ -269,6 +294,7 @@ def generate_script(topic, analytics_data=None, feedback_summary=""):
     Your audience is young men (18-30) on Indian Instagram who love bold, intriguing content about psychology, attraction, relationships, and human behavior.
     {instructions}
     {language_rules}
+    {previous_script_context}
 
     Create a PUNCHY, fast-paced reel script for this topic: "{topic}".
 

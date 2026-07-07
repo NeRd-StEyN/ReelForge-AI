@@ -192,9 +192,23 @@ def append_reel_outcome(topic, script_data, metadata):
         "hashtags": metadata.get("hashtags") or [],
         "series_next_title": metadata.get("series_next_title") or "",  # Track Part 2 queue
         "story_poll": metadata.get("story_poll") or {},               # Track Story poll for cross-promo
+        "script_data": script_data,                                   # Track full script to allow direct continuations
     }
     with open(REEL_OUTCOMES_FILE, "a", encoding="utf-8") as f:
         f.write(json.dumps(entry, ensure_ascii=False) + "\n")
+
+
+def get_previous_part_script(current_topic):
+    """Search reel outcomes to find the script of the previous part in this series.
+    Matches the previous part whose series_next_title equals today's topic.
+    """
+    outcomes = _read_outcomes(limit=100)
+    for item in reversed(outcomes):
+        next_title = (item.get("series_next_title") or "").strip().lower()
+        if next_title and next_title == current_topic.strip().lower():
+            # Found the exact previous part! Return its script
+            return item.get("script_data")
+    return None
 
 
 # ── Fix 3: Optimal Posting Times ─────────────────────────────────────

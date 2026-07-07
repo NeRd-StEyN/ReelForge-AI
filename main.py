@@ -147,6 +147,11 @@ def main(topic, feedback_summary="", tts_voice_override=None):
     else:
         voice_input = voiceover_paths
 
+    # 5. Generate SEO Metadata (generate first to get title with part numbers for video overlay)
+    print("Generating SEO metadata...")
+    metadata = generate_seo_metadata(topic, script_json)
+    save_metadata(metadata, "video_metadata.json")
+
     print("Assembling final video...")
     output_file = "output_video.mp4"
     # Pass content theme for theme-aware background music selection
@@ -157,12 +162,8 @@ def main(topic, feedback_summary="", tts_voice_override=None):
         output_file,
         word_timeline=word_timeline,
         content_theme="default",  # Auto-detected from scenes + domain inside create_video
+        title=metadata.get('title', ''),  # Pass title to allow dynamic header banners for series
     )
-    
-    # 5. Generate SEO Metadata
-    print("Generating SEO metadata...")
-    metadata = generate_seo_metadata(topic, script_json)
-    save_metadata(metadata, "video_metadata.json")
     
     # 6. Auto Send to Make.com
     caption_tags = metadata.get('hashtags') or metadata.get('tags') or []
