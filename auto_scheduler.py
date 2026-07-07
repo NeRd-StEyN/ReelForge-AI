@@ -133,12 +133,15 @@ def create_and_post_one_reel():
             used_topics = load_used_topics(limit=100)
             print(f"[Dedup] {len(used_topics)} topics in history — will avoid repeats.")
 
-            # Series continuation: if feedback has a queued Part 2, prioritize it
+            # Series continuation: if feedback has a queued Part X, prioritize it
             series_topic = None
             if feedback_summary and "SERIES CONTINUATION QUEUE" in feedback_summary:
+                import re
                 for line in feedback_summary.splitlines():
-                    if line.strip().startswith("- Part 2:"):
-                        series_topic = line.strip().lstrip("- ").strip()
+                    clean_line = line.strip()
+                    # Matches "- Part [number]:" format
+                    if re.match(r'^-\s*[Pp]art\s*\d+\s*:', clean_line):
+                        series_topic = clean_line.lstrip("- ").strip()
                         print(f"[Series] Auto-continuing series: {series_topic}")
                         break
 

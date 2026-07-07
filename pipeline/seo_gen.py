@@ -164,36 +164,50 @@ Return ONLY the comment text, nothing else.
 
 
 def _generate_series_title(topic, script_data):
-    """Generate a series-continuation title for Part 2 planning.
+    """Generate a series-continuation title (e.g. Part 2, Part 3) for viral planning.
     
-    When a reel goes viral (1K+ views), the next step is always a Part 2.
-    This function generates what 'Part 2' would be called so it can be
-    logged and auto-suggested in future topic generation cycles.
+    Extracts the current Part number if present (defaults to Part 1) and generates
+    the next sequential part title (e.g., Part 3 after Part 2) to continue high-performing topics.
     """
+    import re
     title = script_data.get("title", topic)
-    hook_framework = script_data.get("hook_framework", "")
+    
+    # Detect if we are already in a series and get the current part number
+    current_part = 1
+    match = re.search(r'part\s*(\d+)', (topic + " " + title).lower())
+    if match:
+        try:
+            current_part = int(match.group(1))
+        except ValueError:
+            pass
+            
+    next_part = current_part + 1
+    prefix = f"Part {next_part}"
+    
     prompt = f"""
-Given this viral reel title: "{title}" (topic: {topic}),
-generate a single short 'Part 2' title that:
+Given this viral reel title: "{title}" (topic: {topic}), which is Part {current_part} of a series,
+generate a single short '{prefix}' title that:
 - Continues the story/revelation naturally
 - Uses the same emotional hook style
-- Starts with 'Part 2:' prefix
+- Starts with '{prefix}:' prefix
 - Is max 8 words
 - Stays in the same niche (relationship psychology, attraction, body language)
 
 Example: If Part 1 was 'Friendzone Test: Spot It Or Stay Stuck?'
 Part 2 could be: 'Part 2: Escape The Friendzone Using This'
+If Part 2 was 'Part 2: Escape The Friendzone Using This'
+Part 3 could be: 'Part 3: The Secret Phrase That Reverses It'
 
-Return ONLY the Part 2 title, nothing else.
+Return ONLY the {prefix} title, nothing else.
 """
     try:
         result = _llm_prompt(prompt).strip()
-        # Ensure it starts with Part 2:
-        if not result.lower().startswith("part 2"):
-            result = f"Part 2: {result}"
+        # Ensure it starts with the correct prefix
+        if not result.lower().startswith(prefix.lower()):
+            result = f"{prefix}: {result}"
         return result[:60]  # cap length
     except Exception:
-        return f"Part 2: {title[:40]}"
+        return f"{prefix}: {title[:40]}"
 
 
 def _generate_story_poll(topic, script_data):

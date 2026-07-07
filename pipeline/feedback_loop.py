@@ -138,14 +138,14 @@ def summarize_feedback(limit=30):
     outcomes = _read_outcomes(limit=limit)
     if outcomes:
         framework_counts = {}
-        series_queue = []  # Part 2s waiting to be made
+        series_queue = []  # Parts waiting to be made
         for item in outcomes:
             framework = (item.get("hook_framework") or "").strip()
             if framework:
                 framework_counts[framework] = framework_counts.get(framework, 0) + 1
             # Collect series_next_title suggestions that haven't been made yet
             series_next = (item.get("series_next_title") or "").strip()
-            if series_next and "Part 2" in series_next:
+            if series_next and "Part " in series_next:
                 series_queue.append(series_next)
 
         if framework_counts:
@@ -160,7 +160,7 @@ def summarize_feedback(limit=30):
         if series_queue:
             lines.extend([
                 "",
-                "SERIES CONTINUATION QUEUE (these Part 2s are ready to be made — high conversion potential):",
+                "SERIES CONTINUATION QUEUE (these continuation parts are ready to be made — high conversion potential):",
             ])
             for sq in series_queue[-3:]:
                 lines.append(f"  - {sq}")
