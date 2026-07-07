@@ -110,7 +110,6 @@ Return ONLY the hashtags, nothing else.
 
     # Ensure we have a reasonable number
     if len(hashtags) < 5:
-        # Fallback hashtags if LLM fails — 15 quality, niche-specific tags
         hashtags = [
             "#GirlPsychology", "#AttractionPsychology", "#BodyLanguageTips",
             "#DatingAdviceIndia", "#MaleSelfImprovement", "#RelationshipDecoding",
@@ -123,44 +122,45 @@ Return ONLY the hashtags, nothing else.
 
 
 def _generate_first_comment(topic, script_data):
-    """Generate a punchy self-comment to seed engagement immediately after posting.
-    
-    The FIRST comment on a reel creates social proof and invites others to reply.
-    A reel with 0 comments feels dead — a seeded question makes it feel alive.
-    Post this as the account's own first comment right after uploading.
-    Uses a NUMBERED reply prompt to maximise comment count (each number = 1 comment).
+    """Generate a debate-triggering first comment to seed engagement immediately after posting.
+
+    Switched from 1/2 numbered voting to CONTROVERSY-style comments.
+    Analytics show 0 organic comments — numbered voting gets single-character responses
+    which Instagram weights as low-quality engagement.
+    Controversy prompts get PARAGRAPH responses = high-quality engagement signals.
     """
     title = script_data.get("title", topic)
     prompt = f"""
 You are writing the FIRST comment that the account owner will post on their own reel immediately after uploading.
-This comment is the most important comment — it sets the tone and invites others to engage.
+This comment must spark a DEBATE — not just a yes/no vote. It must make people DEFEND their opinion in the replies.
 
 Reel title: "{title}"
 Reel topic: "{topic}"
 
 Rules:
-- Write a SHORT, punchy question that makes people WANT to reply (max 15 words)
-- MUST use a NUMBERED reply format. Examples:
-    "কিতনো কা হো चুकা है? 1 = हाँ, 2 = नहीं 👇"
-    "Comment karo: 1 agar relatable, 2 agar nahi 🔥"
-    "1 👍 agree / 2 👎 nahi — tumhara? 👇"
+- Write a SHORT, polarizing statement or question that splits the audience 50/50 (max 15 words)
+- It should provoke strong reactions from BOTH sides — some will agree angrily, some will disagree angrily
+- PROVEN PATTERNS for this niche:
+  * Friendzone topics: "Friendzone exist hi nahi karta — ladke khud apne aap ko friendzone karte hain" → debate starter
+  * Mirror topics: "Agar wo copy nahi karti toh bhai tu friend zone mein hai, seedha baat" → controversy
+  * General: Bold claim that half the audience agrees with and half strongly disagrees with
 - Must be in Hinglish (mix of Hindi + English) — Gen-Z Indian style
-- End with a number-reply prompt + emoji
-- Make it personal/relatable — like the account owner is genuinely curious about viewers' opinions
-- Do NOT just repeat the caption — ask something specific about their personal experience
+- End with "sach ya jhooth? 👇" or "agree? 👇" or "galat hu toh batao 👇" to invite replies
+- Do NOT use numbered voting format (1=haan, 2=nahi) — that gets low-quality single-character comments
+- We want PARAGRAPHS from people arguing — that's what the algorithm reads as high engagement
 
 Return ONLY the comment text, nothing else.
 """
     try:
         return _llm_prompt(prompt).strip()
     except Exception:
-        # Fallback comment options
         fallbacks = [
-            "Kya tumhare saath bhi aisa hua hai? 1 = haan, 2 = nahi 👇",
-            "Relatable hai? Comment 1 agar haan, 2 agar nahi 🔥",
-            "Ye experience kitno ka hai? 1 = mera bhi, 2 = nahi 💬",
+            "Friendzone exist hi nahi karta — ye sirf ek excuse hai. Sach ya jhooth? 👇",
+            "Agar wo tumhe copy karti hai toh 100% interested hai. Disagree karo toh reason batao 👇",
+            "Ye baat koi nahi bolta but ye sach hai — agree karte ho? 👇",
         ]
         return random.choice(fallbacks)
+
 
 
 def _generate_series_title(topic, script_data):

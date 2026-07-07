@@ -421,13 +421,15 @@ def generate_script_payload(topic, analytics_data=None, feedback_summary="", max
 
 
 # ── Topic sub-category rotation for content variety ──────────────────
-# ── PROVEN VIRAL TOPIC SERIES (based on actual account performance) ──────────
-# TIER 1 — CONFIRMED 2.5K+ VIEWS: friendship/friendzone/situationship/relationship stages
-# Analytics show these topics consistently outperform all others on this account.
-_TOPIC_TIER1_VIRAL = [
-    "friendzone psychology — how to spot it, escape it, or use it",           # 2.4K views series
-    "situationship vs friendzone — how to decode where you really stand",      # 2.5K views confirmed
-    "different stages of a relationship and what each stage reveals",          # 2.5K views confirmed
+# Based on REAL analytics (July 2026):
+# TIER 1A — Friendzone/Situationship: 2.5K-2.6K views, 21-24 shares, 84-93 interactions
+# TIER 1B — Mirror Psychology: 1.5K views BUT 23 shares (1.53% share rate — HIGHEST of all reels)
+# These two content types are the ONLY proven performers. Everything else gets 127-541 views.
+
+_TOPIC_TIER1A_FRIENDZONE = [
+    "friendzone psychology — how to spot it, escape it, or use it",
+    "situationship vs friendzone — how to decode where you really stand",
+    "different stages of a relationship and what each stage reveals",
     "friendship to love — signs she wants more than just being friends",
     "stuck in friendzone? psychology of why and how to break out",
     "situationship red flags — signs you're being kept as a backup",
@@ -440,45 +442,65 @@ _TOPIC_TIER1_VIRAL = [
     "how friendships turn into love — the psychology behind it",
     "mixed signals or friendzone — how to tell the real difference",
     "the moment she decides you're just a friend — and how to reverse it",
+    "signs she's keeping you as a backup — not as the one",
+    "Part 2: Escape The Friendzone Using This One Shift",
+    "Part 2: Situationship Exit — How to Make Her Choose",
 ]
 
-# TIER 2 — HIGH POTENTIAL (1K+ views, aligned with niche)
+_TOPIC_TIER1B_MIRROR = [
+    # Mirror psychology: 1.53% share rate (highest) — people DM this to friends
+    "mirror effect psychology — when she copies your behavior it means THIS",
+    "she copies your words gestures energy — what her mirror behavior reveals",
+    "mirror psychology test — does she subconsciously mirror you right now",
+    "body mirroring — the one signal most guys completely miss",
+    "when she starts copying YOU — what the psychology says about attraction",
+    "why girls mirror the guy they like without even knowing it",
+    "Part 2: Mirror Test — 3 Ways To Check If She's Mirroring You",
+    "subconscious mirroring — her body is saying what her words won't",
+]
+
+# TIER 2 — GOOD (1.5K views, proven but not top-tier)
 _TOPIC_TIER2_HIGH = [
-    "mirror effect psychology — when she copies your behavior it means THIS",  # 1.4K views series
-    "eye contact secrets — what her first glance really reveals",              # 1.4K views series
+    "eye contact secrets — what her first glance really reveals",
     "texting psychology — what her reply speed actually means",
     "jealousy test — one move to check if she genuinely cares",
     "signs she's attracted but hiding it — body language tell",
     "what happens when you go silent — the power of withdrawal",
     "3 things that instantly kill attraction without you knowing",
     "the psychology of why being too available destroys attraction",
-    "psychological facts about attraction and human connection",
-    "body language secrets that reveal hidden feelings safely",
+    "her smile decoded — the difference between polite and genuine",
 ]
 
-# TIER 3 — EXPLORATORY (general psychology niche)
+# TIER 3 — EXPLORATORY (use sparingly, 10% max)
 _TOPIC_TIER3_EXPLORE = [
     "how to build unshakeable confidence in social situations",
-    "positive body language habits that command instant respect",
-    "surprising psychological facts about human behavior and desire",
-    "how to read micro-expressions and understand people better",
     "psychology of charisma and what makes someone naturally magnetic",
     "subtle signs someone genuinely respects and values you",
     "the psychology of building strong, healthy relationships",
 ]
 
+# PROVEN DEAD — NEVER USE AGAIN (based on analytics data)
+# - "Her Smile Lies" (posted twice: 133 views + 541 views) — topic is exhausted
+# - "Magnetic Presence / charisma" (127 views, 2 interactions)
+# - "Secret Touch" (generic, no specific signal)
+# - "Micro-Expression" (tutorial feel, doesn't trigger shares)
+# - "Text Ignore" (138 views despite afternoon post)
+
 
 def _pick_topic_subcategory():
     """
-    Weighted topic picker based on proven account analytics:
-    - 70% chance: TIER 1 (friendzone/situationship/relationship stages — confirmed 2.5K views)
-    - 20% chance: TIER 2 (other 1K+ proven topics)
-    - 10% chance: TIER 3 (exploration / variety)
+    Weighted topic picker based on REAL account analytics (July 2026):
+    - 40% TIER 1A: Friendzone/Situationship (2.5K-2.6K views, 21-24 shares)
+    - 35% TIER 1B: Mirror Psychology (1.5K views, 1.53% share rate — HIGHEST)
+    - 20% TIER 2:  Eye contact + other 1.5K performers
+    - 5%  TIER 3:  Exploratory variety (prevent niche burnout)
     """
     roll = random.random()
-    if roll < 0.70:
-        return random.choice(_TOPIC_TIER1_VIRAL)
-    elif roll < 0.90:
+    if roll < 0.40:
+        return random.choice(_TOPIC_TIER1A_FRIENDZONE)
+    elif roll < 0.75:
+        return random.choice(_TOPIC_TIER1B_MIRROR)
+    elif roll < 0.95:
         return random.choice(_TOPIC_TIER2_HIGH)
     else:
         return random.choice(_TOPIC_TIER3_EXPLORE)
