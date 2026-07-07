@@ -90,3 +90,57 @@ def post_video(cl, video_path, caption):
     except Exception as e:
         print(f"Upload Failed: {e}")
         return False
+
+
+def wait_and_share_reel_to_story(cl, username, expected_title, thumbnail_path, max_wait_seconds=360):
+    """
+    Polls Instagram for the newly uploaded Reel, then shares it to Story
+    using the generated high-contrast thumbnail as the background.
+    """
+    import time
+    if not cl:
+        print("[Story] Skipping Story post — client not logged in.")
+        return False
+
+    print(f"[Story] Waiting for Reel '{expected_title}' to be published by Make.com...")
+    start_time = time.time()
+    
+    try:
+        user_id = cl.user_id_from_username(username)
+    except Exception as e:
+        print(f"[Story] Failed to get user ID: {e}")
+        return False
+
+    while time.time() - start_time < max_wait_seconds:
+        try:
+            print("[Story] Checking recent feed posts...")
+            recent_posts = cl.user_medias(user_id, amount=3)
+            for post in recent_posts:
+                caption_text = post.caption_text or ""
+                # Only look for Reels (clips)
+                if post.media_type == 2 and post.product_type == "clips":
+                    # Check if the title or a significant part of it matches
+                    clean_title = expected_title.replace("?", "").replace("!", "").strip().lower()
+                    if clean_title and clean_title in caption_text.lower():
+                        print(f"[Story] Found matching Reel on feed: {post.pk} (Code: {post.code})")
+                        print(f"[Story] Sharing to Story with background: {thumbnail_path}")
+                        
+                        try:
+                            # Use thumbnail path if it exists
+                            if thumbnail_path and os.path.exists(thumbnail_path):
+                                cl.media_share_to_story(post.pk, background=thumbnail_path)
+                            else:
+                                cl.media_share_to_story(post.pk)
+                            print("[Story] Successfully posted Story promotion! 🚀")
+                            return True
+                        except Exception as story_exc:
+                            print(f"[Story] Failed sharing to story: {story_exc}")
+                            return False
+        except Exception as e:
+            print(f"[Story] Error checking feed: {e}")
+
+        print("[Story] Reel not found yet. Sleeping 45 seconds...")
+        time.sleep(45)
+
+    print(f"[Story] Timeout reached ({max_wait_seconds}s). Reel was not detected on feed. Skipping Story.")
+    return False

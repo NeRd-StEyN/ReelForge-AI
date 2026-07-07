@@ -169,13 +169,27 @@ def main(topic, feedback_summary="", tts_voice_override=None):
     caption_text = f"{metadata.get('description', '')}".strip()
     from pipeline.make_handler import send_to_make_webhook
     thumb_path = output_file.replace(".mp4", "_thumbnail.jpg")
-    send_to_make_webhook(
+    webhook_success = send_to_make_webhook(
         output_file,
         metadata.get('title', 'AI Video'),
         caption_text,
         thumbnail_path=thumb_path,
         metadata=metadata,
     )
+    
+    # 7. Auto Share to Story (drives early traffic to Reel to boost search/distribution)
+    if webhook_success and _env_flag("ENABLE_INSTAGRAM_ANALYTICS", "true") and 'cl' in locals() and cl:
+        try:
+            from pipeline.insta_handler import wait_and_share_reel_to_story
+            username = os.getenv("INSTA_USERNAME")
+            wait_and_share_reel_to_story(
+                cl,
+                username,
+                metadata.get('title', ''),
+                thumb_path
+            )
+        except Exception as story_err:
+            print(f"[Story] Story automation encountered an issue: {story_err}")
     
     print(f"Pipeline complete! Video saved to: {output_file}")
     print(f"Metadata saved to: video_metadata.json")
