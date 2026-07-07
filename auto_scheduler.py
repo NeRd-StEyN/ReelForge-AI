@@ -30,16 +30,15 @@ def _get_domain():
 
 
 def _default_times_for_count(count):
-    # Peak IST posting times for Indian Instagram audience (18-30 yr olds)
-    # Based on account analytics: the 2.4K view reel and 1.4K view reels all
-    # got their initial algorithmic push during the 7 PM – 9 PM IST window.
-    # 19:00 = prime evening scroll | 21:00 = second peak (post-dinner lazy scroll)
+    # Peak IST posting times based on account analytics:
+    # 16:00 = proven best slot (Friendzone reels got 2.5K views here)
+    # 19:00 = prime evening scroll | 21:00 = backup third slot
     presets = {
         1: ["19:00"],
-        2: ["19:00", "21:00"],
-        3: ["12:00", "19:00", "21:00"],
+        2: ["16:00", "19:00"],
+        3: ["16:00", "19:00", "21:00"],
     }
-    return presets.get(count, ["12:00", "19:00", "21:00", "21:30"][:count])
+    return presets.get(count, ["16:00", "19:00", "21:00", "21:30"][:count])
 
 
 def _read_schedule_times(reels_per_day):
