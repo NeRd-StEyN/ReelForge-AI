@@ -272,6 +272,17 @@ def generate_script(topic, analytics_data=None, feedback_summary=""):
 
     Create a PUNCHY, fast-paced reel script for this topic: "{topic}".
 
+    ── BREAKING THE 2.5K CEILING ──
+    This account gets 130-150 views on weak reels and 2.5K on strong ones.
+    The difference is always: saves (specific actionable insight) + shares (DM-worthy moment) + comment debate.
+    Your script MUST engineer all three:
+    1. SAVE: Scene 2 must reveal ONE specific, practical sign/test the viewer can use TODAY
+    2. SHARE: Scene 3 must contain one line that makes them think of a friend to DM this to
+    3. COMMENT DEBATE: The topic angle should be SLIGHTLY controversial — a take half the audience
+       agrees with and half doesn't. This creates comment wars which Instagram reads as high engagement.
+       Example of a debate-starting angle: 'Friendzone exist nahi karta — ye sirf ek excuse hai'
+       Not everything needs to be controversial, but the HOOK should provoke a reaction.
+
     HOOK FRAMEWORK (you MUST use this style):
     {hook_framework['instruction']}
 
@@ -284,13 +295,19 @@ def generate_script(topic, analytics_data=None, feedback_summary=""):
         Impossible-to-skip opening. Bold claim or shocking reveal.
         Emotion goal: make the viewer feel a sudden jolt of curiosity — they NEED to know more.
     - Scene 2 (Build — emotional_beat: "tense"): 22-32 words
-        Deepen the intrigue. Reveal one specific, surprising insight.
+        Deepen the intrigue. Reveal ONE specific, PRACTICAL insight — something the viewer can
+        actually USE or CHECK right now (a specific sign, behavior, or test they can apply today).
+        This is the SAVE trigger: if Scene 2 contains a specific, actionable insight, viewers
+        save the reel to remember it. Vague insights get skipped. Specific ones get saved.
         Emotion goal: build anxiety or suspense — make skipping feel like missing out on a secret.
-    - Scene 3 (Payoff + Rewatch Trigger — emotional_beat: "shocked"): 20-28 words
+    - Scene 3 (Payoff + Rewatch + Share Trigger — emotional_beat: "shocked"): 20-28 words
         Drop the mind-blowing conclusion.
         MANDATORY REWATCH TRIGGER: The LAST LINE of Scene 3 MUST loop back to something said in
         Scene 1 — a callback, a twist, or a re-framing of Scene 1's opening claim.
-        This creates an involuntary "wait, let me watch again" reaction.
+        MANDATORY SHARE TRIGGER: Scene 3 must contain one line that makes the viewer think of a
+        specific friend/person they know who is IN this situation right now — so they DM it.
+        Pattern: 'Agar tumhara koi dost isme phansa hai...' or 'Ye sunke koi yaad aaya?'
+        This creates DM shares — Instagram's strongest distribution signal after saves.
         Emotion goal: deliver a satisfying shock + leave a dangling thread that rewards rewatching.
 
     RETENTION TACTICS:
@@ -308,12 +325,14 @@ def generate_script(topic, analytics_data=None, feedback_summary=""):
     Good example: Scene 1 said 'woh kabhi seedha nahi bolti' → Scene 3 ends with 'woh seedha kyun nahi bolti — ab tum samajh gaye.'
     The callback must feel like a satisfying click, not a forced repetition.
 
-    IN-VIDEO LIKE BAIT (MANDATORY):
-    Scene 3 MUST include one direct viewer-addressed line that prompts a like.
-    This should feel natural, not forced. Examples:
-    - 'Agar ye tumhare saath bhi hua hai, toh tum akele nahi ho.'
+    IN-VIDEO LIKE + SHARE BAIT (MANDATORY):
+    Scene 3 MUST include ONE line that triggers both emotional resonance AND a sharing impulse.
+    Best pattern: reference a third person the viewer knows — this makes them DM it to that person.
+    Examples:
+    - 'Agar tumhara koi dost isme phansa hai, toh ye bhejo unhe.'
     - 'Ye baat sirf wo log samjhenge jo sach mein iske through gaye hain.'
-    This line drives the emotional like-trigger without literally saying 'like karo'.
+    - 'Koi yaad aaya? Unhe bhi ye dekhna chahiye.'
+    This line drives DM shares (strongest signal) + emotional likes without literally saying 'like karo'.
 
     PATTERN INTERRUPT:
     - Each scene MUST feel visually and tonally distinct from the others
@@ -403,32 +422,67 @@ def generate_script_payload(topic, analytics_data=None, feedback_summary="", max
 
 # ── Topic sub-category rotation for content variety ──────────────────
 # ── PROVEN VIRAL TOPIC SERIES (based on actual account performance) ──────────
-# These topics are directly modeled from reels that got 1K+ views on this account.
-# Each is part of a content funnel — each topic leads naturally to a Part 2.
-_TOPIC_SUBCATEGORIES = [
-    # TIER 1 — PROVEN VIRAL (replicate these series)
+# TIER 1 — CONFIRMED 2.5K+ VIEWS: friendship/friendzone/situationship/relationship stages
+# Analytics show these topics consistently outperform all others on this account.
+_TOPIC_TIER1_VIRAL = [
     "friendzone psychology — how to spot it, escape it, or use it",           # 2.4K views series
+    "situationship vs friendzone — how to decode where you really stand",      # 2.5K views confirmed
+    "different stages of a relationship and what each stage reveals",          # 2.5K views confirmed
+    "friendship to love — signs she wants more than just being friends",
+    "stuck in friendzone? psychology of why and how to break out",
+    "situationship red flags — signs you're being kept as a backup",
+    "how to know if she sees you as a friend or something more",
+    "the hidden stage before a relationship that most guys miss",
+    "why girls keep certain guys in the friendzone deliberately",
+    "from talking stage to relationship — what signals matter most",
+    "friendzone test — 3 signs that tell you exactly where you stand",
+    "situationship psychology — why it feels like a relationship but isn't",
+    "how friendships turn into love — the psychology behind it",
+    "mixed signals or friendzone — how to tell the real difference",
+    "the moment she decides you're just a friend — and how to reverse it",
+]
+
+# TIER 2 — HIGH POTENTIAL (1K+ views, aligned with niche)
+_TOPIC_TIER2_HIGH = [
     "mirror effect psychology — when she copies your behavior it means THIS",  # 1.4K views series
     "eye contact secrets — what her first glance really reveals",              # 1.4K views series
-    "situationship vs friendzone — how to decode where you really stand",      # Natural Part 2
     "texting psychology — what her reply speed actually means",
     "jealousy test — one move to check if she genuinely cares",
-    # TIER 2 — HIGH POTENTIAL (aligned with niche)
-    "psychological facts about attraction and human connection",
-    "body language secrets that reveal hidden feelings safely",
-    "how to build unshakeable confidence in social situations",
-    "positive body language habits that command instant respect",
-    "surprising psychological facts about human behavior and desire",
-    "common communication mistakes and how to fix them",
-    "how to read micro-expressions and understand people better",
-    "psychology of charisma and what makes someone naturally magnetic",
-    "subtle signs someone genuinely respects and values you",
-    "the psychology of building strong, healthy relationships",
     "signs she's attracted but hiding it — body language tell",
     "what happens when you go silent — the power of withdrawal",
     "3 things that instantly kill attraction without you knowing",
     "the psychology of why being too available destroys attraction",
+    "psychological facts about attraction and human connection",
+    "body language secrets that reveal hidden feelings safely",
 ]
+
+# TIER 3 — EXPLORATORY (general psychology niche)
+_TOPIC_TIER3_EXPLORE = [
+    "how to build unshakeable confidence in social situations",
+    "positive body language habits that command instant respect",
+    "surprising psychological facts about human behavior and desire",
+    "how to read micro-expressions and understand people better",
+    "psychology of charisma and what makes someone naturally magnetic",
+    "subtle signs someone genuinely respects and values you",
+    "the psychology of building strong, healthy relationships",
+]
+
+
+def _pick_topic_subcategory():
+    """
+    Weighted topic picker based on proven account analytics:
+    - 70% chance: TIER 1 (friendzone/situationship/relationship stages — confirmed 2.5K views)
+    - 20% chance: TIER 2 (other 1K+ proven topics)
+    - 10% chance: TIER 3 (exploration / variety)
+    """
+    roll = random.random()
+    if roll < 0.70:
+        return random.choice(_TOPIC_TIER1_VIRAL)
+    elif roll < 0.90:
+        return random.choice(_TOPIC_TIER2_HIGH)
+    else:
+        return random.choice(_TOPIC_TIER3_EXPLORE)
+
 
 
 def generate_topic_from_domain(domain, analytics_data=None, feedback_summary="", used_topics=None):
@@ -445,7 +499,7 @@ The new topic must be clearly different in angle and hook style from all of the 
 """
 
     # Rotate through sub-categories for content variety
-    subcategory = random.choice(_TOPIC_SUBCATEGORIES)
+    subcategory = _pick_topic_subcategory()
 
     prompt = f"""
 You are a short-form content strategist specialized in viral Instagram Reels about psychology, attraction, and human behavior.
