@@ -4,8 +4,17 @@ from typing import Optional
 
 import requests
 from dotenv import load_dotenv
+import cloudinary
+import cloudinary.uploader
 
 load_dotenv()
+
+# Configure Cloudinary
+cloudinary.config(
+    cloud_name=os.getenv("CLOUDINARY_CLOUD_NAME"),
+    api_key=os.getenv("CLOUDINARY_API_KEY"),
+    api_secret=os.getenv("CLOUDINARY_API_SECRET"),
+)
 
 
 def _safe_text(value, fallback: str = "") -> str:
@@ -20,31 +29,26 @@ def _safe_text(value, fallback: str = "") -> str:
     return text
 
 
-def upload_video_to_tmpfiles(video_path: str) -> Optional[str]:
-    """Upload a local MP4 to tmpfiles and return a publicly reachable direct URL."""
-    if not os.path.exists(video_path):
-        print(f"Upload skipped: file not found -> {video_path}")
+def upload_file_to_cloudinary(file_path: str) -> Optional[str]:
+    """Upload a local MP4 or image to Cloudinary and return a publicly reachable direct URL."""
+    if not os.path.exists(file_path):
+        print(f"Upload skipped: file not found -> {file_path}")
         return None
 
     try:
-        with open(video_path, "rb") as video_file:
-            response = requests.post(
-                "https://tmpfiles.org/api/v1/upload",
-                files={"file": video_file},
-                timeout=180,
-            )
-        response.raise_for_status()
-        data = response.json()
-
-        page_url = data.get("data", {}).get("url")
-        if not page_url:
-            print("tmpfiles upload failed: missing URL in response")
+        print(f"Uploading {file_path} to Cloudinary...")
+        response = cloudinary.uploader.upload(
+            file_path,
+            resource_type="auto",
+        )
+        url = response.get("secure_url") or response.get("url")
+        if not url:
+            print("Cloudinary upload failed: missing URL in response")
             return None
-
-        # Convert share page URL into direct download URL required by Make/Instagram.
-        return page_url.replace("tmpfiles.org/", "tmpfiles.org/dl/")
+        print(f"Cloudinary upload successful -> {url}")
+        return url
     except Exception as exc:
-        print(f"tmpfiles upload failed: {exc}")
+        print(f"Cloudinary upload failed: {exc}")
         return None
 
 
@@ -64,14 +68,14 @@ def send_to_make_webhook(
 
     try:
         print("Preparing public video URL for Make.com webhook...")
-        video_url = upload_video_to_tmpfiles(video_path)
+        video_url = upload_file_to_cloudinary(video_path)
         if not video_url:
             return False
 
         cover_url = None
         if thumbnail_path and os.path.exists(thumbnail_path):
             print("Preparing public thumbnail URL for Make.com webhook...")
-            cover_url = upload_video_to_tmpfiles(thumbnail_path)
+            cover_url = upload_file_to_cloudinary(thumbnail_path)
 
         safe_title = _safe_text(title, "AI Video")
         safe_text = _safe_text(text, "")

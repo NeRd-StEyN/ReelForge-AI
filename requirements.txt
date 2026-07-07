@@ -7,3 +7,4 @@ openai
 pillow
 instagrapi
 schedule
+cloudinary
