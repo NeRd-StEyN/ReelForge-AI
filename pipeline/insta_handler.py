@@ -211,9 +211,8 @@ def post_poll_story(cl, thumbnail_path, story_poll):
         return False
 
 
-def _share_reel_to_story(cl, post, thumbnail_path, story_poll=None, first_comment=None):
+def _share_reel_to_story(cl, post, thumbnail_path, story_poll=None):
     """Attempt to share a reel post to story. Returns True on success.
-    If first_comment is provided, it posts a comment on the reel.
     If story_poll is provided, also posts a follow-up poll story slide.
     """
     try:
@@ -222,17 +221,6 @@ def _share_reel_to_story(cl, post, thumbnail_path, story_poll=None, first_commen
         else:
             cl.media_share_to_story(post.pk)
         print("[Story] Successfully posted Story promotion! 🚀")
-
-        # Post the AI-generated first comment to spark debate
-        if first_comment:
-            try:
-                import time
-                time.sleep(2)  # Pause to avoid rate limits
-                print(f"[Comment] Posting first comment: '{first_comment[:50]}...'")
-                cl.media_comment(post.pk, str(first_comment))
-                print("[Comment] ✅ First comment posted successfully!")
-            except Exception as comment_err:
-                print(f"[Comment] Failed to post first comment: {comment_err}")
 
         # Post poll slide immediately after the reel share card
         if story_poll:
@@ -246,11 +234,10 @@ def _share_reel_to_story(cl, post, thumbnail_path, story_poll=None, first_commen
         return False
 
 
-def wait_and_share_reel_to_story(cl, username, expected_title, thumbnail_path, story_poll=None, first_comment=None, max_wait_seconds=900):
+def wait_and_share_reel_to_story(cl, username, expected_title, thumbnail_path, story_poll=None, max_wait_seconds=900):
     """
     Polls Instagram for the newly uploaded Reel, then shares it to Story
     using the generated high-contrast thumbnail as the background.
-    If first_comment is provided, it posts a comment on the Reel to spark debate.
     If story_poll is provided, also posts a follow-up poll story slide.
 
     Strategy (in order):
@@ -295,7 +282,7 @@ def wait_and_share_reel_to_story(cl, username, expected_title, thumbnail_path, s
                 print(f"[Story] Reel pk={post.pk} match score: {score:.2f} (need >= {FUZZY_THRESHOLD})")
                 if score >= FUZZY_THRESHOLD:
                     print(f"[Story] ✅ Fuzzy match found! Reel pk={post.pk}")
-                    return _share_reel_to_story(cl, post, thumbnail_path, story_poll=story_poll, first_comment=first_comment)
+                    return _share_reel_to_story(cl, post, thumbnail_path, story_poll=story_poll)
 
             # --- Strategy 2: Recency fallback after 10 min ---
             if elapsed >= FALLBACK_AFTER_SECONDS and reels and not fallback_used:
@@ -306,7 +293,7 @@ def wait_and_share_reel_to_story(cl, username, expected_title, thumbnail_path, s
                     f"[Story] ⚠️ No title match after {int(elapsed)}s. "
                     f"Falling back to most recent Reel pk={newest.pk} (posted: {newest.taken_at})"
                 )
-                return _share_reel_to_story(cl, newest, thumbnail_path, story_poll=story_poll, first_comment=first_comment)
+                return _share_reel_to_story(cl, newest, thumbnail_path, story_poll=story_poll)
 
         except Exception as e:
             print(f"[Story] Error checking feed: {e}")
