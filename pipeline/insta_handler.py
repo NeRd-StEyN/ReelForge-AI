@@ -69,7 +69,7 @@ def get_performance_data(cl):
             if post.media_type == 2 and post.product_type == "clips":
                 analytics.append({
                     "topic_snippet": (post.caption_text or "")[:120].replace("\n", " ").strip(),
-                    "views": post.view_count or 0,
+                    "views": getattr(post, "play_count", None) or getattr(post, "view_count", None) or getattr(post, "video_view_count", None) or 0,
                     "likes": post.like_count or 0,
                     # Saves and comments are the highest-weight algorithm signals
                     # Instagram weights: saves (5x) > comments (3x) > likes (1x) > views (0.1x)
