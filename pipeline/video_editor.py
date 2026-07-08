@@ -763,7 +763,7 @@ def _scene_durations_from_timeline(scene_word_events, total_duration):
 # heard in the rendered audio. This offset (in seconds) delays subtitle
 # appearance so the caption and voice land at the exact same moment.
 # Tune via env var SUBTITLE_SYNC_OFFSET_MS (default = 80ms).
-_SUBTITLE_SYNC_OFFSET = float(os.getenv("SUBTITLE_SYNC_OFFSET_MS", "80")) / 1000.0
+_SUBTITLE_SYNC_OFFSET = -0.050
 
 def _build_karaoke_subtitle_clips(events, scene_start, scene_duration, words_per_chunk=1):
     """Create karaoke-style rolling subtitle clips with per-word highlighting.

@@ -26,7 +26,6 @@ jobs:
       CLOUDINARY_API_KEY: ${{ secrets.CLOUDINARY_API_KEY }}
       CLOUDINARY_API_SECRET: ${{ secrets.CLOUDINARY_API_SECRET }}
       INSTA_SESSION: ${{ secrets.INSTA_SESSION }}
-      SUBTITLE_SYNC_OFFSET_MS: "-50"
     steps:
       - name: Checkout
         uses: actions/checkout@v4
