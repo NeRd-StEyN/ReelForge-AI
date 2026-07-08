@@ -188,11 +188,14 @@ def main(topic, feedback_summary="", tts_voice_override=None, insta_client=None)
         try:
             from pipeline.insta_handler import wait_and_share_reel_to_story
             username = os.getenv("INSTA_USERNAME")
+            story_poll = metadata.get('story_poll') or {}
+            print(f"[Story] Poll question: {story_poll.get('question', '(none)')}")
             wait_and_share_reel_to_story(
                 cl,
                 username,
                 metadata.get('title', ''),
-                thumb_path
+                thumb_path,
+                story_poll=story_poll,
             )
         except Exception as story_err:
             print(f"[Story] Story automation encountered an issue: {story_err}")

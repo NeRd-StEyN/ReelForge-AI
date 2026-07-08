@@ -113,27 +113,122 @@ def _title_match_score(expected_title, caption_text):
     return hits / len(title_words)
 
 
-def _share_reel_to_story(cl, post, thumbnail_path):
-    """Attempt to share a reel post to story. Returns True on success."""
+def post_poll_story(cl, thumbnail_path, story_poll):
+    """
+    Posts a separate Story slide with a poll sticker.
+    This drives viewers from Stories back to the Reel — one of the highest
+    engagement amplifiers on Instagram.
+
+    story_poll dict format:
+        {"question": "...", "option_1": "...", "option_2": "..."}
+    """
+    if not cl or not story_poll or not isinstance(story_poll, dict):
+        print("[Poll] No poll data — skipping poll story.")
+        return False
+
+    question = story_poll.get("question", "").strip()
+    opt1     = story_poll.get("option_1", "Haan 🔥").strip()[:20]
+    opt2     = story_poll.get("option_2", "Nahi 🤔").strip()[:20]
+
+    if not question:
+        print("[Poll] Empty question — skipping poll story.")
+        return False
+
+    # Background: use thumbnail if available, else create a plain dark card
+    bg_path = thumbnail_path if (thumbnail_path and os.path.exists(thumbnail_path)) else None
+    if not bg_path:
+        print("[Poll] No thumbnail found — will use plain black background for poll story.")
+        try:
+            from PIL import Image, ImageDraw
+            img = Image.new("RGB", (1080, 1920), color=(15, 15, 15))
+            fallback_path = "assets/images/poll_bg.jpg"
+            os.makedirs("assets/images", exist_ok=True)
+            img.save(fallback_path)
+            bg_path = fallback_path
+        except Exception as img_err:
+            print(f"[Poll] Could not create fallback image: {img_err}")
+            return False
+
+    try:
+        from instagrapi.types import StoryPollSticker, StoryPoll, StoryBuildedMedia
+        print(f"[Poll] Posting poll story: '{question}' | {opt1} / {opt2}")
+
+        poll_sticker = StoryPollSticker(
+            poll=StoryPoll(
+                question=question[:80],  # Instagram caps at 80 chars
+                tallies=[
+                    {"text": opt1, "font_size": 35.0},
+                    {"text": opt2, "font_size": 35.0},
+                ],
+            ),
+            x=0.5,
+            y=0.75,
+            width=0.6,
+            height=0.12,
+            rotation=0.0,
+        )
+
+        cl.photo_upload_to_story(
+            path=bg_path,
+            poll_sticker=poll_sticker,
+        )
+        print("[Poll] ✅ Poll story posted successfully!")
+        return True
+
+    except ImportError:
+        print("[Poll] StoryPollSticker not available in this instagrapi version — trying legacy API...")
+    except Exception as exc:
+        print(f"[Poll] poll_sticker API failed ({exc}), trying legacy dict approach...")
+
+    # Legacy fallback: pass poll as a plain dict (older instagrapi builds)
+    try:
+        cl.photo_upload_to_story(
+            path=bg_path,
+            poll_sticker={
+                "question": question[:80],
+                "options": [opt1, opt2],
+                "x": 0.5,
+                "y": 0.75,
+            },
+        )
+        print("[Poll] ✅ Poll story posted (legacy dict mode).")
+        return True
+    except Exception as fallback_exc:
+        print(f"[Poll] ❌ Poll story failed entirely: {fallback_exc}")
+        return False
+
+
+def _share_reel_to_story(cl, post, thumbnail_path, story_poll=None):
+    """Attempt to share a reel post to story. Returns True on success.
+    If story_poll is provided, also posts a follow-up poll story slide.
+    """
     try:
         if thumbnail_path and os.path.exists(thumbnail_path):
             cl.media_share_to_story(post.pk, background=thumbnail_path)
         else:
             cl.media_share_to_story(post.pk)
         print("[Story] Successfully posted Story promotion! 🚀")
+
+        # Post poll slide immediately after the reel share card
+        if story_poll:
+            import time
+            time.sleep(3)  # brief pause so Instagram doesn't rate-limit back-to-back stories
+            post_poll_story(cl, thumbnail_path, story_poll)
+
         return True
     except Exception as story_exc:
         print(f"[Story] Failed sharing to story: {story_exc}")
         return False
 
 
-def wait_and_share_reel_to_story(cl, username, expected_title, thumbnail_path, max_wait_seconds=900):
+def wait_and_share_reel_to_story(cl, username, expected_title, thumbnail_path, story_poll=None, max_wait_seconds=900):
     """
     Polls Instagram for the newly uploaded Reel, then shares it to Story
     using the generated high-contrast thumbnail as the background.
+    If story_poll is provided, also posts a follow-up poll story slide.
 
     Strategy (in order):
-      1. Fuzzy title match against the 3 most recent Reels (>=60% word overlap).
+      1. Fuzzy title match against the 5 most recent Reels (>=60% word overlap).
       2. After 10 min with no match, fall back to the single most-recently-posted
          Reel — this fires even if Make.com reformatted the caption completely.
       3. Timeout after 15 minutes (900s) total.
@@ -174,7 +269,7 @@ def wait_and_share_reel_to_story(cl, username, expected_title, thumbnail_path, m
                 print(f"[Story] Reel pk={post.pk} match score: {score:.2f} (need >= {FUZZY_THRESHOLD})")
                 if score >= FUZZY_THRESHOLD:
                     print(f"[Story] ✅ Fuzzy match found! Reel pk={post.pk}")
-                    return _share_reel_to_story(cl, post, thumbnail_path)
+                    return _share_reel_to_story(cl, post, thumbnail_path, story_poll=story_poll)
 
             # --- Strategy 2: Recency fallback after 10 min ---
             if elapsed >= FALLBACK_AFTER_SECONDS and reels and not fallback_used:
@@ -185,7 +280,7 @@ def wait_and_share_reel_to_story(cl, username, expected_title, thumbnail_path, m
                     f"[Story] ⚠️ No title match after {int(elapsed)}s. "
                     f"Falling back to most recent Reel pk={newest.pk} (posted: {newest.taken_at})"
                 )
-                return _share_reel_to_story(cl, newest, thumbnail_path)
+                return _share_reel_to_story(cl, newest, thumbnail_path, story_poll=story_poll)
 
         except Exception as e:
             print(f"[Story] Error checking feed: {e}")
