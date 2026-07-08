@@ -3,7 +3,15 @@ from instagrapi import Client
 
 
 def get_insta_client():
-    """Logs into Instagram and returns the client using session persistence."""
+    """Logs into Instagram and returns the client using session persistence.
+
+    Login priority (most reliable → least):
+      1. insta_session.json  — full session file written by generate_session.py
+                               or by GitHub Actions from the INSTA_SESSION secret.
+                               Most stable; survives longer than a single cookie.
+      2. INSTA_SESSION_ID    — single sessionid cookie (legacy fallback).
+      3. Password login      — last resort; often blocked on cloud IPs.
+    """
     username = os.getenv("INSTA_USERNAME")
     password = os.getenv("INSTA_PASSWORD")
     sessionid_cookie = os.getenv("INSTA_SESSION_ID")
@@ -15,25 +23,30 @@ def get_insta_client():
     cl = Client()
 
     try:
+        # ── Priority 1: Full session file (most reliable) ──────────────
+        if os.path.exists("insta_session.json"):
+            print(f"[Analytics] Loading full session file for @{username}...")
+            cl.load_settings("insta_session.json")
+            print("[Analytics] Session file loaded successfully.")
+            return cl
+
+        # ── Priority 2: Single session cookie (legacy) ─────────────────
         if sessionid_cookie:
             print(f"[Analytics] Logging in via session cookie for @{username}...")
             cl.login_by_sessionid(sessionid_cookie)
             print("[Analytics] Session cookie login successful.")
             return cl
 
-        if os.path.exists("insta_session.json"):
-            print(f"[Analytics] Loading saved session file for @{username}...")
-            cl.load_settings("insta_session.json")
-            print("[Analytics] Session file loaded.")
-            return cl
-
-        print(f"[Analytics] Attempting password login for @{username} (may be blocked on cloud)...")
+        # ── Priority 3: Password login (often blocked on cloud runners) ─
+        print(f"[Analytics] ⚠️  No session file or cookie found. Attempting password login for @{username}...")
+        print("[Analytics] NOTE: Password login is often blocked on GitHub Actions IPs.")
         cl.login(username, password)
         print("[Analytics] Password login successful.")
         return cl
 
     except Exception as e:
         print(f"[Analytics] LOGIN FAILED for @{username}: {e}")
+        print("[Analytics] Tip: Run generate_session.py locally and save output to INSTA_SESSION GitHub Secret.")
         print("[Analytics] Will fall back to saved history for feedback. No live data this run.")
         return None
 
