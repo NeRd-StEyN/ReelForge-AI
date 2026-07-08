@@ -21,7 +21,7 @@ jobs:
       INSTA_USERNAME: ${{ secrets.INSTA_USERNAME }}
       INSTA_PASSWORD: ${{ secrets.INSTA_PASSWORD }}
       INSTA_SESSION_ID: ${{ secrets.INSTA_SESSION_ID }}
-      ENABLE_INSTAGRAM_ANALYTICS: ${{ secrets.ENABLE_INSTAGRAM_ANALYTICS }}
+      ENABLE_INSTAGRAM_ANALYTICS: "true"  # Always create client — needed for Story posting
       CLOUDINARY_CLOUD_NAME: ${{ secrets.CLOUDINARY_CLOUD_NAME }}
       CLOUDINARY_API_KEY: ${{ secrets.CLOUDINARY_API_KEY }}
       CLOUDINARY_API_SECRET: ${{ secrets.CLOUDINARY_API_SECRET }}

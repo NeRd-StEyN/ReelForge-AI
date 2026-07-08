@@ -56,7 +56,7 @@ def cleanup_generated_assets():
 
     print(f"Cleanup complete. Removed {removed} old generated files.")
 
-def main(topic, feedback_summary="", tts_voice_override=None):
+def main(topic, feedback_summary="", tts_voice_override=None, insta_client=None):
     print(f"Starting pipeline...")
     tts_voice = tts_voice_override or _get_tts_voice()
     print(f"[Voice] TTS voice: {tts_voice}")
@@ -65,16 +65,20 @@ def main(topic, feedback_summary="", tts_voice_override=None):
         cleanup_generated_assets()
 
     # 0. Optional: Fetch Instagram analytics for feedback-based scripting.
+    # Use a pre-authenticated client passed in from the scheduler (preferred), or
+    # fall back to creating one locally if analytics are enabled.
     analytics_data = None
-    if _env_flag("ENABLE_INSTAGRAM_ANALYTICS", "true"):
+    cl = insta_client  # Use externally provided client if available
+    if cl is None and _env_flag("ENABLE_INSTAGRAM_ANALYTICS", "true"):
         cl = get_insta_client()
+    if cl:
         analytics_data = get_performance_data(cl)
         if analytics_data:
             print(f"[Analytics] Live data fetched: {len(analytics_data)} reels.")
         else:
             print("[Analytics] Live fetch failed — script will use saved history if available.")
     else:
-        print("Skipping Instagram analytics login (ENABLE_INSTAGRAM_ANALYTICS=false).")
+        print("Skipping Instagram analytics login (no client available).")
 
     # 1. Generate Script using AI Feedback
     print(f"Brainstorming script using topic: '{topic}' and past performance data...")
@@ -179,7 +183,8 @@ def main(topic, feedback_summary="", tts_voice_override=None):
     )
     
     # 7. Auto Share to Story (drives early traffic to Reel to boost search/distribution)
-    if webhook_success and _env_flag("ENABLE_INSTAGRAM_ANALYTICS", "true") and 'cl' in locals() and cl:
+    # cl is either passed in from the scheduler or created above — no more 'cl in locals()' bug.
+    if webhook_success and cl:
         try:
             from pipeline.insta_handler import wait_and_share_reel_to_story
             username = os.getenv("INSTA_USERNAME")
@@ -191,6 +196,8 @@ def main(topic, feedback_summary="", tts_voice_override=None):
             )
         except Exception as story_err:
             print(f"[Story] Story automation encountered an issue: {story_err}")
+    elif webhook_success:
+        print("[Story] Skipping Story — no Instagram client available (check INSTA_SESSION_ID secret).")
     
     print(f"Pipeline complete! Video saved to: {output_file}")
     print(f"Metadata saved to: video_metadata.json")

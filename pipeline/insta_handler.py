@@ -92,55 +92,106 @@ def post_video(cl, video_path, caption):
         return False
 
 
-def wait_and_share_reel_to_story(cl, username, expected_title, thumbnail_path, max_wait_seconds=360):
+def _title_match_score(expected_title, caption_text):
+    """
+    Fuzzy title match: strips punctuation, splits into words, returns the
+    fraction of title words found in the caption (0.0 – 1.0).
+    A score >= 0.6 is considered a match so emoji/reordering/truncation
+    by Make.com doesn't silently break story posting.
+    """
+    import re
+    def _clean(text):
+        return re.sub(r"[^\w\s]", " ", text.lower()).split()
+
+    title_words = _clean(expected_title)
+    caption_words = set(_clean(caption_text))
+
+    if not title_words:
+        return 0.0
+
+    hits = sum(1 for w in title_words if w in caption_words)
+    return hits / len(title_words)
+
+
+def _share_reel_to_story(cl, post, thumbnail_path):
+    """Attempt to share a reel post to story. Returns True on success."""
+    try:
+        if thumbnail_path and os.path.exists(thumbnail_path):
+            cl.media_share_to_story(post.pk, background=thumbnail_path)
+        else:
+            cl.media_share_to_story(post.pk)
+        print("[Story] Successfully posted Story promotion! 🚀")
+        return True
+    except Exception as story_exc:
+        print(f"[Story] Failed sharing to story: {story_exc}")
+        return False
+
+
+def wait_and_share_reel_to_story(cl, username, expected_title, thumbnail_path, max_wait_seconds=900):
     """
     Polls Instagram for the newly uploaded Reel, then shares it to Story
     using the generated high-contrast thumbnail as the background.
+
+    Strategy (in order):
+      1. Fuzzy title match against the 3 most recent Reels (>=60% word overlap).
+      2. After 10 min with no match, fall back to the single most-recently-posted
+         Reel — this fires even if Make.com reformatted the caption completely.
+      3. Timeout after 15 minutes (900s) total.
     """
     import time
+    FUZZY_THRESHOLD = 0.6          # 60% of title words must appear in caption
+    FALLBACK_AFTER_SECONDS = 600   # 10 min: switch to recency fallback
+
     if not cl:
         print("[Story] Skipping Story post — client not logged in.")
         return False
 
-    print(f"[Story] Waiting for Reel '{expected_title}' to be published by Make.com...")
+    print(f"[Story] Waiting for Reel '{expected_title}' to appear (timeout: {max_wait_seconds}s)...")
     start_time = time.time()
-    
+
     try:
         user_id = cl.user_id_from_username(username)
     except Exception as e:
         print(f"[Story] Failed to get user ID: {e}")
         return False
 
+    fallback_used = False
+
     while time.time() - start_time < max_wait_seconds:
+        elapsed = time.time() - start_time
+
         try:
-            print("[Story] Checking recent feed posts...")
-            recent_posts = cl.user_medias(user_id, amount=3)
-            for post in recent_posts:
+            print(f"[Story] Checking recent feed posts... (elapsed: {int(elapsed)}s)")
+            recent_posts = cl.user_medias(user_id, amount=5)
+
+            # Collect only Reels
+            reels = [p for p in recent_posts if p.media_type == 2 and p.product_type == "clips"]
+
+            # --- Strategy 1: Fuzzy title match ---
+            for post in reels:
                 caption_text = post.caption_text or ""
-                # Only look for Reels (clips)
-                if post.media_type == 2 and post.product_type == "clips":
-                    # Check if the title or a significant part of it matches
-                    clean_title = expected_title.replace("?", "").replace("!", "").strip().lower()
-                    if clean_title and clean_title in caption_text.lower():
-                        print(f"[Story] Found matching Reel on feed: {post.pk} (Code: {post.code})")
-                        print(f"[Story] Sharing to Story with background: {thumbnail_path}")
-                        
-                        try:
-                            # Use thumbnail path if it exists
-                            if thumbnail_path and os.path.exists(thumbnail_path):
-                                cl.media_share_to_story(post.pk, background=thumbnail_path)
-                            else:
-                                cl.media_share_to_story(post.pk)
-                            print("[Story] Successfully posted Story promotion! 🚀")
-                            return True
-                        except Exception as story_exc:
-                            print(f"[Story] Failed sharing to story: {story_exc}")
-                            return False
+                score = _title_match_score(expected_title, caption_text)
+                print(f"[Story] Reel pk={post.pk} match score: {score:.2f} (need >= {FUZZY_THRESHOLD})")
+                if score >= FUZZY_THRESHOLD:
+                    print(f"[Story] ✅ Fuzzy match found! Reel pk={post.pk}")
+                    return _share_reel_to_story(cl, post, thumbnail_path)
+
+            # --- Strategy 2: Recency fallback after 10 min ---
+            if elapsed >= FALLBACK_AFTER_SECONDS and reels and not fallback_used:
+                fallback_used = True
+                # Pick the most recently posted reel (first in list = newest)
+                newest = reels[0]
+                print(
+                    f"[Story] ⚠️ No title match after {int(elapsed)}s. "
+                    f"Falling back to most recent Reel pk={newest.pk} (posted: {newest.taken_at})"
+                )
+                return _share_reel_to_story(cl, newest, thumbnail_path)
+
         except Exception as e:
             print(f"[Story] Error checking feed: {e}")
 
         print("[Story] Reel not found yet. Sleeping 45 seconds...")
         time.sleep(45)
 
-    print(f"[Story] Timeout reached ({max_wait_seconds}s). Reel was not detected on feed. Skipping Story.")
+    print(f"[Story] Timeout reached ({max_wait_seconds}s). Reel was not detected. Skipping Story.")
     return False

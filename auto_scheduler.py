@@ -107,14 +107,15 @@ def create_and_post_one_reel():
             domain = _get_domain()
             now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             print(f"[{now}] Starting automated reel cycle for domain: {domain} (Attempt {attempt}/{max_retries})")
+            # This is the single authoritative login for this pipeline run.
+            cl = get_insta_client()
 
-            # Fetch live Instagram analytics
+            # Fetch live analytics only if the feature flag is on
             analytics_data = None
             if _env_flag("ENABLE_INSTAGRAM_ANALYTICS", "false"):
-                cl = get_insta_client()
                 analytics_data = get_performance_data(cl)
             else:
-                print("Skipping Instagram analytics login (ENABLE_INSTAGRAM_ANALYTICS=false).")
+                print("Skipping Instagram analytics fetch (ENABLE_INSTAGRAM_ANALYTICS=false).")
 
             # Only persist real analytics — never save error strings
             if isinstance(analytics_data, list) and analytics_data:
@@ -139,7 +140,7 @@ def create_and_post_one_reel():
                 import re
                 for line in feedback_summary.splitlines():
                     clean_line = line.strip()
-                    # Matches "- Part [number]:" format
+                    # Matches "– Part [number]:" format
                     if re.match(r'^-\s*[Pp]art\s*\d+\s*:', clean_line):
                         series_topic = clean_line.lstrip("- ").strip()
                         print(f"[Series] Auto-continuing series: {series_topic}")
@@ -162,8 +163,8 @@ def create_and_post_one_reel():
             # Fix 4: Pick rotating TTS voice
             voice = _pick_next_voice()
 
-            # Run full pipeline — pass feedback_summary + voice
-            result = run_pipeline(topic, feedback_summary=feedback_summary, tts_voice_override=voice)
+            # Run full pipeline — pass feedback_summary + voice + insta client for Story posting
+            result = run_pipeline(topic, feedback_summary=feedback_summary, tts_voice_override=voice, insta_client=cl)
 
             if isinstance(result, dict):
                 append_reel_outcome(
