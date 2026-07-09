@@ -298,16 +298,20 @@ def generate_script(topic, analytics_data=None, feedback_summary=""):
 
     Create a PUNCHY, fast-paced reel script for this topic: "{topic}".
 
-    ── BREAKING THE 2.5K CEILING ──
-    This account gets 130-150 views on weak reels and 2.5K on strong ones.
-    The difference is always: saves (specific actionable insight) + shares (DM-worthy moment) + comment debate.
-    Your script MUST engineer all three:
-    1. SAVE: Scene 2 must reveal ONE specific, practical sign/test the viewer can use TODAY
-    2. SHARE: Scene 3 must contain one line that makes them think of a friend to DM this to
-    3. COMMENT DEBATE: The topic angle should be SLIGHTLY controversial — a take half the audience
-       agrees with and half doesn't. This creates comment wars which Instagram reads as high engagement.
-       Example of a debate-starting angle: 'Friendzone exist nahi karta — ye sirf ek excuse hai'
-       Not everything needs to be controversial, but the HOOK should provoke a reaction.
+    ── BREAKING THE 3.5K CEILING ──
+    Account data: Top reels hit 3.5K views. Weak reels get 150-500 views.
+    CRITICAL FINDING: This account has ZERO saves across ALL reels. This is why we can't break 3.5K.
+    Instagram's algorithm pushes reels to non-followers ONLY when saves + comments are high.
+    Currently the content reaches followers (3K) but no further — zero saves = no viral push.
+    Your script MUST fix this by engineering all three signals:
+    1. SAVES (most important — currently 0): Scene 2 MUST be a numbered checklist or step-by-step test.
+       Format: '3 signs hai: pehla — X, doosra — Y, teesra — Z. Agar teen mein se do milti hain...'
+       Numbered lists force saves because viewers can't memorize them — they MUST save to refer back.
+       Vague advice = never saved. Specific numbered checklist = almost always saved.
+    2. SHARE TRIGGER: Scene 3 must contain one line that makes them think of a friend to DM this to.
+    3. COMMENT DEBATE: Topic angle should be SLIGHTLY controversial — half agree, half don't.
+       Example: 'Friendzone exist nahi karta — ye sirf ek excuse hai'
+       Comment wars = Instagram reads as high engagement = more distribution.
 
     HOOK FRAMEWORK (you MUST use this style):
     {hook_framework['instruction']}
@@ -320,21 +324,25 @@ def generate_script(topic, analytics_data=None, feedback_summary=""):
     - Scene 1 (Hook — emotional_beat: "curious"): 20-28 words
         Impossible-to-skip opening. Bold claim or shocking reveal.
         Emotion goal: make the viewer feel a sudden jolt of curiosity — they NEED to know more.
-    - Scene 2 (Build — emotional_beat: "tense"): 22-32 words
-        Deepen the intrigue. Reveal ONE specific, PRACTICAL insight — something the viewer can
-        actually USE or CHECK right now (a specific sign, behavior, or test they can apply today).
-        This is the SAVE trigger: if Scene 2 contains a specific, actionable insight, viewers
-        save the reel to remember it. Vague insights get skipped. Specific ones get saved.
-        Emotion goal: build anxiety or suspense — make skipping feel like missing out on a secret.
-    - Scene 3 (Payoff + Rewatch + Share Trigger — emotional_beat: "shocked"): 20-28 words
+    - Scene 2 (Build — emotional_beat: "tense"): 22-35 words
+        *** THIS IS THE SAVE TRIGGER — THE MOST IMPORTANT SCENE ***
+        MANDATORY FORMAT: Must be a NUMBERED LIST of signs/steps. Exactly 3 items.
+        Pattern: 'Teen signs hain: pehla — [specific behavior], doosra — [specific behavior], teesra — [specific behavior].'
+        WHY: Viewers cannot memorize a list while watching. They MUST save the reel to refer back to it.
+        This is the #1 mechanism to get saves. A numbered list in Scene 2 = viewers save every time.
+        NEVER write a vague observation here. ALWAYS write a numbered, specific, checkable list.
+        Each item in the list must be something the viewer can CHECK RIGHT NOW with a real person they know.
+        Emotion goal: create urgency — 'I need to remember these 3 things.'
+    - Scene 3 (Payoff + Save CTA + Share Trigger — emotional_beat: "shocked"): 25-35 words
         Drop the mind-blowing conclusion.
-        MANDATORY REWATCH TRIGGER: The LAST LINE of Scene 3 MUST loop back to something said in
-        Scene 1 — a callback, a twist, or a re-framing of Scene 1's opening claim.
-        MANDATORY SHARE TRIGGER: Scene 3 must contain one line that makes the viewer think of a
-        specific friend/person they know who is IN this situation right now — so they DM it.
-        Pattern: 'Agar tumhara koi dost isme phansa hai...' or 'Ye sunke koi yaad aaya?'
-        This creates DM shares — Instagram's strongest distribution signal after saves.
-        Emotion goal: deliver a satisfying shock + leave a dangling thread that rewards rewatching.
+        MANDATORY IN-VIDEO SAVE CTA (NON-NEGOTIABLE): Scene 3 MUST contain this exact type of line:
+        'Is list ko save karo — agli baar kaam aayega' or 'Save karo ye — bhool jaoge warna'
+        or 'Screenshot lo is list ko' — this direct in-video save prompt is proven to 3x save rate.
+        Say it naturally as part of the narration, not as an afterthought.
+        MANDATORY REWATCH TRIGGER: The LAST LINE must loop back to something said in Scene 1.
+        MANDATORY SHARE TRIGGER: One line making viewer think of a friend IN this situation right now.
+        Pattern: 'Agar tumhara koi dost isme phansa hai...' or 'Koi yaad aaya? Unhe bhejo ye.'
+        Emotion goal: deliver a satisfying payoff + urgency to save + impulse to share.
 
     RETENTION TACTICS:
     - Scene 1 must hook within 2 seconds — start mid-sentence, mid-story, or with a shocking stat
@@ -351,14 +359,18 @@ def generate_script(topic, analytics_data=None, feedback_summary=""):
     Good example: Scene 1 said 'woh kabhi seedha nahi bolti' → Scene 3 ends with 'woh seedha kyun nahi bolti — ab tum samajh gaye.'
     The callback must feel like a satisfying click, not a forced repetition.
 
-    IN-VIDEO LIKE + SHARE BAIT (MANDATORY):
-    Scene 3 MUST include ONE line that triggers both emotional resonance AND a sharing impulse.
-    Best pattern: reference a third person the viewer knows — this makes them DM it to that person.
+    IN-VIDEO SAVE + SHARE BAIT (BOTH MANDATORY — account currently has 0 saves, this MUST change):
+    Scene 3 MUST include TWO specific lines:
+    LINE A — SAVE CTA (direct, urgent): Tell viewer to save the numbered list from Scene 2.
+    Examples of proven save CTAs:
+    - 'Is list ko save karo — agli baar kaam aayega jab tum confused ho.'
+    - 'Save karo ye teen signs — next time pata chal jayega.'
+    - 'Screenshot lo ye list — bhool jaoge warna.'
+    LINE B — SHARE TRIGGER (friend reference): Make viewer think of someone to DM this to.
     Examples:
     - 'Agar tumhara koi dost isme phansa hai, toh ye bhejo unhe.'
-    - 'Ye baat sirf wo log samjhenge jo sach mein iske through gaye hain.'
     - 'Koi yaad aaya? Unhe bhi ye dekhna chahiye.'
-    This line drives DM shares (strongest signal) + emotional likes without literally saying 'like karo'.
+    Both lines together = saves + DM shares = Instagram pushes reel to non-followers.
 
     PATTERN INTERRUPT:
     - Each scene MUST feel visually and tonally distinct from the others

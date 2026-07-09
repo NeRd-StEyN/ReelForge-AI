@@ -40,11 +40,13 @@ Rules:
     "कितनो के साथ ये हो चुका है? Comment 1 अगर हाँ, 2 अगर नहीं 👇"
     "आपका kya answer hai? 1 = हाँ, 2 = नहीं, 3 = नहीं पता 👇"
     The question MUST end with a numbered option list + 👇 emoji.
-- Third line: A SPECIFIC, urgent SAVE-focused CTA. Examples:
-    "Save this — agli baar kaam aayega jab wo ignore kare 📌"
-    "Save this so you never misread her signals again 📌"
-    "Screenshot karo, apne aap ko remind karo 📌"
-  Make the reason for saving feel PERSONAL and SPECIFIC to this topic, not generic.
+- Third line: A SPECIFIC, urgent SAVE-focused CTA that references the NUMBERED LIST in the reel.
+    Since the reel contains a numbered checklist, tell them to save it because they can't remember all points.
+    Examples:
+    "Save this list — agli baar jab confused ho, dekhna 📌"
+    "Is list ko save karo — ye 3 signs bhool jaoge warna 📌"
+    "Screenshot karo ye teen signs — real life mein test karo 📌"
+    Make the reason SPECIFIC to THIS reel's content — not generic 'save for later'.
 - Fourth line: A like-bait line that triggers emotional resonance WITHOUT literally saying 'like karo'.
   Examples:
     "Like karo agar ye tumhare saath bhi hua hai 💯"
@@ -54,7 +56,9 @@ Rules:
 - Write in Hinglish (mix of Hindi and English) — natural Gen-Z Indian Instagram style
 - Do NOT use generic phrases like "Tag a bro", "Double tap", "Share with bestie"
 - Make it feel like a REAL person wrote it, not a bot
-- If the hook framework suggests curiosity or controversy, keep the first line sharper and more specific.
+- CRITICAL: The caption's save CTA must reference the specific LIST/SIGNS/TEST from the reel — never generic.
+  This is because the reel script now contains numbered checklists. The caption must reinforce:
+  'Save this list' not just 'save this'
 
 Return ONLY the caption text, no quotes, no markdown.
 """
