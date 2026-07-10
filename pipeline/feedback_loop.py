@@ -59,7 +59,12 @@ def _read_outcomes(limit=30):
 
 
 def summarize_feedback(limit=30):
-    """Build a compact summary of what style/topics are working recently."""
+    """Build a compact summary of what style/topics are working recently.
+
+    Scoring is based on views + likes which are the only reliable signals
+    from the Instagram API. Saves are not returned for own media, and
+    comments are inflated by auto-comments — so neither is used for ranking.
+    """
     rows = _read_history(limit=limit)
     if not rows:
         rows = []
@@ -72,19 +77,18 @@ def summarize_feedback(limit=30):
                 views = item.get("views") or 0
                 likes = item.get("likes") or 0
                 comments = item.get("comments") or 0
-                saves = item.get("saves") or 0
                 caption = (item.get("topic_snippet") or "").strip()
                 # Like rate = likes/views — target >3% for healthy engagement
                 like_rate = round((likes / views * 100), 1) if views > 0 else 0.0
-                # Instagram algorithm weights: saves (5x) > comments (3x) > likes (1x) > views (0.1x)
-                # Optimizing for saves and comments = maximum distribution
-                score = (saves * 5) + (comments * 3) + likes + int(views * 0.1)
+                # Score by views + likes*10 — these are the only reliable
+                # signals from the API. Likes are weighted 10x because they
+                # indicate quality engagement vs passive scrolling.
+                score = views + (likes * 10)
                 posts.append({
                     "caption": caption,
                     "views": views,
                     "likes": likes,
                     "comments": comments,
-                    "saves": saves,
                     "like_rate": like_rate,
                     "score": score,
                 })
@@ -94,8 +98,6 @@ def summarize_feedback(limit=30):
 
     avg_views = int(sum(p["views"] for p in posts) / len(posts)) if posts else 0
     avg_likes = int(sum(p["likes"] for p in posts) / len(posts)) if posts else 0
-    avg_comments = int(sum(p["comments"] for p in posts) / len(posts)) if posts else 0
-    avg_saves = int(sum(p["saves"] for p in posts) / len(posts)) if posts else 0
     avg_like_rate = round(sum(p["like_rate"] for p in posts) / len(posts), 1) if posts else 0.0
     peak_views = max((p["views"] for p in posts), default=0)
 
@@ -104,9 +106,9 @@ def summarize_feedback(limit=30):
 
     lines = [
         f"PERFORMANCE DATA ({len(posts)} reels tracked):",
-        f"Average: {avg_views} views, {avg_likes} likes, {avg_comments} comments, {avg_saves} saves per reel.",
+        f"Average: {avg_views} views, {avg_likes} likes per reel.",
         f"Like Rate: {avg_like_rate}% avg [{like_rate_status}] | Peak single reel: {peak_views} views",
-        f"NOTE: Algorithm ranks by: saves (5x weight) > comments (3x) > likes > views",
+        f"Scoring: views + (likes × 10). Higher likes = higher quality content.",
         f"Like Rate target: >3% (currently {avg_like_rate}%) — in-video like bait overlay active to improve this.",
     ]
 
@@ -117,22 +119,22 @@ def summarize_feedback(limit=30):
 
         lines.extend([
             "",
-            "TOP PERFORMING CONTENT (replicate these hooks/angles — they got saves & comments):",
+            "TOP PERFORMING CONTENT (replicate these hooks/angles — they got the most views + likes):",
         ])
         for idx, p in enumerate(top, start=1):
             snippet = p["caption"][:110] if p["caption"] else "(no caption)"
             lines.append(
                 f"  {idx}. \"{snippet}\" → {p['views']} views, {p['likes']} likes, "
-                f"{p['comments']} comments, {p['saves']} saves"
+                f"like rate: {p['like_rate']}%"
             )
 
         if bottom:
             lines.append("")
-            lines.append("LOWEST PERFORMING CONTENT (avoid these angles — low saves/comments = low reach):")
+            lines.append("LOWEST PERFORMING CONTENT (avoid these angles — low views + likes = low reach):")
             for p in bottom:
                 snippet = p["caption"][:80] if p["caption"] else "(no caption)"
                 lines.append(
-                    f"  - \"{snippet}\" → {p['views']} views, {p['comments']} comments, {p['saves']} saves"
+                    f"  - \"{snippet}\" → {p['views']} views, {p['likes']} likes"
                 )
 
     outcomes = _read_outcomes(limit=limit)
@@ -168,8 +170,8 @@ def summarize_feedback(limit=30):
     if lines:
         lines.append("")
         lines.append(
-            "Use this data to write hooks that are SAVE-worthy (teach something) and COMMENT-worthy (provoke debate). "
-            "These are the signals that make Instagram distribute your reel to non-followers."
+            "Use this data to write hooks that maximize VIEWS (strong hook in first 1 second) and "
+            "LIKES (emotionally resonant content). These are the reliable signals that determine reach."
         )
 
     return "\n".join(lines)

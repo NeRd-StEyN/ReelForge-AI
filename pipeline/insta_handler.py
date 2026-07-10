@@ -52,16 +52,29 @@ def get_insta_client():
 
 
 def get_performance_data(cl):
-    """Fetches views and likes for the last 7 reels. Returns a list or None."""
+    """Fetches views and likes for the last 20 reels. Returns a list or None.
+
+    Uses cl.user_id (session-based) instead of user_id_from_username() which
+    hits Instagram's rate-limited public API and frequently returns 429 errors
+    on GitHub Actions runners — this was the root cause of analytics silently
+    failing and returning None.
+    """
     if not cl:
         print("[Analytics] Skipping live fetch — not logged in.")
         return None
 
     try:
         print("[Analytics] Fetching recent reel performance data...")
-        username = os.getenv("INSTA_USERNAME")
-        user_id = cl.user_id_from_username(username)
-        recent_posts = cl.user_medias(user_id, amount=10)
+        # Use the session's own user_id — avoids the rate-limited public
+        # web_profile_info endpoint that causes 429 errors on cloud IPs.
+        user_id = cl.user_id
+        if not user_id:
+            # Fallback: try the username lookup (slower, less reliable)
+            username = os.getenv("INSTA_USERNAME")
+            print(f"[Analytics] Session has no user_id — falling back to username lookup for @{username}...")
+            user_id = cl.user_id_from_username(username)
+
+        recent_posts = cl.user_medias(user_id, amount=20)
 
         analytics = []
         for post in recent_posts:
@@ -71,10 +84,7 @@ def get_performance_data(cl):
                     "topic_snippet": (post.caption_text or "")[:120].replace("\n", " ").strip(),
                     "views": getattr(post, "play_count", None) or getattr(post, "view_count", None) or getattr(post, "video_view_count", None) or 0,
                     "likes": post.like_count or 0,
-                    # Saves and comments are the highest-weight algorithm signals
-                    # Instagram weights: saves (5x) > comments (3x) > likes (1x) > views (0.1x)
                     "comments": post.comment_count or 0,
-                    "saves": getattr(post, "saved_count", None) or 0,
                 })
 
         if not analytics:
