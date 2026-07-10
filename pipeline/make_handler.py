@@ -1,5 +1,7 @@
-import os
+import json
 import math
+import os
+from datetime import datetime
 from typing import Optional
 
 import requests
@@ -16,6 +18,9 @@ cloudinary.config(
     api_secret=os.getenv("CLOUDINARY_API_SECRET"),
 )
 
+# Pending posts file — survives across GitHub Actions runs via cache
+PENDING_POSTS_FILE = os.path.join("data", "pending_posts.jsonl")
+
 
 def _safe_text(value, fallback: str = "") -> str:
     """Return clean text and guard against None/NaN values from upstream systems."""
@@ -28,6 +33,111 @@ def _safe_text(value, fallback: str = "") -> str:
         return fallback
     return text
 
+
+# ---------------------------------------------------------------------------
+# Pending posts — save / load / retry
+# ---------------------------------------------------------------------------
+
+def _save_pending_post(payload: dict) -> None:
+    """Save a failed webhook payload to pending_posts.jsonl for retry on next run."""
+    try:
+        os.makedirs("data", exist_ok=True)
+        entry = {
+            "timestamp": datetime.now().isoformat(),
+            "payload": payload,
+            "attempts": 1,
+            "status": "pending",
+        }
+        with open(PENDING_POSTS_FILE, "a", encoding="utf-8") as f:
+            f.write(json.dumps(entry) + "\n")
+        print(f"[Pending] Reel saved to {PENDING_POSTS_FILE} — will retry on next run.")
+    except Exception as exc:
+        print(f"[Pending] Could not save pending post: {exc}")
+
+
+def _load_all_pending() -> list:
+    """Load all entries from pending_posts.jsonl (pending + sent)."""
+    if not os.path.exists(PENDING_POSTS_FILE):
+        return []
+    entries = []
+    with open(PENDING_POSTS_FILE, "r", encoding="utf-8") as f:
+        for line in f:
+            line = line.strip()
+            if line:
+                try:
+                    entries.append(json.loads(line))
+                except json.JSONDecodeError:
+                    pass
+    return entries
+
+
+def _rewrite_pending_file(entries: list) -> None:
+    """Rewrite the pending posts file with the given entries."""
+    try:
+        os.makedirs("data", exist_ok=True)
+        with open(PENDING_POSTS_FILE, "w", encoding="utf-8") as f:
+            for entry in entries:
+                f.write(json.dumps(entry) + "\n")
+    except Exception as exc:
+        print(f"[Pending] Could not rewrite pending posts file: {exc}")
+
+
+def _post_payload_to_make(payload: dict) -> bool:
+    """Send a pre-built payload dict to the Make.com webhook. Returns True on success."""
+    webhook_url = os.getenv("MAKE_WEBHOOK_URL")
+    if not webhook_url:
+        print("[Pending] MAKE_WEBHOOK_URL not set — cannot retry.")
+        return False
+    try:
+        response = requests.post(webhook_url, json=payload, timeout=60)
+        if 200 <= response.status_code < 300:
+            return True
+        print(f"[Pending] Webhook returned {response.status_code}: {response.text}")
+        return False
+    except Exception as exc:
+        print(f"[Pending] Webhook request failed: {exc}")
+        return False
+
+
+def retry_pending_posts() -> int:
+    """
+    Retry all pending posts at the start of a new pipeline run.
+    Returns the number of posts successfully retried and posted.
+    """
+    all_entries = _load_all_pending()
+    pending = [e for e in all_entries if e.get("status") == "pending"]
+
+    if not pending:
+        print("[Pending] No pending posts to retry.")
+        return 0
+
+    print(f"[Pending] Found {len(pending)} pending post(s) — retrying now...")
+    retried_ok = 0
+
+    for entry in all_entries:
+        if entry.get("status") != "pending":
+            continue
+
+        entry["attempts"] = entry.get("attempts", 1) + 1
+        payload = entry.get("payload", {})
+        video_url = payload.get("url", "(unknown)")
+        print(f"[Pending] Retrying post: {video_url[:80]}...")
+
+        if _post_payload_to_make(payload):
+            entry["status"] = "sent"
+            entry["sent_at"] = datetime.now().isoformat()
+            print(f"[Pending] ✅ Retry succeeded — reel posted to Instagram.")
+            retried_ok += 1
+        else:
+            print(f"[Pending] ❌ Retry failed again — will try on next run.")
+
+    _rewrite_pending_file(all_entries)
+    return retried_ok
+
+
+# ---------------------------------------------------------------------------
+# Cloudinary upload
+# ---------------------------------------------------------------------------
 
 def upload_file_to_cloudinary(file_path: str) -> Optional[str]:
     """Upload a local MP4 or image to Cloudinary and return a publicly reachable direct URL."""
@@ -52,6 +162,10 @@ def upload_file_to_cloudinary(file_path: str) -> Optional[str]:
         return None
 
 
+# ---------------------------------------------------------------------------
+# Main webhook sender
+# ---------------------------------------------------------------------------
+
 def send_to_make_webhook(
     video_path: str,
     title: str,
@@ -59,7 +173,12 @@ def send_to_make_webhook(
     thumbnail_path: Optional[str] = None,
     metadata: Optional[dict] = None,
 ) -> bool:
-    """Send reel URL and caption parts to a Make.com webhook as JSON."""
+    """Send reel URL and caption parts to a Make.com webhook as JSON.
+    
+    If the webhook call fails AFTER a successful Cloudinary upload, the full
+    payload is saved to data/pending_posts.jsonl so it can be retried on the
+    next pipeline run — meaning no generated reel is ever silently lost.
+    """
     webhook_url = os.getenv("MAKE_WEBHOOK_URL")
 
     if not webhook_url:
@@ -93,7 +212,7 @@ def send_to_make_webhook(
             "caption": caption,
             "title": safe_title,
         }
-        
+
         if cover_url:
             payload["cover_url"] = cover_url
 
@@ -117,7 +236,17 @@ def send_to_make_webhook(
         print(
             f"Make.com webhook failed with status code {response.status_code}: {response.text}"
         )
+        # ✅ Save to pending so next run can retry with the already-uploaded Cloudinary URL
+        print("[Pending] Saving payload for retry on next run...")
+        _save_pending_post(payload)
         return False
+
     except Exception as exc:
         print(f"Failed to post to Make.com: {exc}")
+        # If we got a video_url before the crash, try to save it
+        try:
+            if "payload" in dir() and payload.get("url"):
+                _save_pending_post(payload)
+        except Exception:
+            pass
         return False

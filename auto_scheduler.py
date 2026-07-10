@@ -14,6 +14,7 @@ from pipeline.feedback_loop import (
     load_used_topics,
     save_used_topic,
 )
+from pipeline.make_handler import retry_pending_posts
 from pipeline.insta_handler import get_insta_client, get_performance_data
 from pipeline.script_gen import generate_topic_from_domain
 
@@ -101,6 +102,15 @@ def _pick_next_voice():
 
 
 def create_and_post_one_reel():
+    # ✅ Retry any reels that failed to reach Make.com in a previous run
+    # before spending time generating a brand-new reel.
+    try:
+        retried = retry_pending_posts()
+        if retried:
+            print(f"[Pending] {retried} previously failed reel(s) posted successfully via retry.")
+    except Exception as retry_err:
+        print(f"[Pending] Retry step failed (non-fatal): {retry_err}")
+
     max_retries = 3
     for attempt in range(1, max_retries + 1):
         try:

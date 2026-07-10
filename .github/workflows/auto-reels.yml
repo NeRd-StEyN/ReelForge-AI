@@ -39,6 +39,7 @@ jobs:
             data/used_topics.jsonl
             data/reel_outcomes.jsonl
             data/voice_index.txt
+            data/pending_posts.jsonl
           key: reelforge-data-${{ github.ref_name }}-${{ github.run_id }}
           restore-keys: |
             reelforge-data-${{ github.ref_name }}-
@@ -81,4 +82,5 @@ jobs:
             data/used_topics.jsonl
             data/reel_outcomes.jsonl
             data/voice_index.txt
+            data/pending_posts.jsonl
           key: reelforge-data-${{ github.ref_name }}-${{ github.run_id }}
