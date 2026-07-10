@@ -59,13 +59,11 @@ def _read_schedule_times(reels_per_day):
     return times[:reels_per_day]
 
 
-# TTS voice pool — mix of male and female Hindi voices for variety
+# TTS voice pool — Edge TTS only has 2 Hindi voices available
 # Persisted across GitHub Actions runs via data/voice_index.txt
 _TTS_VOICES = [
     "hi-IN-MadhurNeural",   # Male — deep, authoritative
     "hi-IN-SwaraNeural",    # Female — warm, engaging
-    "hi-IN-RehaanNeural",   # Male — younger, energetic tone
-    "hi-IN-AnanyaNeural",   # Female — clear, confident
 ]
 _VOICE_INDEX_FILE = os.path.join("data", "voice_index.txt")
 
