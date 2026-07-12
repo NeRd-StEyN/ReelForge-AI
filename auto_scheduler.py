@@ -120,7 +120,7 @@ def create_and_post_one_reel():
 
             # Fetch live analytics only if the feature flag is on
             analytics_data = None
-            if _env_flag("ENABLE_INSTAGRAM_ANALYTICS", "false"):
+            if _env_flag("ENABLE_INSTAGRAM_ANALYTICS", "true"):
                 analytics_data = get_performance_data(cl)
             else:
                 print("Skipping Instagram analytics fetch (ENABLE_INSTAGRAM_ANALYTICS=false).")

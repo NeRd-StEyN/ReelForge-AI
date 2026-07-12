@@ -268,7 +268,13 @@ def wait_and_share_reel_to_story(cl, username, expected_title, thumbnail_path, s
     start_time = time.time()
 
     try:
-        user_id = cl.user_id_from_username(username)
+        # Use session-based user_id — avoids the rate-limited public
+        # web_profile_info endpoint that returns 429 on GitHub Actions IPs.
+        # This was the root cause of stories silently failing after the first post.
+        user_id = cl.user_id
+        if not user_id:
+            print(f"[Story] Session has no user_id — falling back to username lookup...")
+            user_id = cl.user_id_from_username(username)
     except Exception as e:
         print(f"[Story] Failed to get user ID: {e}")
         return False

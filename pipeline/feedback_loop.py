@@ -80,10 +80,13 @@ def summarize_feedback(limit=30):
                 caption = (item.get("topic_snippet") or "").strip()
                 # Like rate = likes/views — target >3% for healthy engagement
                 like_rate = round((likes / views * 100), 1) if views > 0 else 0.0
-                # Score by views + likes*10 — these are the only reliable
-                # signals from the API. Likes are weighted 10x because they
-                # indicate quality engagement vs passive scrolling.
-                score = views + (likes * 10)
+                # Score by views + likes*10 + like_rate*100 — views and likes
+                # are the reliable API signals. Likes weighted 10x for quality
+                # engagement. Like rate weighted 100x so high-engagement content
+                # that got suppressed by algorithm is still recognized as good
+                # (a 500-view reel with 3% like rate = better content than
+                # a 3K-view reel with 0.5% like rate — it just needed better hooks).
+                score = views + (likes * 10) + (like_rate * 100)
                 posts.append({
                     "caption": caption,
                     "views": views,

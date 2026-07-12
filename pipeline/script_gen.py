@@ -528,20 +528,19 @@ _TOPIC_TIER3_EXPLORE = [
 def _pick_topic_subcategory():
     """
     Weighted topic picker based on REAL account analytics (July 2026):
-    - 40% TIER 1A: Friendzone/Situationship (2.5K-2.6K views, 21-24 shares)
-    - 35% TIER 1B: Mirror Psychology (1.5K views, 1.53% share rate — HIGHEST)
+    - 40% TIER 1A: Friendzone/Situationship (2.5K-3.5K views — PROVEN TOP)
+    - 40% TIER 1B: Mirror Psychology (1.5K views, 1.53% share rate — HIGHEST shares)
     - 20% TIER 2:  Eye contact + other 1.5K performers
-    - 5%  TIER 3:  Exploratory variety (prevent niche burnout)
+    - 0%  TIER 3:  DISABLED — "Magnetic Presence" got 153 views, "Charisma" topics
+    -               are proven dead. Re-enable only after consistently hitting 3K+.
     """
     roll = random.random()
     if roll < 0.40:
         return random.choice(_TOPIC_TIER1A_FRIENDZONE)
-    elif roll < 0.75:
+    elif roll < 0.80:
         return random.choice(_TOPIC_TIER1B_MIRROR)
-    elif roll < 0.95:
-        return random.choice(_TOPIC_TIER2_HIGH)
     else:
-        return random.choice(_TOPIC_TIER3_EXPLORE)
+        return random.choice(_TOPIC_TIER2_HIGH)
 
 
 

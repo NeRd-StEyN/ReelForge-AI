@@ -14,6 +14,7 @@ from pipeline.visual_gen import fetch_pexels_video, fetch_pexels_image, create_p
 from pipeline.video_editor import create_video
 from pipeline.seo_gen import generate_seo_metadata, save_metadata
 from pipeline.insta_handler import get_insta_client, get_performance_data
+from pipeline.feedback_loop import append_analytics_snapshot, summarize_feedback
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -75,10 +76,25 @@ def main(topic, feedback_summary="", tts_voice_override=None, insta_client=None)
         analytics_data = get_performance_data(cl)
         if analytics_data:
             print(f"[Analytics] Live data fetched: {len(analytics_data)} reels.")
+            # Always save analytics to JSONL — builds historical trend data.
+            # Previously only the scheduler path saved; direct main.py runs
+            # would fetch data, use it once, and throw it away.
+            domain = (os.getenv("CONTENT_DOMAIN") or "psychology of attraction").strip()
+            append_analytics_snapshot(domain, analytics_data)
         else:
             print("[Analytics] Live fetch failed — script will use saved history if available.")
     else:
         print("Skipping Instagram analytics login (no client available).")
+
+    # Build feedback summary from saved history if not passed in.
+    # This ensures direct `python main.py "topic"` runs get the same
+    # analytics intelligence as the scheduler path.
+    if not feedback_summary:
+        feedback_summary = summarize_feedback(limit=30)
+        if feedback_summary:
+            print(f"[Feedback] Built summary from saved history: {feedback_summary.splitlines()[0]}")
+        else:
+            print("[Feedback] No saved history yet — running without performance context.")
 
     # 1. Generate Script using AI Feedback
     print(f"Brainstorming script using topic: '{topic}' and past performance data...")
