@@ -226,9 +226,13 @@ def _share_reel_to_story(cl, post, thumbnail_path, story_poll=None):
     If story_poll is provided, also posts a follow-up poll story slide.
     """
     try:
-        if thumbnail_path and os.path.exists(thumbnail_path):
-            cl.media_share_to_story(post.pk, background=thumbnail_path)
-        else:
+        try:
+            if thumbnail_path and os.path.exists(thumbnail_path):
+                cl.media_share_to_story(post.pk, background=thumbnail_path)
+            else:
+                cl.media_share_to_story(post.pk)
+        except Exception as bg_exc:
+            print(f"[Story] media_share_to_story with background failed: {bg_exc}. Retrying without background...")
             cl.media_share_to_story(post.pk)
         print("[Story] Successfully posted Story promotion! 🚀")
 
@@ -244,21 +248,21 @@ def _share_reel_to_story(cl, post, thumbnail_path, story_poll=None):
         return False
 
 
-def wait_and_share_reel_to_story(cl, username, expected_title, thumbnail_path, story_poll=None, max_wait_seconds=900):
+def wait_and_share_reel_to_story(cl, username, expected_title, thumbnail_path, story_poll=None, max_wait_seconds=1500):
     """
     Polls Instagram for the newly uploaded Reel, then shares it to Story
     using the generated high-contrast thumbnail as the background.
     If story_poll is provided, also posts a follow-up poll story slide.
 
     Strategy (in order):
-      1. Fuzzy title match against the 5 most recent Reels (>=60% word overlap).
-      2. After 10 min with no match, fall back to the single most-recently-posted
+      1. Fuzzy title match against the 5 most recent Reels (>=50% word overlap).
+      2. After 15 min with no match, fall back to the single most-recently-posted
          Reel — this fires even if Make.com reformatted the caption completely.
-      3. Timeout after 15 minutes (900s) total.
+      3. Timeout after 25 minutes (1500s) total.
     """
     import time
-    FUZZY_THRESHOLD = 0.6          # 60% of title words must appear in caption
-    FALLBACK_AFTER_SECONDS = 600   # 10 min: switch to recency fallback
+    FUZZY_THRESHOLD = 0.5          # 50% of title words must appear in caption
+    FALLBACK_AFTER_SECONDS = 900   # 15 min: switch to recency fallback
 
     if not cl:
         print("[Story] Skipping Story post — client not logged in.")
@@ -288,8 +292,9 @@ def wait_and_share_reel_to_story(cl, username, expected_title, thumbnail_path, s
             print(f"[Story] Checking recent feed posts... (elapsed: {int(elapsed)}s)")
             recent_posts = cl.user_medias(user_id, amount=5)
 
-            # Collect only Reels
-            reels = [p for p in recent_posts if p.media_type == 2 and p.product_type == "clips"]
+            # Collect only Reels (sometimes product_type is not 'clips', just rely on media_type 2)
+            reels = [p for p in recent_posts if getattr(p, "media_type", None) == 2]
+            print(f"[Story] Found {len(recent_posts)} recent posts. Filtered to {len(reels)} reels.")
 
             # --- Strategy 1: Fuzzy title match ---
             for post in reels:

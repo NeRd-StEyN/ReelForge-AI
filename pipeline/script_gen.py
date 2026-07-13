@@ -196,33 +196,21 @@ Example: 'Ye [topic] test fail kiya toh [consequence] rahoge forever!'""",
 
 
 def _pick_hook_framework(analytics_data=None, feedback_summary=""):
-    """Choose a hook framework with a strong bias toward proven viral frameworks.
+    """Choose a hook framework with a healthy balance to prevent audience fatigue.
     
-    Based on account analytics:
-    - kabhii_nahi: 2x 1.4K-view reels → highest average performer
-    - test_format: 2.4K view reel → top single performer
-    - curiosity_gap: good secondary framework
-    These three get 60% weight; others fill the remainder.
+    Instead of spamming the top 2 hooks 100% of the time, we give the top
+    performers a slight bump, but ensure all frameworks rotate evenly.
     """
-    # Always prioritize the proven frameworks first (60% of the time)
     proven_viral = ["kabhii_nahi", "test_format", "curiosity_gap"]
-    if random.random() < 0.60:
+    
+    # 30% of the time, force one of the proven viral hooks
+    if random.random() < 0.30:
         preferred_name = random.choice(proven_viral)
         for framework in _HOOK_FRAMEWORKS:
             if framework["name"] == preferred_name:
                 return framework
 
-    if feedback_summary:
-        if "saves" in feedback_summary.lower() or "comments" in feedback_summary.lower():
-            preferred = ["kabhii_nahi", "curiosity_gap", "challenge", "story_open"]
-        else:
-            preferred = ["test_format", "shock_stat", "kabhii_nahi", "controversial_take"]
-
-        for framework_name in preferred:
-            for framework in _HOOK_FRAMEWORKS:
-                if framework["name"] == framework_name:
-                    return framework
-
+    # 70% of the time, completely random rotation for variety
     return random.choice(_HOOK_FRAMEWORKS)
 
 
@@ -298,20 +286,13 @@ def generate_script(topic, analytics_data=None, feedback_summary=""):
 
     Create a PUNCHY, fast-paced reel script for this topic: "{topic}".
 
-    ── BREAKING THE 3.5K CEILING ──
-    Account data: Top reels hit 3.5K views. Weak reels get 150-500 views.
-    CRITICAL FINDING: This account has ZERO saves across ALL reels. This is why we can't break 3.5K.
-    Instagram's algorithm pushes reels to non-followers ONLY when saves + comments are high.
-    Currently the content reaches followers (3K) but no further — zero saves = no viral push.
-    Your script MUST fix this by engineering all three signals:
-    1. SAVES (most important — currently 0): Scene 2 MUST be a numbered checklist or step-by-step test.
-       Format: '3 signs hai: pehla — X, doosra — Y, teesra — Z. Agar teen mein se do milti hain...'
-       Numbered lists force saves because viewers can't memorize them — they MUST save to refer back.
-       Vague advice = never saved. Specific numbered checklist = almost always saved.
-    2. SHARE TRIGGER: Scene 3 must contain one line that makes them think of a friend to DM this to.
-    3. COMMENT DEBATE: Topic angle should be SLIGHTLY controversial — half agree, half don't.
-       Example: 'Friendzone exist nahi karta — ye sirf ek excuse hai'
-       Comment wars = Instagram reads as high engagement = more distribution.
+    ── MAXIMIZING ENGAGEMENT WITHOUT REPETITION ──
+    To break past the 3.5K view ceiling, we need SAVES and SHARES, but we CANNOT be repetitive.
+    DO NOT use a numbered checklist (e.g., "3 signs hai") for every single video. 
+    Mix up the structure! Some videos should be a story, some a single deep psychological truth, and some a numbered list.
+    1. SAVES: When appropriate, use specific advice or a checklist that viewers want to refer back to.
+    2. SHARES: Include a relatable moment or realization that makes them want to DM a friend ("Agar koi dost isme phansa hai...").
+    3. COMMENTS: Keep the angle slightly controversial to spark debate in the comments.
 
     HOOK FRAMEWORK (you MUST use this style):
     {hook_framework['instruction']}
@@ -323,50 +304,24 @@ def generate_script(topic, analytics_data=None, feedback_summary=""):
     - Return EXACTLY 3 scenes
     - Scene 1 (Hook — emotional_beat: "curious"): 20-28 words
         Impossible-to-skip opening. Bold claim or shocking reveal.
-        Emotion goal: make the viewer feel a sudden jolt of curiosity — they NEED to know more.
+        Emotion goal: make the viewer feel a sudden jolt of curiosity.
     - Scene 2 (Build — emotional_beat: "tense"): 22-35 words
-        *** THIS IS THE SAVE TRIGGER — THE MOST IMPORTANT SCENE ***
-        MANDATORY FORMAT: Must be a NUMBERED LIST of signs/steps. Exactly 3 items.
-        Pattern: 'Teen signs hain: pehla — [specific behavior], doosra — [specific behavior], teesra — [specific behavior].'
-        WHY: Viewers cannot memorize a list while watching. They MUST save the reel to refer back to it.
-        This is the #1 mechanism to get saves. A numbered list in Scene 2 = viewers save every time.
-        NEVER write a vague observation here. ALWAYS write a numbered, specific, checkable list.
-        Each item in the list must be something the viewer can CHECK RIGHT NOW with a real person they know.
-        Emotion goal: create urgency — 'I need to remember these 3 things.'
+        Deliver the core value. This can be a short list, a surprising psychological fact, or a deep truth.
+        Emotion goal: create an 'aha' moment or realization.
     - Scene 3 (Payoff + Save CTA + Share Trigger — emotional_beat: "shocked"): 25-35 words
         Drop the mind-blowing conclusion.
-        MANDATORY IN-VIDEO SAVE CTA (NON-NEGOTIABLE): Scene 3 MUST contain this exact type of line:
-        'Is list ko save karo — agli baar kaam aayega' or 'Save karo ye — bhool jaoge warna'
-        or 'Screenshot lo is list ko' — this direct in-video save prompt is proven to 3x save rate.
-        Say it naturally as part of the narration, not as an afterthought.
+        Include a natural CTA to save OR share, but mix it up so it doesn't sound robotic.
+        Examples: 'Save this so you don't forget' OR 'Send this to a friend who needs to hear it'.
         MANDATORY REWATCH TRIGGER: The LAST LINE must loop back to something said in Scene 1.
-        MANDATORY SHARE TRIGGER: One line making viewer think of a friend IN this situation right now.
-        Pattern: 'Agar tumhara koi dost isme phansa hai...' or 'Koi yaad aaya? Unhe bhejo ye.'
-        Emotion goal: deliver a satisfying payoff + urgency to save + impulse to share.
 
     RETENTION TACTICS:
-    - Scene 1 must hook within 2 seconds — start mid-sentence, mid-story, or with a shocking stat
-    - Scene 2 creates an open loop that makes skipping feel like missing out
-    - Scene 3 closes the loop AND adds one extra twist that rewards rewatching
-    - Keep language conversational, raw, street-smart — like a friend sharing secrets
-    - Each scene should feel like a new revelation, not a continuation
+    - Scene 1 must hook within 2 seconds.
+    - Scene 2 creates tension.
+    - Scene 3 closes the loop AND adds one extra twist that rewards rewatching.
+    - Keep language conversational, raw, street-smart — like a friend sharing secrets.
 
     MANDATORY REWATCH TRIGGER (NON-NEGOTIABLE):
     The FINAL sentence of Scene 3 MUST contain a callback to EXACTLY one specific word or phrase used in Scene 1.
-    This creates an involuntary 'wait, let me watch again' reaction that Instagram's algorithm
-    registers as a rewatch — which is a top-tier distribution signal.
-    Bad example: 'Toh ab tum jaante ho.' (no callback)
-    Good example: Scene 1 said 'woh kabhi seedha nahi bolti' → Scene 3 ends with 'woh seedha kyun nahi bolti — ab tum samajh gaye.'
-    The callback must feel like a satisfying click, not a forced repetition.
-
-    IN-VIDEO SAVE + SHARE BAIT (BOTH MANDATORY — account currently has 0 saves, this MUST change):
-    Scene 3 MUST include TWO specific lines:
-    LINE A — SAVE CTA (direct, urgent): Tell viewer to save the numbered list from Scene 2.
-    Examples of proven save CTAs:
-    - 'Is list ko save karo — agli baar kaam aayega jab tum confused ho.'
-    - 'Save karo ye teen signs — next time pata chal jayega.'
-    - 'Screenshot lo ye list — bhool jaoge warna.'
-    LINE B — SHARE TRIGGER (friend reference): Make viewer think of someone to DM this to.
     Examples:
     - 'Agar tumhara koi dost isme phansa hai, toh ye bhejo unhe.'
     - 'Koi yaad aaya? Unhe bhi ye dekhna chahiye.'
@@ -527,20 +482,21 @@ _TOPIC_TIER3_EXPLORE = [
 
 def _pick_topic_subcategory():
     """
-    Weighted topic picker based on REAL account analytics (July 2026):
-    - 40% TIER 1A: Friendzone/Situationship (2.5K-3.5K views — PROVEN TOP)
-    - 40% TIER 1B: Mirror Psychology (1.5K views, 1.53% share rate — HIGHEST shares)
-    - 20% TIER 2:  Eye contact + other 1.5K performers
-    - 0%  TIER 3:  DISABLED — "Magnetic Presence" got 153 views, "Charisma" topics
-    -               are proven dead. Re-enable only after consistently hitting 3K+.
+    Weighted topic picker designed for balance:
+    - 25% Friendzone/Situationship (Tier 1A)
+    - 25% Mirror Psychology (Tier 1B)
+    - 25% Eye Contact/Body Language (Tier 2)
+    - 25% Broader Psychology/Charisma (Tier 3 - to explore new angles)
     """
     roll = random.random()
-    if roll < 0.40:
+    if roll < 0.25:
         return random.choice(_TOPIC_TIER1A_FRIENDZONE)
-    elif roll < 0.80:
+    elif roll < 0.50:
         return random.choice(_TOPIC_TIER1B_MIRROR)
-    else:
+    elif roll < 0.75:
         return random.choice(_TOPIC_TIER2_HIGH)
+    else:
+        return random.choice(_TOPIC_TIER3_EXPLORE)
 
 
 
