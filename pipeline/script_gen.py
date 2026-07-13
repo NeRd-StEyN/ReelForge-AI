@@ -303,12 +303,15 @@ def generate_script(topic, analytics_data=None, feedback_summary=""):
     - Heavily favor terms like "Test", "Deciphered", "Secret", or numbered lists in your approach.
 
     ── MAXIMIZING ENGAGEMENT WITHOUT REPETITION ──
-    To break past the 3.5K view ceiling, we need SAVES and SHARES, but we CANNOT be repetitive.
+    To break past the 3.5K view ceiling, we need COMMENTS (most important), SAVES, and SHARES.
+    Current engagement is 2.43% — target 3-5%. Comments are the #1 ranking factor.
     DO NOT use a numbered checklist (e.g., "3 signs hai") for every single video. 
     Mix up the structure! Some videos should be a story, some a single deep psychological truth, and some a numbered list.
-    1. SAVES: When appropriate, use specific advice or a checklist that viewers want to refer back to.
-    2. SHARES: Include a relatable moment or realization that makes them want to DM a friend ("Agar koi dost isme phansa hai...").
-    3. COMMENTS: Keep the angle slightly controversial to spark debate in the comments.
+    1. COMMENTS (PRIORITY #1): End with a DIRECT QUESTION that requires a yes/no/opinion answer in comments
+       Examples: 'Tell me in comments: kabhi aapko ye hua?' OR 'Guilty or Not Guilty? Comment now.'
+       Make viewers feel like they MUST answer — create FOMO of missing the discussion.
+    2. SAVES: When appropriate, use specific advice or a checklist that viewers want to refer back to.
+    3. SHARES: Include a relatable moment or realization that makes them want to DM a friend ("Agar koi dost isme phansa hai...").
 
     HOOK FRAMEWORK (you MUST use this style):
     {hook_framework['instruction']}
@@ -336,12 +339,17 @@ def generate_script(topic, analytics_data=None, feedback_summary=""):
     - Scene 3 closes the loop AND adds one extra twist that rewards rewatching.
     - Keep language conversational, raw, street-smart — like a friend sharing secrets.
 
-    MANDATORY REWATCH TRIGGER (NON-NEGOTIABLE):
-    The FINAL sentence of Scene 3 MUST contain a callback to EXACTLY one specific word or phrase used in Scene 1.
+    MANDATORY COMMENT-DRIVING TRIGGER (NON-NEGOTIABLE):
+    The FINAL sentence of Scene 3 MUST include a direct question or poll that forces viewers to comment.
+    CRITICAL: This is what will push your engagement from 2.4% to 3-5%.
+    Structure: [Controversial Statement] + [Direct Yes/No Question]
     Examples:
-    - 'Agar tumhara koi dost isme phansa hai, toh ye bhejo unhe.'
-    - 'Koi yaad aaya? Unhe bhi ye dekhna chahiye.'
-    Both lines together = saves + DM shares = Instagram pushes reel to non-followers.
+    - 'Tum sochte ho ye testing hai ya genuine interest? Comment karo: Testing / Genuine / Confused'
+    - 'Guilty or innocent? Batao comments mein.'
+    - 'Agar ye tum par hua, toh tum kya karenfe? Share your move in comments.'
+    - 'Mujhe batao: Tumhara last relationship yahi reason se khatam hua ya kuch aur? Comment.'
+    ALSO include one share line: 'Send this to [type of person] who needs to hear it.'
+    Pattern: [Direct Question in comments] + [Share trigger] = maximum engagement.
 
     PATTERN INTERRUPT:
     - Each scene MUST feel visually and tonally distinct from the others
@@ -359,14 +367,20 @@ def generate_script(topic, analytics_data=None, feedback_summary=""):
     VISUAL KEYWORDS:
     - Each scene must have a visual_keyword for stock footage search
     - Keywords should describe the MOOD and SETTING, not just "hot girl"
-    - CRITICAL FOR SCENE 1: The first scene's visual MUST be high-contrast and instantly readable.
-      If it's a psychology video, use bright settings. If it's a horror/mystery video, use dark but highly visible settings (e.g., "creepy abandoned hospital flashlight").
-      The viewer must immediately understand the visual context within 1 second — even with sound off.
-    - Good examples: "confident woman walking city street cinematic", "close up eyes mysterious lighting", "creepy forest fog night"
-    - Include lighting/mood descriptors: neon, golden hour, moody dark, bright aesthetic, cinematic, horror
-    - Each scene MUST have a different visual_mood (one of: mysterious, confident, dramatic, warm, dark, energetic, elegant, horror)
-    - Avoid repetitive stock-looking keywords — make each scene feel visually distinct
-    - Scene 1 visual_mood should be: mysterious OR energetic OR dramatic OR horror — never just "dark" without context
+    - CRITICAL FOR SCENE 1: The first scene's visual MUST be HIGH-IMPACT and stop scrolls within 0.5 seconds.
+      Rules:
+      * Use BOLD color contrast (neon green/magenta on black, bright red, vivid yellow, electric blue)
+      * Close-ups of faces or hands ALWAYS work better than wide shots
+      * For psychology: intense eye contact, raised eyebrow, subtle smirk
+      * For relationships: two people looking in opposite directions (subtle tension)
+      * Horror/Mystery: extreme close-up + shadow + single light source
+      * NEVER use blurry or low-contrast visuals in Scene 1 — it won't stop scrolls
+      * Text overlay (title) MUST be readable in 0.3 seconds even on small phone screens
+    - Best Scene 1 visuals: "extreme close-up face intense eyes neon lighting", "two people back to back dramatic shadow", "single eye macro shot mysterious"
+    - Include mood + technical descriptors: "4K, high contrast, bold colors, cinematic, close-up"
+    - Each scene MUST have a different visual_mood (one of: mysterious, confident, dramatic, intense, dark, energetic, elegant, horror)
+    - Scene 1 visual_mood should be: intense OR mysterious OR dramatic — NEVER calm or neutral
+    - Prioritize STOP-SCROLL visuals over artistic beauty
 
     Format the output as strict JSON:
     {{
