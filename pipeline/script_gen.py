@@ -164,6 +164,14 @@ _HOOK_FRAMEWORKS = [
         "name": "controversial_take",
         "instruction": "Lead with a bold, polarizing opinion. Example pattern: 'Acche ladke kabhi attract nahi karte, aur reason ye hai...' — force the viewer to pick a side.",
     },
+    {
+        "name": "warning_hook",
+        "instruction": "Start with a direct warning that creates immediate suspense. Example pattern: 'Agar tum akele ho toh ye video mat dekhna...' or 'Ye sach sunne ke baad tum darr jaoge...'",
+    },
+    {
+        "name": "dark_mystery",
+        "instruction": "Open with an unsolved mystery or creepy phenomenon. Example pattern: 'Duniya ki sabse rahasyamayi jagah jahan se koi wapas nahi aaya...' or 'Ye creepy fact tumhe sone nahi dega...'",
+    },
     # ── PROVEN VIRAL FRAMEWORK — HIGHEST PERFORMER (2.4K+ views) ──
     {
         "name": "kabhii_nahi",
@@ -464,12 +472,16 @@ _TOPIC_TIER2_HIGH = [
     "her smile decoded — the difference between polite and genuine",
 ]
 
-# TIER 3 — EXPLORATORY (use sparingly, 10% max)
+# TIER 3 — HORROR & MYSTERY (The new viral pivot)
 _TOPIC_TIER3_EXPLORE = [
-    "how to build unshakeable confidence in social situations",
-    "psychology of charisma and what makes someone naturally magnetic",
-    "subtle signs someone genuinely respects and values you",
-    "the psychology of building strong, healthy relationships",
+    "creepy psychological facts that will keep you awake at night",
+    "unsolved mysteries that scientists still cannot explain",
+    "the most haunted places where people disappeared without a trace",
+    "dark psychology facts about the human mind",
+    "creepy things that happen in the deep ocean or space",
+    "glitch in the matrix real life scary stories",
+    "the dark side of human behavior and psychology",
+    "disturbing facts about dreams and sleep paralysis",
 ]
 
 # PROVEN DEAD — NEVER USE AGAIN (based on analytics data)
@@ -485,8 +497,8 @@ def _pick_topic_subcategory():
     Weighted topic picker designed for balance:
     - 25% Friendzone/Situationship (Tier 1A)
     - 25% Mirror Psychology (Tier 1B)
-    - 25% Eye Contact/Body Language (Tier 2)
-    - 25% Broader Psychology/Charisma (Tier 3 - to explore new angles)
+    - 20% Eye Contact/Body Language (Tier 2)
+    - 30% Horror, Mystery & Dark Psychology (Tier 3 - to mix in the new niche)
     """
     roll = random.random()
     if roll < 0.25:
@@ -517,8 +529,8 @@ The new topic must be clearly different in angle and hook style from all of the 
     subcategory = _pick_topic_subcategory()
 
     prompt = f"""
-You are a short-form content strategist specialized in viral Instagram Reels about psychology, attraction, and human behavior.
-Your target audience is young men (18-30) on Indian Instagram.
+You are a short-form content strategist specialized in viral Instagram Reels. 
+Your target audience is young men (18-30) on Indian Instagram who love dark psychology, attraction secrets, horror, and mysteries.
 
 Primary domain: "{domain}"
 Today's angle/subcategory to focus on: "{subcategory}"
@@ -529,19 +541,19 @@ Propose exactly ONE topic idea for the next Instagram Reel that:
 1. Stays within the primary domain
 2. Uses today's angle/subcategory as the specific focus
 3. Iterates on what performed best (if analytics data is available)
-4. Has VERY strong hook potential — must create instant curiosity
-5. Focuses on psychology, body language, attraction science, or behavioral insights
+4. Has VERY strong hook potential — must create instant curiosity or fear
+5. Focuses on psychology, horror, mysteries, or dark facts
 6. Is bold and intriguing WITHOUT being sexually explicit (Instagram-safe)
 7. Is DIFFERENT from the recently used topics listed above
 
 Great topic examples (for inspiration, don't copy exactly):
+- Duniya ki sabse bhutiya jagah jahan se koi nahi lauta
+- 3 creepy facts jo tumhe aaj raat sone nahi denge
 - Ek cheez jo ladkiyon ko turant attract karti hai
+- Sleep paralysis ka dark secret jo koi nahi batata
 - Body language signs jo batati hain ke wo interested hai
 - Psychology trick jo kisi ko bhi tumhari taraf kheench le
-- 3 galtiyan jo ladke attraction mein karte hain
-- Ankhen kaise reveal karti hain true feelings
-- Red flags jo har ladke ko pehchanni chahiye
-- Confidence ka wo secret jo koi nahi batata
+- Samundar ki gehrayi mein chhupe dark secrets
 - Kaise pata chale ke wo tumhare baare mein sochti hai
 
 Return only a single plain-text topic line, max 12 words, no quotes, no numbering.

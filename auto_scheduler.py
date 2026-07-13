@@ -27,7 +27,7 @@ def _env_flag(name, default="false"):
 
 
 def _get_domain():
-    return (os.getenv("CONTENT_DOMAIN") or "girl psychology and dating secrets").strip()
+    return (os.getenv("CONTENT_DOMAIN") or "psychology of attraction, dating secrets, horror, unsolved mysteries, and creepy facts").strip()
 
 
 def _default_times_for_count(count):

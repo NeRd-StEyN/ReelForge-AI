@@ -63,6 +63,12 @@ _DIVERSE_FALLBACK_QUERIES = [
     "woman silhouette dramatic lighting studio portrait",
     "mysterious woman dark background spotlight cinematic",
     "woman rain night street moody cinematic slow motion",
+    # Horror/Mystery mood
+    "creepy abandoned hospital dark hallway cinematic",
+    "misty dark forest night scary slow motion",
+    "shadowy figure standing in dark room cinematic",
+    "old cursed house vintage footage aesthetic",
+    "unsolved mystery crime scene tape dark moody",
     # Elegant/luxury mood
     "elegant woman fashion photoshoot studio lighting",
     "woman luxury car lifestyle cinematic golden",
@@ -80,6 +86,7 @@ _MOOD_MODIFIERS = {
     "dramatic": ["dramatic spotlight", "high contrast", "rain cinematic", "silhouette backlit"],
     "warm": ["golden hour", "warm tones sunset", "cozy aesthetic lighting", "candlelight intimate"],
     "dark": ["dark moody", "shadow play", "night neon", "low key lighting"],
+    "horror": ["creepy fog", "abandoned dark", "scary shadow", "horror cinematic", "haunted house lighting"],
     "energetic": ["vibrant colors", "dynamic movement", "fast paced", "colorful neon"],
     "elegant": ["studio lighting", "luxury aesthetic", "fashion editorial", "minimalist clean"],
     "neutral": ["cinematic natural", "soft lighting", "aesthetic portrait", "clean composition"],

@@ -79,7 +79,10 @@ def main(topic, feedback_summary="", tts_voice_override=None, insta_client=None)
             # Always save analytics to JSONL — builds historical trend data.
             # Previously only the scheduler path saved; direct main.py runs
             # would fetch data, use it once, and throw it away.
-            domain = (os.getenv("CONTENT_DOMAIN") or "psychology of attraction").strip()
+            domain = os.getenv(
+                "CONTENT_DOMAIN",
+                "psychology of attraction, human behavior, horror, unsolved mysteries, and creepy facts",
+            )
             append_analytics_snapshot(domain, analytics_data)
         else:
             print("[Analytics] Live fetch failed — script will use saved history if available.")
