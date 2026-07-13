@@ -352,15 +352,13 @@ def generate_script(topic, analytics_data=None, feedback_summary=""):
     - Each scene must have a visual_keyword for stock footage search
     - Keywords should describe the MOOD and SETTING, not just "hot girl"
     - CRITICAL FOR SCENE 1: The first scene's visual MUST be high-contrast and instantly readable.
-      Use bright, clear settings like: "woman face close up neon light portrait", "bold text glitch aesthetic", 
-      "person confident city street golden hour", "dramatic studio portrait bright lighting".
-      NEVER use dark, ambiguous indoor scenes (warehouses, dim tents, unlit rooms) for Scene 1.
+      If it's a psychology video, use bright settings. If it's a horror/mystery video, use dark but highly visible settings (e.g., "creepy abandoned hospital flashlight").
       The viewer must immediately understand the visual context within 1 second — even with sound off.
-    - Good examples: "confident woman walking city street cinematic", "close up eyes mysterious lighting", "couple coffee shop candid moment"
-    - Include lighting/mood descriptors: neon, golden hour, moody dark, bright aesthetic, cinematic
-    - Each scene MUST have a different visual_mood (one of: mysterious, confident, dramatic, warm, dark, energetic, elegant)
+    - Good examples: "confident woman walking city street cinematic", "close up eyes mysterious lighting", "creepy forest fog night"
+    - Include lighting/mood descriptors: neon, golden hour, moody dark, bright aesthetic, cinematic, horror
+    - Each scene MUST have a different visual_mood (one of: mysterious, confident, dramatic, warm, dark, energetic, elegant, horror)
     - Avoid repetitive stock-looking keywords — make each scene feel visually distinct
-    - Scene 1 visual_mood should be: mysterious OR energetic OR dramatic — never "dark" alone
+    - Scene 1 visual_mood should be: mysterious OR energetic OR dramatic OR horror — never just "dark" without context
 
     Format the output as strict JSON:
     {{
@@ -497,8 +495,8 @@ def _pick_topic_subcategory():
     Weighted topic picker designed for balance:
     - 25% Friendzone/Situationship (Tier 1A)
     - 25% Mirror Psychology (Tier 1B)
-    - 20% Eye Contact/Body Language (Tier 2)
-    - 30% Horror, Mystery & Dark Psychology (Tier 3 - to mix in the new niche)
+    - 25% Eye Contact/Body Language (Tier 2)
+    - 25% Horror, Mystery & Dark Psychology (Tier 3)
     """
     roll = random.random()
     if roll < 0.25:
