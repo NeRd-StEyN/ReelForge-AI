@@ -1,0 +1,112 @@
+name: Monthly Session Renewal
+
+on:
+  schedule:
+    # Run on the 1st of every month at 2:00 AM UTC (you can adjust time)
+    - cron: '0 2 1 * *'
+  
+  # Also allow manual trigger if needed
+  workflow_dispatch:
+
+jobs:
+  renew-session:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+      
+      - name: Install dependencies
+        run: |
+          pip install instagrapi python-dotenv
+      
+      - name: Attempt Session Renewal with Password
+        id: renew
+        env:
+          INSTA_USERNAME: ${{ secrets.INSTA_USERNAME }}
+          INSTA_PASSWORD: ${{ secrets.INSTA_PASSWORD }}
+        run: |
+          python << 'EOF'
+          import os
+          import json
+          from instagrapi import Client
+          
+          username = os.getenv("INSTA_USERNAME")
+          password = os.getenv("INSTA_PASSWORD")
+          
+          if not username or not password:
+              print("❌ INSTA_USERNAME or INSTA_PASSWORD not set in secrets")
+              print("📝 To enable auto-renewal, add these secrets to GitHub:")
+              print("   1. INSTA_USERNAME = your Instagram username")
+              print("   2. INSTA_PASSWORD = your Instagram password")
+              exit(1)
+          
+          print(f"🔄 Attempting to renew session for @{username}...")
+          
+          try:
+              cl = Client()
+              cl.login(username, password)
+              
+              # Save new session
+              cl.dump_settings("insta_session.json")
+              
+              # Verify it worked
+              user_id = cl.user_id
+              if user_id:
+                  print(f"✅ Session renewed successfully!")
+                  print(f"   Authenticated as User ID: {user_id}")
+                  print(f"   New session saved to insta_session.json")
+                  print("   Next: Workflow will commit and push changes")
+                  exit(0)
+              else:
+                  print("❌ Login succeeded but authentication failed")
+                  exit(1)
+                  
+          except Exception as e:
+              print(f"❌ Password login failed: {e}")
+              print("\n📝 This is expected - Instagram blocks password login on cloud IPs")
+              print("⚠️  MANUAL ACTION REQUIRED:")
+              print("   1. Run locally: python generate_session.py")
+              print("   2. Choose Option 2: Browser Bypass")
+              print("   3. Update GitHub secret INSTA_SESSION with new JSON")
+              print("   4. Or add INSTA_PASSWORD secret and try again next month")
+              exit(1)
+          EOF
+      
+      - name: Check if session was renewed
+        if: success()
+        run: |
+          if [ -f insta_session.json ]; then
+            echo "✅ New session file created"
+            ls -lh insta_session.json
+          fi
+      
+      - name: Commit and push renewed session
+        if: success()
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git add insta_session.json
+          git commit -m "🔄 Auto-renewed Instagram session on $(date +%Y-%m-%d)" || echo "No changes to commit"
+          git push
+      
+      - name: Update GitHub Secret with new session
+        if: success()
+        uses: gliech/create-github-secret-action@v1
+        with:
+          name: INSTA_SESSION
+          value: ${{ secrets.GH_TOKEN }}
+          repository: ${{ github.repository }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Alert on failure
+        if: failure()
+        run: |
+          echo "❌ Automatic session renewal failed"
+          echo "⚠️  Manual renewal needed - see logs above for details"
+          exit 1
