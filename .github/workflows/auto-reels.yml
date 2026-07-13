@@ -40,9 +40,9 @@ jobs:
             data/reel_outcomes.jsonl
             data/voice_index.txt
             data/pending_posts.jsonl
-          key: reelforge-data-${{ github.ref_name }}-${{ github.run_id }}
+          key: reelforge-data-${{ github.ref_name }}
           restore-keys: |
-            reelforge-data-${{ github.ref_name }}-
+            reelforge-data-
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -83,4 +83,4 @@ jobs:
             data/reel_outcomes.jsonl
             data/voice_index.txt
             data/pending_posts.jsonl
-          key: reelforge-data-${{ github.ref_name }}-${{ github.run_id }}
+          key: reelforge-data-${{ github.ref_name }}

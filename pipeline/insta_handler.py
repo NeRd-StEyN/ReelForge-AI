@@ -1,20 +1,45 @@
 import os
 from instagrapi import Client
+import threading
+
+
+def _validate_session(cl):
+    """Verify session is still active by making a test API call.
+    
+    Returns True if session is valid, False otherwise.
+    This prevents silent failures where session loads but is expired.
+    """
+    if not cl:
+        return False
+    
+    try:
+        # Try to get own user info — simple validation that doesn't hit public API
+        user_id = cl.user_id
+        if not user_id:
+            print("[Session] Validation: user_id is None, session may be expired")
+            return False
+        print("[Session] Validation: Session is active (user_id found)")
+        return True
+    except Exception as e:
+        print(f"[Session] Validation failed: {e}")
+        return False
 
 
 def get_insta_client():
     """Logs into Instagram and returns the client using session persistence.
 
-    Login priority (most reliable → least):
-      1. insta_session.json  — full session file written by generate_session.py
-                               or by GitHub Actions from the INSTA_SESSION secret.
-                               Most stable; survives longer than a single cookie.
-      2. INSTA_SESSION_ID    — single sessionid cookie (legacy fallback).
-      3. Password login      — last resort; often blocked on cloud IPs.
+    IMPORTANT: Instagram blocks session ID-only logins as a security measure.
+    The ONLY reliable method on GitHub Actions is the full session file.
+
+    Login priority:
+      1. insta_session.json  — full session file from INSTA_SESSION secret.
+                               Only reliable method that works on GitHub Actions.
+      2. Password login      — fallback; often blocked on cloud IPs by Instagram.
+
+    ⚠️  INSTA_SESSION_ID is no longer used (Instagram blocks session ID auth).
     """
     username = os.getenv("INSTA_USERNAME")
     password = os.getenv("INSTA_PASSWORD")
-    sessionid_cookie = os.getenv("INSTA_SESSION_ID")
 
     if not username:
         print("[Analytics] WARNING: INSTA_USERNAME missing in .env — skipping analytics.")
@@ -23,32 +48,75 @@ def get_insta_client():
     cl = Client()
 
     try:
-        # ── Priority 1: Full session file (most reliable) ──────────────
+        # ── Priority 1: Full session file (ONLY reliable method) ──────
         if os.path.exists("insta_session.json"):
             print(f"[Analytics] Loading full session file for @{username}...")
             cl.load_settings("insta_session.json")
             print("[Analytics] Session file loaded successfully.")
-            return cl
+            # Validate that the session is actually active (not expired)
+            if _validate_session(cl):
+                print("[Analytics] ✅ Session validation passed. Ready for Story posting & analytics.")
+                return cl
+            else:
+                print("[Analytics] ❌ Session file expired or invalid.")
+                print("[Analytics] Action required: Run generate_session.py locally and update INSTA_SESSION secret.")
+                print("[Analytics] Session files expire after ~30 days. You must regenerate periodically.")
+                cl = Client()  # Reset client for fallback
 
-        # ── Priority 2: Single session cookie (legacy) ─────────────────
-        if sessionid_cookie:
-            print(f"[Analytics] Logging in via session cookie for @{username}...")
-            cl.login_by_sessionid(sessionid_cookie)
-            print("[Analytics] Session cookie login successful.")
-            return cl
+        # ── Fallback: Password login (often blocked on GitHub Actions) ─
+        if password:
+            print(f"[Analytics] ⚠️  No valid session file. Attempting password login for @{username}...")
+            print("[Analytics] WARNING: Password login is frequently blocked by Instagram on cloud IPs.")
+            print("[Analytics] For reliable automation, use session file instead (see above).")
+            try:
+                cl.login(username, password)
+                if _validate_session(cl):
+                    print("[Analytics] Password login successful (rare on GitHub Actions).")
+                    return cl
+            except Exception as login_err:
+                print(f"[Analytics] Password login failed: {login_err}")
 
-        # ── Priority 3: Password login (often blocked on cloud runners) ─
-        print(f"[Analytics] ⚠️  No session file or cookie found. Attempting password login for @{username}...")
-        print("[Analytics] NOTE: Password login is often blocked on GitHub Actions IPs.")
-        cl.login(username, password)
-        print("[Analytics] Password login successful.")
-        return cl
-
-    except Exception as e:
-        print(f"[Analytics] LOGIN FAILED for @{username}: {e}")
-        print("[Analytics] Tip: Run generate_session.py locally and save output to INSTA_SESSION GitHub Secret.")
+        # ── All methods failed ──────────────────────────────────────────
+        print("[Analytics] ❌ ALL LOGIN METHODS FAILED")
+        print("[Analytics] To fix this:")
+        print("[Analytics]   1. Run: python generate_session.py")
+        print("[Analytics]   2. Copy the output JSON")
+        print("[Analytics]   3. Add it to GitHub Secret 'INSTA_SESSION'")
+        print("[Analytics]   4. Regenerate every ~30 days when session expires")
         print("[Analytics] Will fall back to saved history for feedback. No live data this run.")
         return None
+
+    except Exception as e:
+        print(f"[Analytics] UNEXPECTED ERROR: {e}")
+        print("[Analytics] Will fall back to saved history for feedback. No live data this run.")
+        return None
+
+
+def _get_medias_with_timeout(cl, user_id, amount=20, timeout_seconds=30):
+    """Fetch medias with timeout to prevent hanging on slow runners.
+    
+    Returns list of media objects on success, raises TimeoutError on timeout.
+    """
+    result = [None]
+    exception = [None]
+    
+    def fetch():
+        try:
+            result[0] = cl.user_medias(user_id, amount=amount)
+        except Exception as e:
+            exception[0] = e
+    
+    thread = threading.Thread(target=fetch, daemon=True)
+    thread.start()
+    thread.join(timeout=timeout_seconds)
+    
+    if thread.is_alive():
+        raise TimeoutError(f"user_medias() exceeded {timeout_seconds}s timeout")
+    
+    if exception[0]:
+        raise exception[0]
+    
+    return result[0]
 
 
 def get_performance_data(cl):
@@ -74,7 +142,12 @@ def get_performance_data(cl):
             print(f"[Analytics] Session has no user_id — falling back to username lookup for @{username}...")
             user_id = cl.user_id_from_username(username)
 
-        recent_posts = cl.user_medias(user_id, amount=20)
+        try:
+            recent_posts = _get_medias_with_timeout(cl, user_id, amount=20, timeout_seconds=30)
+        except TimeoutError as e:
+            print(f"[Analytics] Timeout fetching medias: {e}")
+            print("[Analytics] Will skip live analytics this run and use saved history.")
+            return None
 
         analytics = []
         for post in recent_posts:
@@ -224,6 +297,7 @@ def post_poll_story(cl, thumbnail_path, story_poll):
 def _share_reel_to_story(cl, post, thumbnail_path, story_poll=None):
     """Attempt to share a reel post to story. Returns True on success.
     If story_poll is provided, also posts a follow-up poll story slide.
+    Poll failures do NOT cause the entire story posting to fail.
     """
     try:
         try:
@@ -237,15 +311,60 @@ def _share_reel_to_story(cl, post, thumbnail_path, story_poll=None):
         print("[Story] Successfully posted Story promotion! 🚀")
 
         # Post poll slide immediately after the reel share card
+        # Wrap in try-catch so poll failures don't fail the entire story post
         if story_poll:
             import time
             time.sleep(3)  # brief pause so Instagram doesn't rate-limit back-to-back stories
-            post_poll_story(cl, thumbnail_path, story_poll)
+            try:
+                post_poll_story(cl, thumbnail_path, story_poll)
+            except Exception as poll_err:
+                # Poll failures are non-fatal — main reel story already posted
+                print(f"[Poll] ⚠️ Poll story posting failed (non-fatal): {poll_err}")
+                print("[Poll] Main reel story was posted successfully. Poll story skipped.")
 
         return True
     except Exception as story_exc:
         print(f"[Story] Failed sharing to story: {story_exc}")
         return False
+
+
+def _get_safe_user_id(cl, username, max_retries=3):
+    """Get user_id with retry logic for rate limiting (429 errors).
+    
+    Returns user_id on success, raises exception on failure after max_retries.
+    """
+    import time
+    
+    # Try session-based user_id first (most reliable)
+    user_id = cl.user_id
+    if user_id:
+        print(f"[Story] Using session-based user_id: {user_id}")
+        return user_id
+    
+    # Fallback to username lookup with exponential backoff for rate limiting
+    print(f"[Story] Session user_id not available, falling back to username lookup...")
+    for attempt in range(max_retries):
+        try:
+            print(f"[Story] Fetching user_id for @{username} (attempt {attempt+1}/{max_retries})...")
+            user_id = cl.user_id_from_username(username)
+            if user_id:
+                print(f"[Story] Got user_id from username: {user_id}")
+                return user_id
+        except Exception as e:
+            error_str = str(e).lower()
+            if "429" in str(e) or "rate" in error_str or "too many" in error_str:
+                if attempt < max_retries - 1:
+                    wait_time = (2 ** attempt)  # Exponential backoff: 1s, 2s, 4s
+                    print(f"[Story] Rate limited (429). Waiting {wait_time}s before retry...")
+                    time.sleep(wait_time)
+                else:
+                    print(f"[Story] Rate limited after {max_retries} attempts. Giving up.")
+                    raise Exception(f"Rate limited after {max_retries} retries: {e}")
+            else:
+                # Non-rate-limit error, fail immediately
+                raise
+    
+    raise Exception(f"Could not get user_id for @{username}")
 
 
 def wait_and_share_reel_to_story(cl, username, expected_title, thumbnail_path, story_poll=None, max_wait_seconds=1500):
@@ -272,13 +391,8 @@ def wait_and_share_reel_to_story(cl, username, expected_title, thumbnail_path, s
     start_time = time.time()
 
     try:
-        # Use session-based user_id — avoids the rate-limited public
-        # web_profile_info endpoint that returns 429 on GitHub Actions IPs.
-        # This was the root cause of stories silently failing after the first post.
-        user_id = cl.user_id
-        if not user_id:
-            print(f"[Story] Session has no user_id — falling back to username lookup...")
-            user_id = cl.user_id_from_username(username)
+        # Use safe user_id fetch with retry logic for rate limits
+        user_id = _get_safe_user_id(cl, username)
     except Exception as e:
         print(f"[Story] Failed to get user ID: {e}")
         return False
