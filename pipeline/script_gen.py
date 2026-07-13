@@ -230,7 +230,7 @@ def generate_script(topic, analytics_data=None, feedback_summary=""):
     - Narration text MUST be in pure Hindi using STRICTLY Devanagari script (e.g. "लड़कियां" NOT "ladkiyan").
     - DO NOT use Roman/Latin letters for the narration text. This is a hard requirement.
     - Keep pronunciation natural for Hindi TTS.
-    - Title can be English or Hinglish, but scene text MUST be Devanagari.
+    - CRITICAL: The `title` MUST be in English or Roman Hinglish. NEVER use Devanagari script in the `title`.
     """ if language in {"hindi", "hi", "hi-in"} else ""
 
     # Check if this is a continuation part and retrieve the previous script to ensure continuity
@@ -286,13 +286,21 @@ def generate_script(topic, analytics_data=None, feedback_summary=""):
     hook_framework = _pick_hook_framework(analytics_data=analytics_data, feedback_summary=feedback_summary)
 
     prompt = f"""
-    You are an expert Instagram Reels strategist. Your goal: maximum completion rate and engagement.
-    Your audience is young men (18-30) on Indian Instagram who love bold, intriguing content about psychology, attraction, relationships, and human behavior.
+    You are "The Decoder", an expert Instagram Reels psychologist. Your goal: maximum completion rate and engagement.
+    Your audience is young men (18-30) on Indian Instagram who want you to DECODE female psychology, mixed signals, and relationship tests.
     {instructions}
     {language_rules}
     {previous_script_context}
 
     Create a PUNCHY, fast-paced reel script for this topic: "{topic}".
+
+    ── THE DECODER PERSONA & TITLE RULES (CRITICAL) ──
+    - You must act as the expert who "hacks" or deciphers psychology.
+    - Ban all vague, depressing, or purely emotional angles. Focus purely on actionable decoding, tests, and hard truths.
+    - The `title` field (which is the on-screen hook) MUST follow this format: `[Trigger Word] + [Question/Promise]`
+      Examples of perfect titles: "Mixed Signals: Testing or Friendzone?", "Confused Signals? Friendzone DECIPHERED!", "Friendzone Test: Spot it or Stay Stuck?"
+    - The `title` field MUST NEVER use Devanagari script (Hindi characters). Use pure English or Roman Hinglish.
+    - Heavily favor terms like "Test", "Deciphered", "Secret", or numbered lists in your approach.
 
     ── MAXIMIZING ENGAGEMENT WITHOUT REPETITION ──
     To break past the 3.5K view ceiling, we need SAVES and SHARES, but we CANNOT be repetitive.
