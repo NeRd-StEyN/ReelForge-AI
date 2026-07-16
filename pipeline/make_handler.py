@@ -226,6 +226,12 @@ def send_to_make_webhook(
         if hook_framework:
             payload["hook_framework"] = hook_framework
 
+        # Send story poll data so Make.com can post the story on our behalf
+        # (instagrapi cannot work from GitHub Actions cloud IPs)
+        story_poll = metadata.get("story_poll")
+        if isinstance(story_poll, dict) and story_poll.get("question"):
+            payload["story_poll"] = story_poll
+
         print("Sending JSON payload to Make.com webhook...")
         response = requests.post(webhook_url, json=payload, timeout=60)
 
@@ -250,3 +256,30 @@ def send_to_make_webhook(
         except Exception:
             pass
         return False
+
+
+def fetch_analytics_from_make() -> Optional[list]:
+    """Fetch Instagram post insights from Make.com webhook."""
+    webhook_url = os.getenv("MAKE_ANALYTICS_WEBHOOK_URL")
+    if not webhook_url:
+        print("[Analytics] MAKE_ANALYTICS_WEBHOOK_URL not set — skipping Make.com analytics fetch.")
+        return None
+
+    try:
+        print(f"[Analytics] Fetching live performance data via Make.com webhook...")
+        response = requests.get(webhook_url, timeout=60)
+        
+        if 200 <= response.status_code < 300:
+            data = response.json()
+            if isinstance(data, list):
+                print(f"[Analytics] Successfully fetched {len(data)} items from Make.com.")
+                return data
+            else:
+                print(f"[Analytics] Make.com returned invalid format (expected list): {type(data)}")
+                return None
+                
+        print(f"[Analytics] Make.com webhook failed with status code {response.status_code}: {response.text}")
+        return None
+    except Exception as exc:
+        print(f"[Analytics] Failed to fetch analytics from Make.com: {exc}")
+        return None

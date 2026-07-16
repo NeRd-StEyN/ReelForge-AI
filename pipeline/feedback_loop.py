@@ -3,13 +3,6 @@ import os
 from datetime import datetime
 import time
 
-# Try to import fcntl for Unix/Linux file locking
-try:
-    import fcntl
-    HAS_FCNTL = True
-except ImportError:
-    HAS_FCNTL = False
-
 
 DATA_DIR = "data"
 HISTORY_FILE = os.path.join(DATA_DIR, "insta_analytics_history.jsonl")
@@ -22,32 +15,20 @@ def _ensure_data_dir():
 
 
 def _append_to_jsonl_safe(file_path, data_dict):
-    """Safely append to JSONL with file locking to prevent corruption from concurrent writes."""
+    """Safely append one JSON line to a JSONL file.
+
+    Previous implementation used temp-file + os.replace() on Windows/Linux
+    which *replaced* the entire file with only the latest line — destroying
+    all historical data.  Since GitHub Actions runs one job at a time there
+    is no concurrent-write risk, so a simple append is both correct and safe.
+    """
     _ensure_data_dir()
-    
+
     try:
-        if HAS_FCNTL and os.name != 'nt':  # Unix/Linux/Mac
-            # Use fcntl for file locking
-            with open(file_path, "a", encoding="utf-8") as f:
-                fcntl.flock(f.fileno(), fcntl.LOCK_EX)
-                try:
-                    f.write(json.dumps(data_dict, ensure_ascii=True) + "\n")
-                finally:
-                    fcntl.flock(f.fileno(), fcntl.LOCK_UN)
-        else:  # Windows or no fcntl available
-            # Use atomic write with temp file + rename
-            temp_path = file_path + ".tmp"
-            # Write to temp file
-            with open(temp_path, "a", encoding="utf-8") as f:
-                f.write(json.dumps(data_dict, ensure_ascii=True) + "\n")
-            # Atomic rename (on most filesystems)
-            try:
-                os.replace(temp_path, file_path)
-            except:
-                # Fallback: just keep temp as is, it will be picked up next run
-                pass
+        with open(file_path, "a", encoding="utf-8") as f:
+            f.write(json.dumps(data_dict, ensure_ascii=True) + "\n")
     except Exception as e:
-        print(f"[Feedback] Warning: Could not safely write to {file_path}: {e}")
+        print(f"[Feedback] Warning: Could not write to {file_path}: {e}")
 
 
 def _read_jsonl(file_path, limit=30):

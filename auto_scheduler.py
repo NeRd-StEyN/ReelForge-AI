@@ -14,8 +14,7 @@ from pipeline.feedback_loop import (
     load_used_topics,
     save_used_topic,
 )
-from pipeline.make_handler import retry_pending_posts
-from pipeline.insta_handler import get_insta_client, get_performance_data
+from pipeline.make_handler import retry_pending_posts, fetch_analytics_from_make
 from pipeline.script_gen import generate_topic_from_domain
 
 
@@ -115,13 +114,13 @@ def create_and_post_one_reel():
             domain = _get_domain()
             now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             print(f"[{now}] Starting automated reel cycle for domain: {domain} (Attempt {attempt}/{max_retries})")
-            # This is the single authoritative login for this pipeline run.
-            cl = get_insta_client()
+            # This is the single authoritative run for this pipeline.
+            # cl = get_insta_client() # Removed to prevent rate limits
 
             # Fetch live analytics only if the feature flag is on
             analytics_data = None
             if _env_flag("ENABLE_INSTAGRAM_ANALYTICS", "true"):
-                analytics_data = get_performance_data(cl)
+                analytics_data = fetch_analytics_from_make()
             else:
                 print("Skipping Instagram analytics fetch (ENABLE_INSTAGRAM_ANALYTICS=false).")
 
@@ -171,8 +170,8 @@ def create_and_post_one_reel():
             # Fix 4: Pick rotating TTS voice
             voice = _pick_next_voice()
 
-            # Run full pipeline — pass feedback_summary + voice + insta client for Story posting
-            result = run_pipeline(topic, feedback_summary=feedback_summary, tts_voice_override=voice, insta_client=cl)
+            # Run full pipeline — pass feedback_summary + voice 
+            result = run_pipeline(topic, feedback_summary=feedback_summary, tts_voice_override=voice)
 
             if isinstance(result, dict):
                 append_reel_outcome(

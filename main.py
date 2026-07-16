@@ -13,7 +13,7 @@ from pipeline.voice_gen import run_generate_voiceover, run_generate_voiceover_wi
 from pipeline.visual_gen import fetch_pexels_video, fetch_pexels_image, create_placeholder_image
 from pipeline.video_editor import create_video
 from pipeline.seo_gen import generate_seo_metadata, save_metadata
-from pipeline.insta_handler import get_insta_client, get_performance_data
+from pipeline.make_handler import fetch_analytics_from_make
 from pipeline.feedback_loop import append_analytics_snapshot, summarize_feedback
 from dotenv import load_dotenv
 
@@ -65,20 +65,12 @@ def main(topic, feedback_summary="", tts_voice_override=None, insta_client=None)
     if _env_flag("AUTO_CLEANUP_ASSETS", "true"):
         cleanup_generated_assets()
 
-    # 0. Optional: Fetch Instagram analytics for feedback-based scripting.
-    # Use a pre-authenticated client passed in from the scheduler (preferred), or
-    # fall back to creating one locally if analytics are enabled.
+    # 0. Optional: Fetch Instagram analytics for feedback-based scripting via Make.com.
     analytics_data = None
-    cl = insta_client  # Use externally provided client if available
-    if cl is None and _env_flag("ENABLE_INSTAGRAM_ANALYTICS", "true"):
-        cl = get_insta_client()
-    if cl:
-        analytics_data = get_performance_data(cl)
+    if _env_flag("ENABLE_INSTAGRAM_ANALYTICS", "true"):
+        analytics_data = fetch_analytics_from_make()
         if analytics_data:
             print(f"[Analytics] Live data fetched: {len(analytics_data)} reels.")
-            # Always save analytics to JSONL — builds historical trend data.
-            # Previously only the scheduler path saved; direct main.py runs
-            # would fetch data, use it once, and throw it away.
             domain = os.getenv(
                 "CONTENT_DOMAIN",
                 "psychology of attraction, human behavior, horror, unsolved mysteries, and creepy facts",
@@ -87,7 +79,7 @@ def main(topic, feedback_summary="", tts_voice_override=None, insta_client=None)
         else:
             print("[Analytics] Live fetch failed — script will use saved history if available.")
     else:
-        print("Skipping Instagram analytics login (no client available).")
+        print("Skipping Instagram analytics fetch (ENABLE_INSTAGRAM_ANALYTICS=false).")
 
     # Build feedback summary from saved history if not passed in.
     # This ensures direct `python main.py "topic"` runs get the same
@@ -201,25 +193,9 @@ def main(topic, feedback_summary="", tts_voice_override=None, insta_client=None)
         metadata=metadata,
     )
     
-    # 7. Auto Share to Story (drives early traffic to Reel to boost search/distribution)
-    # cl is either passed in from the scheduler or created above — no more 'cl in locals()' bug.
-    if webhook_success and cl:
-        try:
-            from pipeline.insta_handler import wait_and_share_reel_to_story
-            username = os.getenv("INSTA_USERNAME")
-            story_poll = metadata.get('story_poll') or {}
-            print(f"[Story] Poll question: {story_poll.get('question', '(none)')}")
-            wait_and_share_reel_to_story(
-                cl,
-                username,
-                metadata.get('title', ''),
-                thumb_path,
-                story_poll=story_poll,
-            )
-        except Exception as story_err:
-            print(f"[Story] Story automation encountered an issue: {story_err}")
-    elif webhook_success:
-        print("[Story] Skipping Story — no Instagram client available (check INSTA_SESSION_ID secret).")
+    # 7. Auto Share to Story (Disabled for Make.com migration)
+    # Story polling has been disabled to prevent Instagrapi blocks. 
+    # Can be re-added via Make.com later if Make adds poll support.
     
     print(f"Pipeline complete! Video saved to: {output_file}")
     print(f"Metadata saved to: video_metadata.json")
