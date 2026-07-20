@@ -291,6 +291,14 @@ def fetch_analytics_from_make(max_retries: int = 3) -> Optional[list]:
             response = requests.get(webhook_url, timeout=60)
 
             if 200 <= response.status_code < 300:
+                # Check if it's the default Make.com "Accepted" response instead of JSON
+                if "application/json" not in response.headers.get("Content-Type", "") or response.text.strip() == "Accepted":
+                    print("[Analytics] ❌ CRITICAL ERROR: Your Make.com scenario is missing a 'Webhook Response' module!")
+                    print("[Analytics] Make.com received the trigger, but returned plain text ('Accepted') instead of JSON data.")
+                    print("[Analytics] Aborting retries to save your Make.com credits.")
+                    print("[Analytics] FIX: Add a 'Webhook Response' module at the end of your Make.com scenario and return the JSON array.")
+                    return None
+
                 data = response.json()
 
                 # Handle both list and dict-with-nested-list responses
@@ -311,6 +319,8 @@ def fetch_analytics_from_make(max_retries: int = 3) -> Optional[list]:
                     return normalized
 
                 print(f"[Analytics] Make.com returned unexpected format: {type(data)}")
+                # If format is totally wrong, don't retry and waste credits
+                return None
 
             elif response.status_code == 429:
                 print(f"[Analytics] Rate limited by Make.com (429). Will retry...")
