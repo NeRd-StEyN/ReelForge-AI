@@ -395,13 +395,11 @@ def _create_hook_overlay(topic="", duration=2.0, size=(1080, 1920)):
     img = Image.new('RGBA', size, (0, 0, 0, 0))
     draw = ImageDraw.Draw(img)
 
-    # Use the topic/scene text as the hook card — max 5 words so it reads instantly
+    # Use the full topic/scene text as the hook card
     if topic and topic.strip():
-        # Trim to first 5 words for instant readability on the hook card
+        # Keep up to 10 words so it isn't an accidental massive paragraph, no truncation '...'
         words = _strip_unsupported_chars(topic.strip()).split()
-        hook_text = " ".join(words[:5])
-        if len(words) > 5:
-            hook_text += "..."
+        hook_text = " ".join(words[:10])
     else:
         hook_text = "\u092f\u0947 \u091c\u093e\u0928\u094b!"  # "ये जानो!" fallback
 
@@ -994,16 +992,7 @@ def create_video(scenes, voiceovers, visuals, output_file, word_timeline=None, c
                 cta_overlay = _create_follow_cta(duration=cta_dur).set_start(max(0, duration - cta_dur))
                 extra_overlays.append(cta_overlay)
 
-            # Like-bait overlay: shown at 70% of the MIDDLE scene duration
-            # Placed at the emotional peak — when the reveal is landing
-            if i == max(0, len(scenes) // 2):
-                like_bait_dur = min(2.0, duration * 0.35)
-                like_bait_start = max(0.0, duration * 0.55)
-                try:
-                    like_bait = _create_like_bait_overlay(duration=like_bait_dur).set_start(like_bait_start)
-                    extra_overlays.append(like_bait)
-                except Exception as e:
-                    print(f"[LikeBait] Could not add like bait overlay: {e}")
+            # (Removed static like-bait overlay based on AI critique. The voiceover handles comments now.)
 
             # Dynamic header banner for series reels (e.g. Follow for Part 2)
             if title:
