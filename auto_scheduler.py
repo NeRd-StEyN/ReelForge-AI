@@ -197,6 +197,8 @@ def create_and_post_one_reel():
             analytics_data = None
             if _env_flag("ENABLE_INSTAGRAM_ANALYTICS", "true"):
                 if _should_fetch_analytics_today():
+                    # Mark it fetched BEFORE the actual fetch to ensure we strictly never try twice a day, even on failure.
+                    _mark_analytics_fetched_today()
                     analytics_data = fetch_analytics_from_make()
                 else:
                     print("[Analytics] Already fetched analytics today. Skipping to save Make.com credits.")
@@ -207,7 +209,6 @@ def create_and_post_one_reel():
             if isinstance(analytics_data, list) and analytics_data:
                 append_analytics_snapshot(domain, analytics_data)
                 _reset_analytics_fail_counter()
-                _mark_analytics_fetched_today()
             elif analytics_data is None and not _should_fetch_analytics_today():
                 # We skipped fetching because we already fetched today. That's fine, no failure.
                 pass
