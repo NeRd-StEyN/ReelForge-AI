@@ -148,8 +148,7 @@ def create_text_image(text, size=(1080, 1920), font_size=100, highlight_word_ind
     normal_color = (255, 255, 255)          # Clean white for non-active words
     highlight_color = (0, 220, 255)         # Cyan-teal for active word (proven viral palette)
     stroke_color = (0, 0, 0)
-    stroke_width = 6
-    bg_pill_color = (0, 0, 0, 140)          # Semi-transparent dark background
+    stroke_width = 8  # Thicker stroke to make text stand out without a background box
 
     # Word wrapping
     lines = []
@@ -181,21 +180,9 @@ def create_text_image(text, size=(1080, 1920), font_size=100, highlight_word_ind
     # Keep subtitles in the lower third
     base_y = int(size[1] * 0.78) - (total_h // 2)
 
-    # Draw background pill
-    # Calculate total text block dimensions
-    max_line_width = 0
-    for line_words, _ in lines:
-        w = draw.textlength(" ".join(line_words), font=font)
-        max_line_width = max(max_line_width, w)
-
-    pill_padding_x = 40
-    pill_padding_y = 20
-    pill_x1 = max(0, (size[0] - max_line_width) / 2 - pill_padding_x)
-    pill_y1 = base_y - pill_padding_y
-    pill_x2 = min(size[0], (size[0] + max_line_width) / 2 + pill_padding_x)
-    pill_y2 = base_y + total_h + pill_padding_y
-    _draw_rounded_rect(draw, (pill_x1, pill_y1, pill_x2, pill_y2), 24, bg_pill_color)
-
+    # Removed the semi-transparent black pill completely to make text pop organically
+    # (The thicker stroke handles readability without looking like an automated template)
+    
     current_y = base_y
     for line_words, line_word_indices in lines:
         full_line = " ".join(line_words)
@@ -502,24 +489,8 @@ def _create_follow_cta(duration=2.5, size=(1080, 1920)):
     x = (size[0] - w) / 2
     y = int(size[1] * 0.10)
 
-    # Semi-transparent background pill (covers both lines)
-    handle_w = draw.textlength(handle_text, font=font_handle)
-    max_w = max(w, handle_w)
-    pill_pad_x, pill_pad_y = 30, 12
-    _draw_rounded_rect(
-        draw,
-        (size[0]/2 - max_w/2 - pill_pad_x, y - pill_pad_y,
-         size[0]/2 + max_w/2 + pill_pad_x, y + 65 + 50 + pill_pad_y + 8),
-        18,
-        (0, 0, 0, 185),
-    )
-
-    # Cyan accent bar on top
-    draw.rectangle(
-        [size[0]/2 - max_w/2 - pill_pad_x + 18, y - pill_pad_y,
-         size[0]/2 + max_w/2 + pill_pad_x - 18, y - pill_pad_y + 5],
-        fill=(0, 220, 255)
-    )
+    # Removed the rigid black pill background for the CTA. 
+    # Let the text sit cleanly on the screen using stroke outlining instead.
 
     # CTA text
     stroke_w = 5
@@ -529,10 +500,11 @@ def _create_follow_cta(duration=2.5, size=(1080, 1920)):
     draw.text((x, y), cta_text, font=font, fill=(0, 220, 255))
 
     # Account handle below CTA
+    handle_w = draw.textlength(handle_text, font=font_handle)
     hx = (size[0] - handle_w) / 2
     hy = y + 65 + 8
-    for ax in range(-4, 5, 2):
-        for ay in range(-4, 5, 2):
+    for ax in range(-5, 6, 2):
+        for ay in range(-5, 6, 2):
             draw.text((hx + ax, hy + ay), handle_text, font=font_handle, fill=(0, 0, 0))
     draw.text((hx, hy), handle_text, font=font_handle, fill=(255, 255, 255))
 

@@ -176,22 +176,17 @@ _HOOK_FRAMEWORKS = [
         "name": "dark_mystery",
         "instruction": "Open with an unsolved mystery or creepy phenomenon. Example pattern: 'Duniya ki sabse rahasyamayi jagah jahan se koi wapas nahi aaya...' or 'Ye creepy fact tumhe sone nahi dega...'",
     },
-    # ── PROVEN VIRAL FRAMEWORK — HIGHEST PERFORMER (2.4K+ views) ──
     {
         "name": "kabhii_nahi",
         "instruction": """
 This is the PROVEN highest-performing hook framework on this account (drove 2.4K views).
-Open with an incomplete 'kabhi nahi...' statement in Devanagari Hindi.
-The sentence MUST be cut off mid-thought so the screen text ends with '...' ellipsis.
-This creates an involuntary open loop — the brain literally cannot scroll away without completing the sentence.
-Pattern structure:
-  Line 1 (on screen): 'लड़कियां कभी सीधे नहीं बतातीं...' (cut off — the '...' is the scroll stopper)
-  Narration: Continue the thought — reveal WHAT they never say directly and WHY.
+Open with a 'kabhi nahi...' statement in Devanagari Hindi.
+The sentence MUST be a complete, punchy hook that generates extreme curiosity.
+DO NOT use '...' or truncate the sentence. It must be a full sentence on the first frame.
 Examples of proven-viral openers:
-  - 'ये चीज़ लड़कियां कभी नहीं...'
-  - 'लड़कियां कभी सीधे नहीं बतातीं...'
-  - 'वो signal जो ladkiyan kabhi...'
-MANDATORY: The very first scene text must end with '...' to create the open loop on screen.""",
+  - 'ये चीज़ लड़कियां कभी सीधे नहीं बतातीं!'
+  - 'लड़कियां कभी भी ये राज़ नहीं खोलतीं!'
+MANDATORY: The very first scene text must be a complete sentence that hooks the viewer instantly.""",
     },
     {
         "name": "test_format",
@@ -375,18 +370,17 @@ def generate_script(topic, analytics_data=None, feedback_summary=""):
       Rules:
       * Use BOLD color contrast (neon green/magenta on black, bright red, vivid yellow, electric blue)
       * Close-ups of faces or hands ALWAYS work better than wide shots
-      * For psychology: intense eye contact, raised eyebrow, subtle smirk
-      * For relationships: two people looking in opposite directions (subtle tension)
-      * Horror/Mystery: extreme close-up + shadow + single light source
-      * NEVER use blurry or low-contrast visuals in Scene 1 — it won't stop scrolls
-      * Text overlay (title) MUST be readable in 0.3 seconds even on small phone screens
-    - Best Scene 1 visuals: "extreme close-up face intense eyes neon lighting", "two people back to back dramatic shadow", "single eye macro shot mysterious"
-    - Include mood + technical descriptors: "4K, high contrast, bold colors, cinematic, close-up"
-    - Each scene MUST have a different visual_mood (one of: mysterious, confident, dramatic, intense, dark, energetic, elegant, horror)
-    - Scene 1 visual_mood should be: intense OR mysterious OR dramatic — NEVER calm or neutral
-    - Prioritize STOP-SCROLL visuals over artistic beauty
+    {instructions}
 
-    Format the output as strict JSON:
+    RULES:
+    1. Generate exactly 6 to 8 short scenes. This is critical for fast-paced visual cuts.
+    2. Each scene's `text` MUST be very short (1 or 2 sentences max) for high-energy pacing.
+    3. For `visual_keyword`, YOU MUST provide LITERAL, highly-specific human actions (e.g., "close up couple holding hands", "person looking at phone in dark", "woman smiling over shoulder"). DO NOT use abstract words like "psychology", "mind", or "brain". We need real human B-roll.
+    4. Each scene MUST have a `visual_mood` (mysterious, confident, dramatic, intense, dark, energetic, elegant, or horror).
+    5. Final scene MUST include a CTA for comments (poll or question) and share trigger.
+    6. Output strict JSON only.
+
+    JSON STRUCTURE:
     {{
         "title": "A catchy viral title (max 8 words)",
         "hook_framework": "curiosity_gap",

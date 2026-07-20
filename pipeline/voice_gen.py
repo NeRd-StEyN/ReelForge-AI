@@ -7,17 +7,17 @@ def _ticks_to_seconds(ticks):
     """Convert 100ns ticks used by Edge events into seconds."""
     return float(ticks or 0) / 10_000_000.0
 
-async def generate_voiceover(text, output_path, voice="hi-IN-SwaraNeural"):
+async def generate_voiceover(text, output_path, voice="hi-IN-MadhurNeural"):
     """Generates a high-energy, fast-paced, high-retention voiceover file using edge-tts."""
     # Neutral rate sounds more natural with longer paragraph narration.
-    communicate = edge_tts.Communicate(text, voice, rate="+18%")
+    communicate = edge_tts.Communicate(text, voice, rate="+8%")
     await communicate.save(output_path)
     return output_path
 
 
-async def generate_voiceover_with_timestamps(text, output_path, voice="hi-IN-SwaraNeural"):
+async def generate_voiceover_with_timestamps(text, output_path, voice="hi-IN-MadhurNeural"):
     """Generate voiceover and return word timing events for subtitle sync."""
-    communicate = edge_tts.Communicate(text, voice, rate="+18%")
+    communicate = edge_tts.Communicate(text, voice, rate="+8%")
     word_timeline = []
 
     with open(output_path, "wb") as audio_file:
@@ -41,12 +41,12 @@ async def generate_voiceover_with_timestamps(text, output_path, voice="hi-IN-Swa
 
     return output_path, word_timeline
 
-def run_generate_voiceover(text, output_path, voice="hi-IN-SwaraNeural"):
+def run_generate_voiceover(text, output_path, voice="hi-IN-MadhurNeural"):
     """Wrapper to run the async voiceover generation."""
     asyncio.run(generate_voiceover(text, output_path, voice))
     return output_path
 
 
-def run_generate_voiceover_with_timestamps(text, output_path, voice="hi-IN-SwaraNeural"):
+def run_generate_voiceover_with_timestamps(text, output_path, voice="hi-IN-MadhurNeural"):
     """Wrapper to generate voiceover plus word-level timestamps."""
     return asyncio.run(generate_voiceover_with_timestamps(text, output_path, voice))
