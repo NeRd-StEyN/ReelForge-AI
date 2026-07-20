@@ -61,9 +61,6 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Sleep for random jitter
-        run: sleep $((RANDOM % 900))
-
       - name: Generate and post one reel
         run: |
           python auto_scheduler.py --mode batch --count 1
