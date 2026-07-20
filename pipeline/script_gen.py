@@ -11,7 +11,8 @@ load_dotenv()
 _OPENROUTER_PRIMARY_MODEL = "google/gemini-2.5-flash"
 _OPENROUTER_FALLBACK_MODELS = [
     "openai/gpt-4o-mini",
-    "meta-llama/llama-3.1-8b-instruct:free",
+    "google/gemini-2.0-pro-exp-02-05:free",
+    "meta-llama/llama-3.3-70b-instruct:free",
 ]
 _OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1/chat/completions"
 
