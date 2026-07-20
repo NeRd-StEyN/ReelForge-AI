@@ -6,10 +6,6 @@ on:
     # TIER 1 SLOTS — PROVEN TOP PERFORMERS
     # 11:00 IST = 05:30 UTC — Morning peak (fresh scroll, high engagement)
     - cron: '30 5 * * *'
-    # 14:00 IST = 08:30 UTC — PROVEN BEST (top reel: 3505 views)
-    - cron: '30 8 * * *'
-    # 17:30 IST = 12:00 UTC — PROVEN 2ND BEST (3463 views)
-    - cron: '0 12 * * *'
     # 20:00 IST = 14:30 UTC — Evening peak (break time scroll)
     - cron: '30 14 * * *'
 
@@ -43,6 +39,7 @@ jobs:
             data/reel_outcomes.jsonl
             data/voice_index.txt
             data/pending_posts.jsonl
+            data/analytics_fail_count.txt
           key: reelforge-data-${{ github.ref_name }}
           restore-keys: |
             reelforge-data-
@@ -82,4 +79,5 @@ jobs:
             data/reel_outcomes.jsonl
             data/voice_index.txt
             data/pending_posts.jsonl
+            data/analytics_fail_count.txt
           key: reelforge-data-${{ github.ref_name }}

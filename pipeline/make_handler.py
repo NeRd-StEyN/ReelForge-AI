@@ -211,10 +211,16 @@ def send_to_make_webhook(
             "text": safe_text,
             "caption": caption,
             "title": safe_title,
+            # Story posting: tell Make.com to also post the thumbnail as a Story
+            "post_story": True,
         }
 
         if cover_url:
             payload["cover_url"] = cover_url
+        else:
+            # Story posting requires a cover image — warn if missing
+            print("[Make] [WARN] No cover_url available -- Make.com will skip Story posting.")
+            payload["post_story"] = False
 
         if hashtags:
             payload["hashtags"] = hashtags
@@ -258,28 +264,203 @@ def send_to_make_webhook(
         return False
 
 
-def fetch_analytics_from_make() -> Optional[list]:
-    """Fetch Instagram post insights from Make.com webhook."""
+def fetch_analytics_from_make(max_retries: int = 3) -> Optional[list]:
+    """Fetch Instagram post insights from Make.com webhook.
+
+    Retries up to *max_retries* times with exponential back-off so a single
+    transient failure (network hiccup, Make.com cold-start) doesn't silently
+    kill the entire feedback loop.
+
+    The response from Make.com may be:
+      - A plain JSON array of media objects  →  used directly
+      - A JSON object with a nested list     →  auto-extracted
+    Both formats are handled.
+    """
+    import time as _time
+
     webhook_url = os.getenv("MAKE_ANALYTICS_WEBHOOK_URL")
     if not webhook_url:
         print("[Analytics] MAKE_ANALYTICS_WEBHOOK_URL not set — skipping Make.com analytics fetch.")
+        print("[Analytics] To fix: Create an analytics scenario in Make.com and add the webhook URL")
+        print("[Analytics]   to your .env / GitHub Secrets as MAKE_ANALYTICS_WEBHOOK_URL.")
         return None
 
-    try:
-        print(f"[Analytics] Fetching live performance data via Make.com webhook...")
-        response = requests.get(webhook_url, timeout=60)
-        
-        if 200 <= response.status_code < 300:
-            data = response.json()
-            if isinstance(data, list):
-                print(f"[Analytics] Successfully fetched {len(data)} items from Make.com.")
-                return data
+    for attempt in range(1, max_retries + 1):
+        try:
+            print(f"[Analytics] Fetching live performance data via Make.com (attempt {attempt}/{max_retries})...")
+            response = requests.get(webhook_url, timeout=60)
+
+            if 200 <= response.status_code < 300:
+                data = response.json()
+
+                # Handle both list and dict-with-nested-list responses
+                if isinstance(data, dict):
+                    # Make.com sometimes wraps results: {"data": [...]} or {"items": [...]}
+                    for key in ("data", "items", "results", "media"):
+                        if isinstance(data.get(key), list):
+                            data = data[key]
+                            break
+                    else:
+                        # Single-item dict — wrap it
+                        data = [data]
+
+                if isinstance(data, list):
+                    # Normalize field names — Make.com may return Graph API field names
+                    normalized = _normalize_analytics(data)
+                    print(f"[Analytics] [OK] Successfully fetched {len(normalized)} items from Make.com.")
+                    return normalized
+
+                print(f"[Analytics] Make.com returned unexpected format: {type(data)}")
+
+            elif response.status_code == 429:
+                print(f"[Analytics] Rate limited by Make.com (429). Will retry...")
             else:
-                print(f"[Analytics] Make.com returned invalid format (expected list): {type(data)}")
-                return None
-                
-        print(f"[Analytics] Make.com webhook failed with status code {response.status_code}: {response.text}")
-        return None
-    except Exception as exc:
-        print(f"[Analytics] Failed to fetch analytics from Make.com: {exc}")
-        return None
+                print(f"[Analytics] Make.com webhook returned {response.status_code}: {response.text[:200]}")
+
+        except requests.exceptions.Timeout:
+            print(f"[Analytics] Request timed out (attempt {attempt}/{max_retries}).")
+        except Exception as exc:
+            print(f"[Analytics] Request failed: {exc}")
+
+        # Exponential back-off: 5s, 10s, 20s
+        if attempt < max_retries:
+            wait = 5 * (2 ** (attempt - 1))
+            print(f"[Analytics] Retrying in {wait}s...")
+            _time.sleep(wait)
+
+    print(f"[Analytics] [FAIL] All {max_retries} attempts failed. Will use saved history.")
+    return None
+
+
+def _normalize_analytics(data: list) -> list:
+    """Normalize Make.com / Graph API response to the format expected by feedback_loop.py.
+
+    Make.com returns one entry *per metric per post*, e.g.:
+        [
+            {"id": "123", "name": "views",    "values": [{"value": 88}], "caption": "...", ...},
+            {"id": "123", "name": "likes",    "values": [{"value": 5}],  "caption": "...", ...},
+            {"id": "456", "name": "views",    "values": [{"value": 200}], ...},
+            ...
+        ]
+
+    We group by post ID and merge all metrics into one dict per post with
+    the simple keys that feedback_loop.py expects: views, likes, comments.
+    """
+    # Group entries by post ID
+    posts = {}  # id -> {views, likes, comments, caption, ...}
+    for item in data:
+        if not isinstance(item, dict):
+            continue
+
+        post_id = str(item.get("id") or item.get("post_id") or "")
+        if not post_id:
+            continue
+
+        if post_id not in posts:
+            # Extract caption snippet from any entry for this post
+            caption = (
+                item.get("caption")
+                or item.get("topic_snippet")
+                or item.get("text")
+                or ""
+            )
+            if isinstance(caption, str):
+                caption = caption[:120].replace("\n", " ").strip()
+                # Strip non-ASCII chars to prevent Windows cp1252 encoding crashes
+                caption = caption.encode("ascii", errors="ignore").decode("ascii").strip()
+
+            posts[post_id] = {
+                "topic_snippet": caption,
+                "views": 0,
+                "likes": int(item.get("like_count") or 0),
+                "comments": int(item.get("comments_count") or 0),
+            }
+
+        # Extract metric value from the "name" + "values" structure
+        metric_name = str(item.get("name") or "").lower().strip()
+        metric_values = item.get("values")
+        if isinstance(metric_values, list) and metric_values:
+            try:
+                metric_value = int(metric_values[0].get("value", 0))
+            except (ValueError, TypeError, AttributeError):
+                metric_value = 0
+        else:
+            metric_value = 0
+
+        # Map metric names to our simple keys
+        if metric_name in ("views", "total_views", "ig_reels_video_view_total_count", "impressions"):
+            posts[post_id]["views"] = max(posts[post_id]["views"], metric_value)
+        elif metric_name in ("likes", "total_likes"):
+            posts[post_id]["likes"] = max(posts[post_id]["likes"], metric_value)
+        elif metric_name in ("comments", "total_comments"):
+            posts[post_id]["comments"] = max(posts[post_id]["comments"], metric_value)
+
+    # If the data was already in simple format (not per-metric), handle that too
+    if not posts:
+        for item in data:
+            if not isinstance(item, dict):
+                continue
+            views = (
+                item.get("views") or item.get("plays")
+                or item.get("video_views") or item.get("impressions") or 0
+            )
+            likes = item.get("likes") or item.get("like_count") or 0
+            comments = item.get("comments") or item.get("comment_count") or 0
+            caption = (
+                item.get("topic_snippet") or item.get("caption")
+                or item.get("text") or ""
+            )
+            if isinstance(caption, str):
+                caption = caption[:120].replace("\n", " ").strip()
+                # Strip non-ASCII chars to prevent Windows cp1252 encoding crashes
+                caption = caption.encode("ascii", errors="ignore").decode("ascii").strip()
+            try:
+                posts[str(id(item))] = {
+                    "topic_snippet": caption,
+                    "views": int(views),
+                    "likes": int(likes),
+                    "comments": int(comments),
+                }
+            except (ValueError, TypeError):
+                continue
+
+    return list(posts.values())
+
+
+def check_make_webhook_health() -> dict:
+    """Quick health-check: verify the Make.com webhook is reachable and the
+    Instagram OAuth connection is alive.
+
+    Returns a dict with 'healthy' (bool) and 'message' (str).
+    Call this before/after posting to detect OAuth expiry early.
+    """
+    webhook_url = os.getenv("MAKE_WEBHOOK_URL")
+    analytics_url = os.getenv("MAKE_ANALYTICS_WEBHOOK_URL")
+
+    status = {"healthy": True, "message": "All systems operational.", "details": {}}
+
+    # Check reel webhook reachability
+    if not webhook_url:
+        status["healthy"] = False
+        status["message"] = "MAKE_WEBHOOK_URL not configured."
+        return status
+
+    # Check analytics webhook
+    if not analytics_url:
+        status["details"]["analytics"] = "MAKE_ANALYTICS_WEBHOOK_URL not set — feedback loop disabled."
+    else:
+        try:
+            resp = requests.get(analytics_url, timeout=15)
+            if 200 <= resp.status_code < 300:
+                status["details"]["analytics"] = "[OK] Analytics webhook responding."
+            else:
+                status["details"]["analytics"] = f"[WARN] Analytics webhook returned {resp.status_code}"
+                # If analytics returns OAuth error text, flag it
+                body = resp.text.lower()
+                if "oauth" in body or "token" in body or "expired" in body:
+                    status["healthy"] = False
+                    status["message"] = "Instagram OAuth token may be expired. Reauthorize in Make.com."
+        except Exception as exc:
+            status["details"]["analytics"] = f"[FAIL] Analytics webhook unreachable: {exc}"
+
+    return status

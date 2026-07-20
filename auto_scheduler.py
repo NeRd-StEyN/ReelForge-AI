@@ -14,7 +14,7 @@ from pipeline.feedback_loop import (
     load_used_topics,
     save_used_topic,
 )
-from pipeline.make_handler import retry_pending_posts, fetch_analytics_from_make
+from pipeline.make_handler import retry_pending_posts, fetch_analytics_from_make, check_make_webhook_health
 from pipeline.script_gen import generate_topic_from_domain
 
 
@@ -98,6 +98,76 @@ def _pick_next_voice():
 
 
 
+# ---------------------------------------------------------------------------
+# Analytics failure tracking — warn when feedback loop has been broken too long
+# ---------------------------------------------------------------------------
+_ANALYTICS_FAIL_FILE = os.path.join("data", "analytics_fail_count.txt")
+
+
+def _increment_analytics_fail_counter():
+    """Increment consecutive analytics failure count and warn if too many."""
+    count = 0
+    try:
+        if os.path.exists(_ANALYTICS_FAIL_FILE):
+            with open(_ANALYTICS_FAIL_FILE, "r") as f:
+                count = int(f.read().strip())
+    except (ValueError, OSError):
+        pass
+
+    count += 1
+    try:
+        os.makedirs("data", exist_ok=True)
+        with open(_ANALYTICS_FAIL_FILE, "w") as f:
+            f.write(str(count))
+    except OSError:
+        pass
+
+    if count >= 3:
+        print(f"[Analytics] [WARN] Analytics fetch has failed {count} times in a row!")
+        print("[Analytics] Your feedback loop is running on stale data.")
+        print("[Analytics] Fix: Set up MAKE_ANALYTICS_WEBHOOK_URL in .env / GitHub Secrets.")
+        print("[Analytics] See implementation_plan.md -> Scenario B for setup instructions.")
+
+
+def _reset_analytics_fail_counter():
+    """Reset the consecutive failure counter after a successful fetch."""
+    try:
+        if os.path.exists(_ANALYTICS_FAIL_FILE):
+            os.remove(_ANALYTICS_FAIL_FILE)
+    except OSError:
+        pass
+
+
+def _should_fetch_analytics_today() -> bool:
+    """Returns True if we haven't fetched analytics today yet."""
+    fetch_file = os.path.join("data", "last_analytics_fetch.txt")
+    today = datetime.now().strftime("%Y-%m-%d")
+    
+    try:
+        if os.path.exists(fetch_file):
+            with open(fetch_file, "r") as f:
+                last_fetch = f.read().strip()
+                if last_fetch == today:
+                    return False
+    except OSError:
+        pass
+        
+    return True
+
+
+def _mark_analytics_fetched_today():
+    """Records that we fetched analytics today."""
+    fetch_file = os.path.join("data", "last_analytics_fetch.txt")
+    today = datetime.now().strftime("%Y-%m-%d")
+    
+    try:
+        os.makedirs("data", exist_ok=True)
+        with open(fetch_file, "w") as f:
+            f.write(today)
+    except OSError:
+        pass
+
+
 def create_and_post_one_reel():
     # ✅ Retry any reels that failed to reach Make.com in a previous run
     # before spending time generating a brand-new reel.
@@ -114,20 +184,35 @@ def create_and_post_one_reel():
             domain = _get_domain()
             now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             print(f"[{now}] Starting automated reel cycle for domain: {domain} (Attempt {attempt}/{max_retries})")
-            # This is the single authoritative run for this pipeline.
-            # cl = get_insta_client() # Removed to prevent rate limits
 
-            # Fetch live analytics only if the feature flag is on
+            # Health-check Make.com before spending time generating a reel
+            health = check_make_webhook_health()
+            if not health["healthy"]:
+                print(f"[Health] [WARN] Make.com issue detected: {health['message']}")
+                print("[Health] The reel will still be generated and queued, but may fail to post.")
+            for k, v in health.get("details", {}).items():
+                print(f"[Health] {k}: {v}")
+
+            # Fetch live analytics only if the feature flag is on AND we haven't fetched today
             analytics_data = None
             if _env_flag("ENABLE_INSTAGRAM_ANALYTICS", "true"):
-                analytics_data = fetch_analytics_from_make()
+                if _should_fetch_analytics_today():
+                    analytics_data = fetch_analytics_from_make()
+                else:
+                    print("[Analytics] Already fetched analytics today. Skipping to save Make.com credits.")
             else:
                 print("Skipping Instagram analytics fetch (ENABLE_INSTAGRAM_ANALYTICS=false).")
 
             # Only persist real analytics — never save error strings
             if isinstance(analytics_data, list) and analytics_data:
                 append_analytics_snapshot(domain, analytics_data)
+                _reset_analytics_fail_counter()
+                _mark_analytics_fetched_today()
+            elif analytics_data is None and not _should_fetch_analytics_today():
+                # We skipped fetching because we already fetched today. That's fine, no failure.
+                pass
             else:
+                _increment_analytics_fail_counter()
                 print("[Feedback] No live data to save. Will rely on existing history for feedback.")
 
             # Build enriched feedback summary from all saved history
