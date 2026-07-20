@@ -264,12 +264,11 @@ def send_to_make_webhook(
         return False
 
 
-def fetch_analytics_from_make(max_retries: int = 3) -> Optional[list]:
+def fetch_analytics_from_make() -> Optional[list]:
     """Fetch Instagram post insights from Make.com webhook.
 
-    Retries up to *max_retries* times with exponential back-off so a single
-    transient failure (network hiccup, Make.com cold-start) doesn't silently
-    kill the entire feedback loop.
+    Executes only once per run (no retries) to strictly conserve Make.com operations.
+    If it fails, it will safely fall back to local historical data.
 
     The response from Make.com may be:
       - A plain JSON array of media objects  →  used directly
@@ -285,60 +284,52 @@ def fetch_analytics_from_make(max_retries: int = 3) -> Optional[list]:
         print("[Analytics]   to your .env / GitHub Secrets as MAKE_ANALYTICS_WEBHOOK_URL.")
         return None
 
-    for attempt in range(1, max_retries + 1):
-        try:
-            print(f"[Analytics] Fetching live performance data via Make.com (attempt {attempt}/{max_retries})...")
-            response = requests.get(webhook_url, timeout=60)
+    try:
+        print("[Analytics] Fetching live performance data via Make.com (single attempt)...")
+        response = requests.get(webhook_url, timeout=60)
 
-            if 200 <= response.status_code < 300:
-                # Check if it's the default Make.com "Accepted" response instead of JSON
-                if "application/json" not in response.headers.get("Content-Type", "") or response.text.strip() == "Accepted":
-                    print("[Analytics] ❌ CRITICAL ERROR: Your Make.com scenario is missing a 'Webhook Response' module!")
-                    print("[Analytics] Make.com received the trigger, but returned plain text ('Accepted') instead of JSON data.")
-                    print("[Analytics] Aborting retries to save your Make.com credits.")
-                    print("[Analytics] FIX: Add a 'Webhook Response' module at the end of your Make.com scenario and return the JSON array.")
-                    return None
-
-                data = response.json()
-
-                # Handle both list and dict-with-nested-list responses
-                if isinstance(data, dict):
-                    # Make.com sometimes wraps results: {"data": [...]} or {"items": [...]}
-                    for key in ("data", "items", "results", "media"):
-                        if isinstance(data.get(key), list):
-                            data = data[key]
-                            break
-                    else:
-                        # Single-item dict — wrap it
-                        data = [data]
-
-                if isinstance(data, list):
-                    # Normalize field names — Make.com may return Graph API field names
-                    normalized = _normalize_analytics(data)
-                    print(f"[Analytics] [OK] Successfully fetched {len(normalized)} items from Make.com.")
-                    return normalized
-
-                print(f"[Analytics] Make.com returned unexpected format: {type(data)}")
-                # If format is totally wrong, don't retry and waste credits
+        if 200 <= response.status_code < 300:
+            # Check if it's the default Make.com "Accepted" response instead of JSON
+            if "application/json" not in response.headers.get("Content-Type", "") or response.text.strip() == "Accepted":
+                print("[Analytics] ❌ CRITICAL ERROR: Your Make.com scenario is missing a 'Webhook Response' module!")
+                print("[Analytics] Make.com received the trigger, but returned plain text ('Accepted') instead of JSON data.")
+                print("[Analytics] FIX: Add a 'Webhook Response' module at the end of your Make.com scenario and return the JSON array.")
                 return None
 
-            elif response.status_code == 429:
-                print(f"[Analytics] Rate limited by Make.com (429). Will retry...")
-            else:
-                print(f"[Analytics] Make.com webhook returned {response.status_code}: {response.text[:200]}")
+            data = response.json()
 
-        except requests.exceptions.Timeout:
-            print(f"[Analytics] Request timed out (attempt {attempt}/{max_retries}).")
-        except Exception as exc:
-            print(f"[Analytics] Request failed: {exc}")
+            # Handle both list and dict-with-nested-list responses
+            if isinstance(data, dict):
+                # Make.com sometimes wraps results: {"data": [...]} or {"items": [...]}
+                for key in ("data", "items", "results", "media"):
+                    if isinstance(data.get(key), list):
+                        data = data[key]
+                        break
+                else:
+                    # Single-item dict — wrap it
+                    data = [data]
 
-        # Exponential back-off: 5s, 10s, 20s
-        if attempt < max_retries:
-            wait = 5 * (2 ** (attempt - 1))
-            print(f"[Analytics] Retrying in {wait}s...")
-            _time.sleep(wait)
+            if isinstance(data, list):
+                # Normalize field names — Make.com may return Graph API field names
+                normalized = _normalize_analytics(data)
+                print(f"[Analytics] [OK] Successfully fetched {len(normalized)} items from Make.com.")
+                return normalized
 
-    print(f"[Analytics] [FAIL] All {max_retries} attempts failed. Will use saved history.")
+            print(f"[Analytics] Make.com returned unexpected format: {type(data)}")
+            # If format is totally wrong, don't retry and waste credits
+            return None
+
+        elif response.status_code == 429:
+            print("[Analytics] Rate limited by Make.com (429).")
+        else:
+            print(f"[Analytics] Make.com webhook returned {response.status_code}: {response.text[:200]}")
+
+    except requests.exceptions.Timeout:
+        print("[Analytics] Request timed out.")
+    except Exception as exc:
+        print(f"[Analytics] Request failed: {exc}")
+
+    print("[Analytics] [FAIL] Make.com fetch failed. Will use saved history.")
     return None
 
 
