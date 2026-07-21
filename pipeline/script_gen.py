@@ -38,8 +38,6 @@ def _normalize_content(content):
     if text.endswith("```"):
         text = text[:-3]
     return text.strip()
-_OPENROUTER_PRIMARY_MODEL = "openrouter/free"
-_OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1/chat/completions"
 
 def _call_openrouter(prompt, model):
     """Call OpenRouter API with a given model. Returns response text."""
@@ -66,7 +64,7 @@ def _call_openrouter(prompt, model):
 
 def _llm_prompt(prompt):
     """Call LLM via OpenRouter dynamic free routing."""
-    models_to_try = [_OPENROUTER_PRIMARY_MODEL]
+    models_to_try = [_OPENROUTER_PRIMARY_MODEL] + _OPENROUTER_FALLBACK_MODELS
     last_error = None
 
     for model in models_to_try:

@@ -89,7 +89,7 @@ def _post_payload_to_make(payload: dict) -> bool:
         print("[Pending] MAKE_WEBHOOK_URL not set — cannot retry.")
         return False
     try:
-        response = requests.post(webhook_url, json=payload, timeout=60)
+        response = requests.post(webhook_url, json=payload, timeout=300)
         if 200 <= response.status_code < 300:
             return True
         print(f"[Pending] Webhook returned {response.status_code}: {response.text}")
@@ -239,7 +239,7 @@ def send_to_make_webhook(
             payload["story_poll"] = story_poll
 
         print("Sending JSON payload to Make.com webhook...")
-        response = requests.post(webhook_url, json=payload, timeout=60)
+        response = requests.post(webhook_url, json=payload, timeout=300)
 
         if 200 <= response.status_code < 300:
             print("Success! Reel payload sent to Make.com.")
