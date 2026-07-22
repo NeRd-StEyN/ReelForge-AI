@@ -14,7 +14,8 @@ from pipeline.feedback_loop import (
     load_used_topics,
     save_used_topic,
 )
-from pipeline.make_handler import retry_pending_posts, fetch_analytics_from_make, check_make_webhook_health
+from pipeline.make_handler import retry_pending_posts, check_make_webhook_health
+from pipeline.insta_handler import get_insta_client, get_performance_data
 from pipeline.script_gen import generate_topic_from_domain
 
 
@@ -199,7 +200,8 @@ def create_and_post_one_reel():
                 if _should_fetch_analytics_today():
                     # Mark it fetched BEFORE the actual fetch to ensure we strictly never try twice a day, even on failure.
                     _mark_analytics_fetched_today()
-                    analytics_data = fetch_analytics_from_make()
+                    cl = get_insta_client()
+                    analytics_data = get_performance_data(cl) if cl else None
                 else:
                     print("[Analytics] Already fetched analytics today. Skipping to save Make.com credits.")
             else:

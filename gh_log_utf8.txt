@@ -1,0 +1,1301 @@
+﻿generate-and-post	UNKNOWN STEP	∩╗┐2026-07-21T07:54:39.8592398Z Current runner version: '2.335.1'
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:39.8630029Z ##[group]Runner Image Provisioner
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:39.8631931Z Hosted Compute Agent
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:39.8633307Z Version: 20260707.563
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:39.8634569Z Commit: 02667638d2b423fbc733a8e32a88b44996a3ba6e
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:39.8636048Z Build Date: 2026-07-07T19:33:50Z
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:39.8637506Z Worker ID: {2060353d-403c-4650-af2a-0dd114065718}
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:39.8639283Z Azure Region: eastus
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:39.8640384Z ##[endgroup]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:39.8643036Z ##[group]Operating System
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:39.8644204Z Ubuntu
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:39.8645822Z 24.04.4
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:39.8646917Z LTS
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:39.8648020Z ##[endgroup]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:39.8649471Z ##[group]Runner Image
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:39.8650736Z Image: ubuntu-24.04
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:39.8651752Z Version: 20260714.240.1
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:39.8654177Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20260714.240/images/ubuntu/Ubuntu2404-Readme.md
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:39.8657096Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20260714.240
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:39.8659290Z ##[endgroup]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:39.8661660Z ##[group]GITHUB_TOKEN Permissions
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:39.8664721Z Contents: read
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:39.8666017Z Metadata: read
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:39.8667066Z Packages: read
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:39.8668272Z ##[endgroup]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:39.8671625Z Secret source: Actions
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:39.8673403Z Prepare workflow directory
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:39.9417009Z Prepare all required actions
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:39.9472913Z Getting action download info
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:40.1218888Z Download action repository 'actions/checkout@v4' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:40.3542207Z Download action repository 'actions/cache@v4' (SHA:0057852bfaa89a56745cba8c7296529d2fc39830)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:40.4929810Z Download action repository 'actions/setup-python@v5' (SHA:a26af69be951a213d495a4c3e4e4022e16d87065)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:40.7022945Z Complete job name: generate-and-post
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:40.7735598Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:40.7744660Z ##[group]Run actions/checkout@v4
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:40.7745475Z with:
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:40.7745999Z   repository: NeRd-StEyN/ReelForge-AI
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:40.7749945Z   token: ***
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:40.7750449Z   ssh-strict: true
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:40.7750954Z   ssh-user: git
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:40.7751464Z   persist-credentials: true
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:40.7752017Z   clean: true
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:40.7752565Z   sparse-checkout-cone-mode: true
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:40.7753169Z   fetch-depth: 1
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:40.7753667Z   fetch-tags: false
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:40.7754176Z   show-progress: true
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:40.7754687Z   lfs: false
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:40.7755226Z   submodules: false
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:40.7755754Z   set-safe-directory: true
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:40.7756326Z   allow-unsafe-pr-checkout: false
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:40.7757179Z env:
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:40.7757887Z   GEMINI_API_KEY: ***
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:40.7758931Z   OPENROUTER_API_KEY: ***
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:40.7759713Z   PEXELS_API_KEY: ***
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:40.7760473Z   MAKE_WEBHOOK_URL: ***
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:40.7761530Z   CONTENT_DOMAIN: ***
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:40.7762081Z   INSTA_USERNAME: ***
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:40.7762637Z   INSTA_PASSWORD: ***
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:40.7763189Z   CLOUDINARY_CLOUD_NAME: ***
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:40.7763778Z   CLOUDINARY_API_KEY: ***
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:40.7764402Z   CLOUDINARY_API_SECRET: ***
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:40.7765252Z   MAKE_ANALYTICS_WEBHOOK_URL: ***
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:40.7765826Z ##[endgroup]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:40.9025643Z Syncing repository: NeRd-StEyN/ReelForge-AI
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:40.9027770Z ##[group]Getting Git version info
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:40.9028930Z Working directory is '/home/runner/work/ReelForge-AI/ReelForge-AI'
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:40.9030585Z [command]/usr/bin/git version
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:40.9044743Z git version 2.54.0
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:40.9114700Z ##[endgroup]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:40.9123825Z Temporarily overriding HOME='/home/runner/work/_temp/016794ab-5b6b-4182-aa29-ce8c6ae120e5' before making global git config changes
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:40.9126708Z Adding repository directory to the temporary git global config as a safe directory
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:40.9129505Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/ReelForge-AI/ReelForge-AI
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:40.9189132Z Deleting the contents of '/home/runner/work/ReelForge-AI/ReelForge-AI'
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:40.9194139Z ##[group]Initializing the repository
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:40.9200027Z [command]/usr/bin/git init /home/runner/work/ReelForge-AI/ReelForge-AI
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:40.9295254Z hint: Using 'master' as the name for the initial branch. This default branch name
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:40.9298295Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:40.9300245Z hint: to use in all of your new repositories, which will suppress this warning,
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:40.9301562Z hint: call:
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:40.9302364Z hint:
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:40.9303324Z hint: 	git config --global init.defaultBranch <name>
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:40.9304424Z hint:
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:40.9305450Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:40.9307117Z hint: 'development'. The just-created branch can be renamed via this command:
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:40.9308738Z hint:
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:40.9309542Z hint: 	git branch -m <name>
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:40.9310392Z hint:
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:40.9311932Z hint: Disable this message with "git config set advice.defaultBranchName false"
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:40.9313846Z Initialized empty Git repository in /home/runner/work/ReelForge-AI/ReelForge-AI/.git/
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:40.9316809Z [command]/usr/bin/git remote add origin https://github.com/NeRd-StEyN/ReelForge-AI
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:40.9392077Z ##[endgroup]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:40.9394193Z ##[group]Disabling automatic garbage collection
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:40.9395954Z [command]/usr/bin/git config --local gc.auto 0
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:40.9436668Z ##[endgroup]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:40.9438976Z ##[group]Setting up auth
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:40.9445284Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:40.9486166Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:40.9893923Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:40.9933089Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:41.0170233Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:41.0207391Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:41.0436559Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:41.0475377Z ##[endgroup]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:41.0485335Z ##[group]Fetching the repository
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:41.0487016Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +fa24a768a3c1d343e643abd7d92e879ced57e26b:refs/remotes/origin/main
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:41.5946414Z From https://github.com/NeRd-StEyN/ReelForge-AI
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:41.5948874Z  * [new ref]         fa24a768a3c1d343e643abd7d92e879ced57e26b -> origin/main
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:41.5985332Z ##[endgroup]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:41.5987348Z ##[group]Determining the checkout info
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:41.5989729Z ##[endgroup]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:41.5996537Z [command]/usr/bin/git sparse-checkout disable
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:41.6052789Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:41.6087025Z ##[group]Checking out the ref
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:41.6093878Z [command]/usr/bin/git checkout --progress --force -B main refs/remotes/origin/main
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:41.6191240Z Switched to a new branch 'main'
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:41.6194031Z branch 'main' set up to track 'origin/main'.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:41.6201587Z ##[endgroup]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:41.6252104Z [command]/usr/bin/git log -1 --format=%H
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:41.6278665Z fa24a768a3c1d343e643abd7d92e879ced57e26b
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:41.6588954Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:41.6594927Z ##[group]Run actions/cache/restore@v4
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:41.6596200Z with:
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:41.6600139Z   path: data/insta_analytics_history.jsonl
+generate-and-post	UNKNOWN STEP	data/pexels_used_ids.json
+generate-and-post	UNKNOWN STEP	data/used_topics.jsonl
+generate-and-post	UNKNOWN STEP	data/reel_outcomes.jsonl
+generate-and-post	UNKNOWN STEP	data/voice_index.txt
+generate-and-post	UNKNOWN STEP	data/pending_posts.jsonl
+generate-and-post	UNKNOWN STEP	data/analytics_fail_count.txt
+generate-and-post	UNKNOWN STEP	data/last_analytics_fetch.txt
+generate-and-post	UNKNOWN STEP	
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:41.6604343Z   key: reelforge-data-main
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:41.6605569Z   restore-keys: reelforge-data-
+generate-and-post	UNKNOWN STEP	
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:41.6606851Z   enableCrossOsArchive: false
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:41.6608097Z   fail-on-cache-miss: false
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:41.6609413Z   lookup-only: false
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:41.6610458Z env:
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:41.6612189Z   GEMINI_API_KEY: ***
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:41.6614214Z   OPENROUTER_API_KEY: ***
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:41.6615978Z   PEXELS_API_KEY: ***
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:41.6617612Z   MAKE_WEBHOOK_URL: ***
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:41.6620131Z   CONTENT_DOMAIN: ***
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:41.6621266Z   INSTA_USERNAME: ***
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:41.6622405Z   INSTA_PASSWORD: ***
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:41.6623521Z   CLOUDINARY_CLOUD_NAME: ***
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:41.6624732Z   CLOUDINARY_API_KEY: ***
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:41.6626061Z   CLOUDINARY_API_SECRET: ***
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:41.6627940Z   MAKE_ANALYTICS_WEBHOOK_URL: ***
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:41.6629234Z ##[endgroup]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:41.7694799Z (node:2268) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:41.7697844Z (Use `node --trace-deprecation ...` to show where the warning was created)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:41.8390003Z Cache hit for: reelforge-data-main
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:41.8537331Z (node:2268) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:41.9779565Z Received 1820 of 1820 (100.0%), 0.0 MBs/sec
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:41.9781554Z Cache Size: ~0 MB (1820 B)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:41.9810514Z [command]/usr/bin/tar -xf /home/runner/work/_temp/ea91dc2c-e3cc-4f18-96bb-70369c85dd1b/cache.tzst -P -C /home/runner/work/ReelForge-AI/ReelForge-AI --use-compress-program unzstd
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:41.9872268Z Cache restored successfully
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:41.9950872Z Cache restored from key: reelforge-data-main
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:42.0208845Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:42.0213543Z ##[group]Run actions/setup-python@v5
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:42.0214744Z with:
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:42.0215721Z   python-version: 3.11
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:42.0216953Z   check-latest: false
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:42.0225635Z   token: ***
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:42.0226707Z   update-environment: true
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:42.0227889Z   allow-prereleases: false
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:42.0229539Z   freethreaded: false
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:42.0230612Z env:
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:42.0232047Z   GEMINI_API_KEY: ***
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:42.0233852Z   OPENROUTER_API_KEY: ***
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:42.0235462Z   PEXELS_API_KEY: ***
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:42.0236995Z   MAKE_WEBHOOK_URL: ***
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:42.0239349Z   CONTENT_DOMAIN: ***
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:42.0240483Z   INSTA_USERNAME: ***
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:42.0241618Z   INSTA_PASSWORD: ***
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:42.0242749Z   CLOUDINARY_CLOUD_NAME: ***
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:42.0243951Z   CLOUDINARY_API_KEY: ***
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:42.0245239Z   CLOUDINARY_API_SECRET: ***
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:42.0246954Z   MAKE_ANALYTICS_WEBHOOK_URL: ***
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:42.0248141Z ##[endgroup]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:42.1622748Z ##[group]Installed versions
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:42.1717264Z (node:2285) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:42.1721152Z Successfully set up CPython (3.11.15)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:42.1724156Z ##[endgroup]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:42.1745483Z (Use `node --trace-deprecation ...` to show where the warning was created)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:42.1924301Z ##[group]Run sudo rm -f /etc/apt/sources.list.d/azure-cli.list
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:42.1926677Z ^[[36;1msudo rm -f /etc/apt/sources.list.d/azure-cli.list^[[0m
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:42.1929652Z ^[[36;1msudo rm -f /etc/apt/sources.list.d/microsoft-prod.list^[[0m
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:42.1931979Z ^[[36;1msudo apt-get update^[[0m
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:42.1934310Z ^[[36;1msudo DEBIAN_FRONTEND=noninteractive apt-get install -y ffmpeg^[[0m
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:42.2052262Z shell: /usr/bin/bash -e {0}
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:42.2054210Z env:
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:42.2056683Z   GEMINI_API_KEY: ***
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:42.2059748Z   OPENROUTER_API_KEY: ***
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:42.2062310Z   PEXELS_API_KEY: ***
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:42.2064880Z   MAKE_WEBHOOK_URL: ***
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:42.2068596Z   CONTENT_DOMAIN: ***
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:42.2070476Z   INSTA_USERNAME: ***
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:42.2072318Z   INSTA_PASSWORD: ***
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:42.2074158Z   CLOUDINARY_CLOUD_NAME: ***
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:42.2076093Z   CLOUDINARY_API_KEY: ***
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:42.2078238Z   CLOUDINARY_API_SECRET: ***
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:42.2081197Z   MAKE_ANALYTICS_WEBHOOK_URL: ***
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:42.2083329Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.15/x64
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:42.2085280Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.15/x64/lib/pkgconfig
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:42.2087009Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.15/x64
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:42.2088880Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.15/x64
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:42.2090561Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.15/x64
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:42.2092188Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.15/x64/lib
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:42.2093588Z ##[endgroup]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:42.3667748Z Get:1 file:/etc/apt/apt-mirrors.txt Mirrorlist [144 B]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:42.4143676Z Hit:6 https://packages.microsoft.com/repos/azure-cli noble InRelease
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:42.4147528Z Hit:2 http://azure.archive.ubuntu.com/ubuntu noble InRelease
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:42.4152566Z Get:7 https://dl.google.com/linux/chrome-stable/deb stable InRelease [1825 B]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:42.4214363Z Get:3 http://azure.archive.ubuntu.com/ubuntu noble-updates InRelease [126 kB]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:42.4330290Z Get:4 http://azure.archive.ubuntu.com/ubuntu noble-backports InRelease [126 kB]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:42.4381246Z Get:5 http://azure.archive.ubuntu.com/ubuntu noble-security InRelease [126 kB]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:42.6616467Z Get:8 https://dl.google.com/linux/chrome-stable/deb stable/main amd64 Packages [1414 B]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:42.6955630Z Get:9 http://azure.archive.ubuntu.com/ubuntu noble-updates/main amd64 Packages [1120 kB]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:42.7040097Z Get:10 http://azure.archive.ubuntu.com/ubuntu noble-updates/main Translation-en [273 kB]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:42.7079904Z Get:11 http://azure.archive.ubuntu.com/ubuntu noble-updates/main amd64 Components [180 kB]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:42.7091896Z Get:12 http://azure.archive.ubuntu.com/ubuntu noble-updates/universe amd64 Packages [1662 kB]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:42.7190693Z Get:13 http://azure.archive.ubuntu.com/ubuntu noble-updates/universe Translation-en [328 kB]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:42.7222459Z Get:14 http://azure.archive.ubuntu.com/ubuntu noble-updates/universe amd64 Components [388 kB]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:42.7255460Z Get:15 http://azure.archive.ubuntu.com/ubuntu noble-updates/restricted amd64 Packages [1270 kB]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:42.7348822Z Get:16 http://azure.archive.ubuntu.com/ubuntu noble-updates/restricted Translation-en [290 kB]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:42.7361009Z Get:17 http://azure.archive.ubuntu.com/ubuntu noble-updates/multiverse amd64 Components [940 B]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:42.7582927Z Get:18 http://azure.archive.ubuntu.com/ubuntu noble-backports/main amd64 Components [5752 B]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:42.8031268Z Get:19 http://azure.archive.ubuntu.com/ubuntu noble-backports/universe amd64 Components [10.5 kB]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:42.8197408Z Get:20 http://azure.archive.ubuntu.com/ubuntu noble-security/main amd64 Packages [856 kB]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:42.8252010Z Get:21 http://azure.archive.ubuntu.com/ubuntu noble-security/main Translation-en [192 kB]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:42.8280226Z Get:22 http://azure.archive.ubuntu.com/ubuntu noble-security/main amd64 Components [46.3 kB]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:42.8291771Z Get:23 http://azure.archive.ubuntu.com/ubuntu noble-security/universe amd64 Packages [1180 kB]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:42.8355841Z Get:24 http://azure.archive.ubuntu.com/ubuntu noble-security/universe Translation-en [233 kB]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:42.8379658Z Get:25 http://azure.archive.ubuntu.com/ubuntu noble-security/universe amd64 Components [76.3 kB]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:42.8397225Z Get:26 http://azure.archive.ubuntu.com/ubuntu noble-security/restricted amd64 Packages [1166 kB]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:42.8460072Z Get:27 http://azure.archive.ubuntu.com/ubuntu noble-security/restricted Translation-en [268 kB]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:48.9976474Z Fetched 9926 kB in 1s (7403 kB/s)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:49.6813146Z Reading package lists...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:49.7124460Z Reading package lists...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:49.8737342Z Building dependency tree...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:49.8744482Z Reading state information...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:50.0125384Z The following additional packages will be installed:
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:50.0126539Z   i965-va-driver intel-media-va-driver libaacs0 libass9 libasyncns0
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:50.0127412Z   libavc1394-0 libavcodec60 libavdevice60 libavfilter9 libavformat60
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:50.0128251Z   libavutil58 libbdplus0 libblas3 libbluray2 libbs2b0 libcaca0
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:50.0129439Z   libcdio-cdda2t64 libcdio-paranoia2t64 libcdio19t64 libchromaprint1 libcjson1
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:50.0130507Z   libcodec2-1.2 libdav1d7 libdc1394-25 libdecor-0-0 libdecor-0-plugin-1-gtk
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:50.0132148Z   libflac12t64 libflite1 libgme0 libgsm1 libhwy1t64 libiec61883-0 libigdgmm12
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:50.0133925Z   libjack-jackd2-0 libjxl0.7 liblapack3 liblilv-0-0 libmbedcrypto7t64
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:50.0134987Z   libmp3lame0 libmpg123-0t64 libmysofa1 libopenal-data libopenal1
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:50.0136202Z   libopenmpt0t64 libopus0 libplacebo338 libpocketsphinx3 libpostproc57
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:50.0137294Z   libpulse0 librav1e0 libraw1394-11 librist4 librsvg2-2 librsvg2-common
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:50.0138288Z   librubberband2 libsamplerate0 libsdl2-2.0-0 libserd-0-0 libshine3
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:50.0139773Z   libsndfile1 libsndio7.0 libsord-0-0 libsoxr0 libspeex1 libsphinxbase3t64
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:50.0140757Z   libsratom-0-0 libsrt1.5-gnutls libssh-gcrypt-4 libsvtav1enc1d1
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:50.0141751Z   libswresample4 libswscale7 libtheora0 libtwolame0 libudfread0 libunibreak5
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:50.0142891Z   libva-drm2 libva-x11-2 libva2 libvdpau1 libvidstab1.1 libvorbisenc2 libvpl2
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:50.0143919Z   libvpx9 libx264-164 libx265-199 libxcb-shape0 libxv1 libxvidcore4 libzimg2
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:50.0144942Z   libzix-0-0 libzvbi-common libzvbi0t64 mesa-va-drivers mesa-vdpau-drivers
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:50.0145981Z   ocl-icd-libopencl1 pocketsphinx-en-us va-driver-all vdpau-driver-all
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:50.0147417Z Suggested packages:
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:50.0148175Z   ffmpeg-doc i965-va-driver-shaders libcuda1 libnvcuvid1 libnvidia-encode1
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:50.0149561Z   libbluray-bdj jackd2 libportaudio2 opus-tools pulseaudio libraw1394-doc
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:50.0150576Z   librsvg2-bin serdi sndiod sordi speex opencl-icd libvdpau-va-gl1
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:50.1008917Z The following NEW packages will be installed:
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:50.1010415Z   ffmpeg i965-va-driver intel-media-va-driver libaacs0 libass9 libasyncns0
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:50.1011768Z   libavc1394-0 libavcodec60 libavdevice60 libavfilter9 libavformat60
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:50.1012934Z   libavutil58 libbdplus0 libblas3 libbluray2 libbs2b0 libcaca0
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:50.1014171Z   libcdio-cdda2t64 libcdio-paranoia2t64 libcdio19t64 libchromaprint1 libcjson1
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:50.1015315Z   libcodec2-1.2 libdav1d7 libdc1394-25 libdecor-0-0 libdecor-0-plugin-1-gtk
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:50.1018025Z   libflac12t64 libflite1 libgme0 libgsm1 libhwy1t64 libiec61883-0 libigdgmm12
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:50.1019534Z   libjack-jackd2-0 libjxl0.7 liblapack3 liblilv-0-0 libmbedcrypto7t64
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:50.1020240Z   libmp3lame0 libmpg123-0t64 libmysofa1 libopenal-data libopenal1
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:50.1020922Z   libopenmpt0t64 libopus0 libplacebo338 libpocketsphinx3 libpostproc57
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:50.1021625Z   libpulse0 librav1e0 libraw1394-11 librist4 librsvg2-2 librsvg2-common
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:50.1022307Z   librubberband2 libsamplerate0 libsdl2-2.0-0 libserd-0-0 libshine3
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:50.1023005Z   libsndfile1 libsndio7.0 libsord-0-0 libsoxr0 libspeex1 libsphinxbase3t64
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:50.1023694Z   libsratom-0-0 libsrt1.5-gnutls libssh-gcrypt-4 libsvtav1enc1d1
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:50.1024387Z   libswresample4 libswscale7 libtheora0 libtwolame0 libudfread0 libunibreak5
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:50.1025144Z   libva-drm2 libva-x11-2 libva2 libvdpau1 libvidstab1.1 libvorbisenc2 libvpl2
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:50.1025875Z   libvpx9 libx264-164 libx265-199 libxcb-shape0 libxv1 libxvidcore4 libzimg2
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:50.1026600Z   libzix-0-0 libzvbi-common libzvbi0t64 mesa-va-drivers mesa-vdpau-drivers
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:50.1027349Z   ocl-icd-libopencl1 pocketsphinx-en-us va-driver-all vdpau-driver-all
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:50.1228657Z 0 upgraded, 99 newly installed, 0 to remove and 63 not upgraded.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:50.1229527Z Need to get 94.1 MB of archives.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:50.1230207Z After this operation, 227 MB of additional disk space will be used.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:50.1231058Z Get:1 file:/etc/apt/apt-mirrors.txt Mirrorlist [144 B]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:50.1519866Z Get:2 http://azure.archive.ubuntu.com/ubuntu noble-updates/universe amd64 libva2 amd64 2.20.0-2ubuntu0.2 [66.4 kB]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:50.1632860Z Get:3 http://azure.archive.ubuntu.com/ubuntu noble-updates/universe amd64 libva-drm2 amd64 2.20.0-2ubuntu0.2 [7124 B]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:50.1753047Z Get:4 http://azure.archive.ubuntu.com/ubuntu noble-updates/universe amd64 libva-x11-2 amd64 2.20.0-2ubuntu0.2 [12.0 kB]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:50.1850896Z Get:5 http://azure.archive.ubuntu.com/ubuntu noble/main amd64 libvdpau1 amd64 1.5-2build1 [27.8 kB]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:50.1969141Z Get:6 http://azure.archive.ubuntu.com/ubuntu noble/universe amd64 libvpl2 amd64 2023.3.0-1build1 [99.8 kB]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:50.2085026Z Get:7 http://azure.archive.ubuntu.com/ubuntu noble/universe amd64 ocl-icd-libopencl1 amd64 2.3.2-1build1 [38.5 kB]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:50.2171250Z Get:8 http://azure.archive.ubuntu.com/ubuntu noble/universe amd64 libavutil58 amd64 7:6.1.1-3ubuntu5 [401 kB]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:50.2368206Z Get:9 http://azure.archive.ubuntu.com/ubuntu noble/universe amd64 libcodec2-1.2 amd64 1.2.0-2build1 [8998 kB]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:50.3321011Z Get:10 http://azure.archive.ubuntu.com/ubuntu noble/universe amd64 libdav1d7 amd64 1.4.1-1build1 [604 kB]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:50.3457116Z Get:11 http://azure.archive.ubuntu.com/ubuntu noble/universe amd64 libgsm1 amd64 1.0.22-1build1 [27.8 kB]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:50.3541650Z Get:12 http://azure.archive.ubuntu.com/ubuntu noble/universe amd64 libhwy1t64 amd64 1.0.7-8.1build1 [584 kB]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:50.3676143Z Get:13 http://azure.archive.ubuntu.com/ubuntu noble-updates/universe amd64 libjxl0.7 amd64 0.7.0-10.2ubuntu6.1 [1001 kB]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:50.3853514Z Get:14 http://azure.archive.ubuntu.com/ubuntu noble/main amd64 libmp3lame0 amd64 3.100-6build1 [142 kB]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:50.3949684Z Get:15 http://azure.archive.ubuntu.com/ubuntu noble/main amd64 libopus0 amd64 1.4-1build1 [208 kB]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:50.4045906Z Get:16 http://azure.archive.ubuntu.com/ubuntu noble/universe amd64 librav1e0 amd64 0.7.1-2 [1022 kB]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:50.4200499Z Get:17 http://azure.archive.ubuntu.com/ubuntu noble/main amd64 librsvg2-2 amd64 2.58.0+dfsg-1build1 [2135 kB]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:50.4494428Z Get:18 http://azure.archive.ubuntu.com/ubuntu noble/universe amd64 libshine3 amd64 3.1.1-2build1 [23.2 kB]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:50.4578272Z Get:19 http://azure.archive.ubuntu.com/ubuntu noble-updates/main amd64 libspeex1 amd64 1.2.1-2ubuntu2.24.04.1 [59.6 kB]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:50.5087243Z Get:20 http://azure.archive.ubuntu.com/ubuntu noble/universe amd64 libsvtav1enc1d1 amd64 1.7.0+dfsg-2build1 [2425 kB]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:50.5366295Z Get:21 http://azure.archive.ubuntu.com/ubuntu noble/universe amd64 libsoxr0 amd64 0.1.3-4build3 [80.0 kB]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:50.5552247Z Get:22 http://azure.archive.ubuntu.com/ubuntu noble/universe amd64 libswresample4 amd64 7:6.1.1-3ubuntu5 [63.8 kB]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:50.5720546Z Get:23 http://azure.archive.ubuntu.com/ubuntu noble/main amd64 libtheora0 amd64 1.1.1+dfsg.1-16.1build3 [211 kB]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:50.5824784Z Get:24 http://azure.archive.ubuntu.com/ubuntu noble/main amd64 libtwolame0 amd64 0.4.0-2build3 [52.3 kB]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:50.5912230Z Get:25 http://azure.archive.ubuntu.com/ubuntu noble/main amd64 libvorbisenc2 amd64 1.3.7-1build3 [80.8 kB]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:50.6000520Z Get:26 http://azure.archive.ubuntu.com/ubuntu noble-updates/main amd64 libvpx9 amd64 1.14.0-1ubuntu2.3 [1143 kB]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:50.6171356Z Get:27 http://azure.archive.ubuntu.com/ubuntu noble/universe amd64 libx264-164 amd64 2:0.164.3108+git31e19f9-1 [604 kB]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:50.6309569Z Get:28 http://azure.archive.ubuntu.com/ubuntu noble/universe amd64 libx265-199 amd64 3.5-2build1 [1226 kB]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:50.6474729Z Get:29 http://azure.archive.ubuntu.com/ubuntu noble/universe amd64 libxvidcore4 amd64 2:1.3.7-1build1 [219 kB]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:50.6575831Z Get:30 http://azure.archive.ubuntu.com/ubuntu noble/universe amd64 libzvbi-common all 0.2.42-2 [42.4 kB]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:50.6661372Z Get:31 http://azure.archive.ubuntu.com/ubuntu noble/universe amd64 libzvbi0t64 amd64 0.2.42-2 [261 kB]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:50.6767293Z Get:32 http://azure.archive.ubuntu.com/ubuntu noble/universe amd64 libavcodec60 amd64 7:6.1.1-3ubuntu5 [5851 kB]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:50.7287399Z Get:33 http://azure.archive.ubuntu.com/ubuntu noble/main amd64 libraw1394-11 amd64 2.1.2-2build3 [26.2 kB]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:50.7372341Z Get:34 http://azure.archive.ubuntu.com/ubuntu noble/main amd64 libavc1394-0 amd64 0.5.4-5build3 [15.4 kB]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:50.7454231Z Get:35 http://azure.archive.ubuntu.com/ubuntu noble/universe amd64 libunibreak5 amd64 5.1-2build1 [25.0 kB]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:50.7537633Z Get:36 http://azure.archive.ubuntu.com/ubuntu noble/universe amd64 libass9 amd64 1:0.17.1-2build1 [104 kB]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:50.7629313Z Get:37 http://azure.archive.ubuntu.com/ubuntu noble/universe amd64 libudfread0 amd64 1.1.2-1build1 [19.0 kB]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:50.7712195Z Get:38 http://azure.archive.ubuntu.com/ubuntu noble/universe amd64 libbluray2 amd64 1:1.3.4-1build1 [159 kB]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:50.8259564Z Get:39 http://azure.archive.ubuntu.com/ubuntu noble/universe amd64 libchromaprint1 amd64 1.5.1-5 [30.5 kB]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:50.8344579Z Get:40 http://azure.archive.ubuntu.com/ubuntu noble/universe amd64 libgme0 amd64 0.6.3-7build1 [134 kB]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:50.8437291Z Get:41 http://azure.archive.ubuntu.com/ubuntu noble-updates/main amd64 libmpg123-0t64 amd64 1.32.5-1ubuntu1.1 [169 kB]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:50.8535129Z Get:42 http://azure.archive.ubuntu.com/ubuntu noble/universe amd64 libopenmpt0t64 amd64 0.7.3-1.1build3 [647 kB]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:50.8661388Z Get:43 http://azure.archive.ubuntu.com/ubuntu noble/universe amd64 libcjson1 amd64 1.7.17-1 [24.8 kB]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:50.8745259Z Get:44 http://azure.archive.ubuntu.com/ubuntu noble/universe amd64 libmbedcrypto7t64 amd64 2.28.8-1 [209 kB]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:50.8842859Z Get:45 http://azure.archive.ubuntu.com/ubuntu noble/universe amd64 librist4 amd64 0.2.10+dfsg-2 [74.9 kB]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:50.8979959Z Get:46 http://azure.archive.ubuntu.com/ubuntu noble/universe amd64 libsrt1.5-gnutls amd64 1.5.3-1build2 [316 kB]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:50.9352645Z Get:47 http://azure.archive.ubuntu.com/ubuntu noble-updates/main amd64 libssh-gcrypt-4 amd64 0.10.6-2ubuntu0.4 [225 kB]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:50.9499002Z Get:48 http://azure.archive.ubuntu.com/ubuntu noble/universe amd64 libavformat60 amd64 7:6.1.1-3ubuntu5 [1153 kB]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:50.9736209Z Get:49 http://azure.archive.ubuntu.com/ubuntu noble/universe amd64 libbs2b0 amd64 3.1.0+dfsg-7build1 [10.6 kB]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:50.9809159Z Get:50 http://azure.archive.ubuntu.com/ubuntu noble/universe amd64 libflite1 amd64 2.2-6build3 [13.6 MB]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:51.3154102Z Get:51 http://azure.archive.ubuntu.com/ubuntu noble/universe amd64 libserd-0-0 amd64 0.32.2-1 [43.6 kB]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:51.3251080Z Get:52 http://azure.archive.ubuntu.com/ubuntu noble/universe amd64 libzix-0-0 amd64 0.4.2-2build1 [23.6 kB]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:51.3334384Z Get:53 http://azure.archive.ubuntu.com/ubuntu noble/universe amd64 libsord-0-0 amd64 0.16.16-2build1 [15.8 kB]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:51.3415743Z Get:54 http://azure.archive.ubuntu.com/ubuntu noble/universe amd64 libsratom-0-0 amd64 0.6.16-1build1 [17.3 kB]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:51.3513037Z Get:55 http://azure.archive.ubuntu.com/ubuntu noble/universe amd64 liblilv-0-0 amd64 0.24.22-1build1 [41.0 kB]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:51.3591942Z Get:56 http://azure.archive.ubuntu.com/ubuntu noble/universe amd64 libmysofa1 amd64 1.3.2+dfsg-2ubuntu2 [1158 kB]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:51.3881007Z Get:57 http://azure.archive.ubuntu.com/ubuntu noble/universe amd64 libplacebo338 amd64 6.338.2-2build1 [2654 kB]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:51.4928624Z Get:58 http://azure.archive.ubuntu.com/ubuntu noble-updates/main amd64 libblas3 amd64 3.12.0-3build1.1 [238 kB]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:51.5055880Z Get:59 http://azure.archive.ubuntu.com/ubuntu noble-updates/main amd64 liblapack3 amd64 3.12.0-3build1.1 [2646 kB]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:51.5699388Z Get:60 http://azure.archive.ubuntu.com/ubuntu noble/main amd64 libasyncns0 amd64 0.8-6build4 [11.3 kB]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:51.5802034Z Get:61 http://azure.archive.ubuntu.com/ubuntu noble/main amd64 libflac12t64 amd64 1.4.3+ds-2.1ubuntu2 [197 kB]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:51.5903634Z Get:62 http://azure.archive.ubuntu.com/ubuntu noble-updates/main amd64 libsndfile1 amd64 1.2.2-1ubuntu5.24.04.1 [209 kB]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:51.6012521Z Get:63 http://azure.archive.ubuntu.com/ubuntu noble-updates/main amd64 libpulse0 amd64 1:16.1+dfsg1-2ubuntu10.1 [292 kB]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:51.6122701Z Get:64 http://azure.archive.ubuntu.com/ubuntu noble/universe amd64 libsphinxbase3t64 amd64 0.8+5prealpha+1-17build2 [126 kB]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:51.6221554Z Get:65 http://azure.archive.ubuntu.com/ubuntu noble/universe amd64 libpocketsphinx3 amd64 0.8.0+real5prealpha+1-15ubuntu5 [133 kB]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:51.6310932Z Get:66 http://azure.archive.ubuntu.com/ubuntu noble/universe amd64 libpostproc57 amd64 7:6.1.1-3ubuntu5 [49.9 kB]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:51.6394678Z Get:67 http://azure.archive.ubuntu.com/ubuntu noble/main amd64 libsamplerate0 amd64 0.2.2-4build1 [1344 kB]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:51.6596623Z Get:68 http://azure.archive.ubuntu.com/ubuntu noble/universe amd64 librubberband2 amd64 3.3.0+dfsg-2build1 [130 kB]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:51.6700359Z Get:69 http://azure.archive.ubuntu.com/ubuntu noble/universe amd64 libswscale7 amd64 7:6.1.1-3ubuntu5 [193 kB]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:51.6809573Z Get:70 http://azure.archive.ubuntu.com/ubuntu noble/universe amd64 libvidstab1.1 amd64 1.1.0-2build1 [38.5 kB]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:51.6918873Z Get:71 http://azure.archive.ubuntu.com/ubuntu noble/universe amd64 libzimg2 amd64 3.0.5+ds1-1build1 [254 kB]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:51.7094448Z Get:72 http://azure.archive.ubuntu.com/ubuntu noble/universe amd64 libavfilter9 amd64 7:6.1.1-3ubuntu5 [4235 kB]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:51.7824790Z Get:73 http://azure.archive.ubuntu.com/ubuntu noble-updates/main amd64 libcaca0 amd64 0.99.beta20-4ubuntu0.2 [209 kB]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:51.7933370Z Get:74 http://azure.archive.ubuntu.com/ubuntu noble-updates/main amd64 libcdio19t64 amd64 2.1.0-4.1ubuntu1.2 [62.4 kB]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:51.8016635Z Get:75 http://azure.archive.ubuntu.com/ubuntu noble/main amd64 libcdio-cdda2t64 amd64 10.2+2.0.1-1.1build2 [16.5 kB]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:51.8535437Z Get:76 http://azure.archive.ubuntu.com/ubuntu noble/main amd64 libcdio-paranoia2t64 amd64 10.2+2.0.1-1.1build2 [16.6 kB]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:51.8618297Z Get:77 http://azure.archive.ubuntu.com/ubuntu noble/universe amd64 libdc1394-25 amd64 2.2.6-4build1 [90.1 kB]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:51.8710428Z Get:78 http://azure.archive.ubuntu.com/ubuntu noble/main amd64 libiec61883-0 amd64 1.2.0-6build1 [24.5 kB]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:51.8793925Z Get:79 http://azure.archive.ubuntu.com/ubuntu noble/main amd64 libjack-jackd2-0 amd64 1.9.21~dfsg-3ubuntu3 [289 kB]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:51.8920275Z Get:80 http://azure.archive.ubuntu.com/ubuntu noble/universe amd64 libopenal-data all 1:1.23.1-4build1 [161 kB]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:51.9023821Z Get:81 http://azure.archive.ubuntu.com/ubuntu noble/universe amd64 libsndio7.0 amd64 1.9.0-0.3build3 [29.6 kB]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:51.9106850Z Get:82 http://azure.archive.ubuntu.com/ubuntu noble/universe amd64 libopenal1 amd64 1:1.23.1-4build1 [540 kB]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:51.9284275Z Get:83 http://azure.archive.ubuntu.com/ubuntu noble/main amd64 libdecor-0-0 amd64 0.2.2-1build2 [16.5 kB]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:51.9366754Z Get:84 http://azure.archive.ubuntu.com/ubuntu noble-updates/main amd64 libsdl2-2.0-0 amd64 2.30.0+dfsg-1ubuntu3.1 [686 kB]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:51.9643316Z Get:85 http://azure.archive.ubuntu.com/ubuntu noble/main amd64 libxcb-shape0 amd64 1.15-1ubuntu2 [6100 B]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:51.9729451Z Get:86 http://azure.archive.ubuntu.com/ubuntu noble/main amd64 libxv1 amd64 2:1.0.11-1.1build1 [10.7 kB]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:51.9812497Z Get:87 http://azure.archive.ubuntu.com/ubuntu noble/universe amd64 libavdevice60 amd64 7:6.1.1-3ubuntu5 [82.3 kB]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:51.9908982Z Get:88 http://azure.archive.ubuntu.com/ubuntu noble/universe amd64 ffmpeg amd64 7:6.1.1-3ubuntu5 [1879 kB]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:52.0255202Z Get:89 http://azure.archive.ubuntu.com/ubuntu noble-updates/universe amd64 libigdgmm12 amd64 22.3.17+ds1-1ubuntu1 [145 kB]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:52.0350195Z Get:90 http://azure.archive.ubuntu.com/ubuntu noble-updates/universe amd64 intel-media-va-driver amd64 24.1.0+dfsg1-1ubuntu0.2 [3163 kB]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:52.0747767Z Get:91 http://azure.archive.ubuntu.com/ubuntu noble/universe amd64 libaacs0 amd64 0.11.1-2build1 [62.9 kB]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:52.0835697Z Get:92 http://azure.archive.ubuntu.com/ubuntu noble/universe amd64 libbdplus0 amd64 0.2.0-3build1 [52.2 kB]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:52.0926785Z Get:93 http://azure.archive.ubuntu.com/ubuntu noble/main amd64 libdecor-0-plugin-1-gtk amd64 0.2.2-1build2 [22.2 kB]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:52.1008254Z Get:94 http://azure.archive.ubuntu.com/ubuntu noble/main amd64 librsvg2-common amd64 2.58.0+dfsg-1build1 [11.8 kB]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:52.1514707Z Get:95 http://azure.archive.ubuntu.com/ubuntu noble-updates/universe amd64 mesa-va-drivers amd64 25.2.8-0ubuntu0.24.04.2 [6784 B]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:52.1589761Z Get:96 http://azure.archive.ubuntu.com/ubuntu noble-updates/main amd64 mesa-vdpau-drivers amd64 25.2.8-0ubuntu0.24.04.2 [23.2 kB]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:52.1667718Z Get:97 http://azure.archive.ubuntu.com/ubuntu noble-updates/universe amd64 i965-va-driver amd64 2.4.1+dfsg1-1ubuntu0.2 [332 kB]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:52.1777947Z Get:98 http://azure.archive.ubuntu.com/ubuntu noble-updates/universe amd64 va-driver-all amd64 2.20.0-2ubuntu0.2 [5014 B]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:52.1851054Z Get:99 http://azure.archive.ubuntu.com/ubuntu noble/main amd64 vdpau-driver-all amd64 1.5-2build1 [4414 B]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:52.1922707Z Get:100 http://azure.archive.ubuntu.com/ubuntu noble/universe amd64 pocketsphinx-en-us all 0.8.0+real5prealpha+1-15ubuntu5 [27.4 MB]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:52.8057944Z Fetched 94.1 MB in 2s (39.9 MB/s)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:52.8546261Z Selecting previously unselected package libva2:amd64.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:52.9367961Z (Reading database ... 
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:52.9369401Z (Reading database ... 5%
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:52.9370081Z (Reading database ... 10%
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:52.9370494Z (Reading database ... 15%
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:52.9370881Z (Reading database ... 20%
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:52.9371249Z (Reading database ... 25%
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:52.9371546Z (Reading database ... 30%
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:52.9371842Z (Reading database ... 35%
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:52.9372130Z (Reading database ... 40%
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:52.9372422Z (Reading database ... 45%
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:52.9372713Z (Reading database ... 50%
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:52.9710078Z (Reading database ... 55%
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:53.3489623Z (Reading database ... 60%
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:53.6137215Z (Reading database ... 65%
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:53.8855841Z (Reading database ... 70%
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:54.1216920Z (Reading database ... 75%
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:54.4957529Z (Reading database ... 80%
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:55.0688160Z (Reading database ... 85%
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:55.6851190Z (Reading database ... 90%
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:56.2922652Z (Reading database ... 95%
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:56.2923321Z (Reading database ... 100%
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:56.2923976Z (Reading database ... 202507 files and directories currently installed.)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:56.2966125Z Preparing to unpack .../00-libva2_2.20.0-2ubuntu0.2_amd64.deb ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:56.3048232Z Unpacking libva2:amd64 (2.20.0-2ubuntu0.2) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:56.3291384Z Selecting previously unselected package libva-drm2:amd64.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:56.3418315Z Preparing to unpack .../01-libva-drm2_2.20.0-2ubuntu0.2_amd64.deb ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:56.3431884Z Unpacking libva-drm2:amd64 (2.20.0-2ubuntu0.2) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:56.3698212Z Selecting previously unselected package libva-x11-2:amd64.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:56.3823566Z Preparing to unpack .../02-libva-x11-2_2.20.0-2ubuntu0.2_amd64.deb ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:56.3834437Z Unpacking libva-x11-2:amd64 (2.20.0-2ubuntu0.2) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:56.4110910Z Selecting previously unselected package libvdpau1:amd64.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:56.4238599Z Preparing to unpack .../03-libvdpau1_1.5-2build1_amd64.deb ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:56.4252820Z Unpacking libvdpau1:amd64 (1.5-2build1) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:56.4521397Z Selecting previously unselected package libvpl2.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:56.4645511Z Preparing to unpack .../04-libvpl2_2023.3.0-1build1_amd64.deb ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:56.4655934Z Unpacking libvpl2 (2023.3.0-1build1) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:56.4892581Z Selecting previously unselected package ocl-icd-libopencl1:amd64.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:56.5016750Z Preparing to unpack .../05-ocl-icd-libopencl1_2.3.2-1build1_amd64.deb ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:56.5027917Z Unpacking ocl-icd-libopencl1:amd64 (2.3.2-1build1) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:56.5337986Z Selecting previously unselected package libavutil58:amd64.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:56.5461272Z Preparing to unpack .../06-libavutil58_7%3a6.1.1-3ubuntu5_amd64.deb ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:56.5472226Z Unpacking libavutil58:amd64 (7:6.1.1-3ubuntu5) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:56.5732396Z Selecting previously unselected package libcodec2-1.2:amd64.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:56.5857542Z Preparing to unpack .../07-libcodec2-1.2_1.2.0-2build1_amd64.deb ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:56.5872790Z Unpacking libcodec2-1.2:amd64 (1.2.0-2build1) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:56.6649496Z Selecting previously unselected package libdav1d7:amd64.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:56.6775790Z Preparing to unpack .../08-libdav1d7_1.4.1-1build1_amd64.deb ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:56.6787679Z Unpacking libdav1d7:amd64 (1.4.1-1build1) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:56.7066337Z Selecting previously unselected package libgsm1:amd64.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:56.7194061Z Preparing to unpack .../09-libgsm1_1.0.22-1build1_amd64.deb ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:56.7204501Z Unpacking libgsm1:amd64 (1.0.22-1build1) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:56.7441229Z Selecting previously unselected package libhwy1t64:amd64.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:56.7567913Z Preparing to unpack .../10-libhwy1t64_1.0.7-8.1build1_amd64.deb ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:56.7580240Z Unpacking libhwy1t64:amd64 (1.0.7-8.1build1) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:56.7919192Z Selecting previously unselected package libjxl0.7:amd64.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:56.8044306Z Preparing to unpack .../11-libjxl0.7_0.7.0-10.2ubuntu6.1_amd64.deb ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:56.8055305Z Unpacking libjxl0.7:amd64 (0.7.0-10.2ubuntu6.1) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:56.8418962Z Selecting previously unselected package libmp3lame0:amd64.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:56.8547977Z Preparing to unpack .../12-libmp3lame0_3.100-6build1_amd64.deb ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:56.8560223Z Unpacking libmp3lame0:amd64 (3.100-6build1) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:56.8817229Z Selecting previously unselected package libopus0:amd64.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:56.8945284Z Preparing to unpack .../13-libopus0_1.4-1build1_amd64.deb ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:56.8956915Z Unpacking libopus0:amd64 (1.4-1build1) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:56.9209198Z Selecting previously unselected package librav1e0:amd64.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:56.9334015Z Preparing to unpack .../14-librav1e0_0.7.1-2_amd64.deb ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:56.9344593Z Unpacking librav1e0:amd64 (0.7.1-2) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:56.9682707Z Selecting previously unselected package librsvg2-2:amd64.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:56.9810720Z Preparing to unpack .../15-librsvg2-2_2.58.0+dfsg-1build1_amd64.deb ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:56.9822229Z Unpacking librsvg2-2:amd64 (2.58.0+dfsg-1build1) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:57.0288663Z Selecting previously unselected package libshine3:amd64.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:57.0414985Z Preparing to unpack .../16-libshine3_3.1.1-2build1_amd64.deb ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:57.0425849Z Unpacking libshine3:amd64 (3.1.1-2build1) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:57.0642320Z Selecting previously unselected package libspeex1:amd64.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:57.0768803Z Preparing to unpack .../17-libspeex1_1.2.1-2ubuntu2.24.04.1_amd64.deb ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:57.0780810Z Unpacking libspeex1:amd64 (1.2.1-2ubuntu2.24.04.1) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:57.1021475Z Selecting previously unselected package libsvtav1enc1d1:amd64.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:57.1147902Z Preparing to unpack .../18-libsvtav1enc1d1_1.7.0+dfsg-2build1_amd64.deb ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:57.1157936Z Unpacking libsvtav1enc1d1:amd64 (1.7.0+dfsg-2build1) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:57.1659651Z Selecting previously unselected package libsoxr0:amd64.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:57.1785095Z Preparing to unpack .../19-libsoxr0_0.1.3-4build3_amd64.deb ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:57.1796385Z Unpacking libsoxr0:amd64 (0.1.3-4build3) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:57.2034750Z Selecting previously unselected package libswresample4:amd64.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:57.2160016Z Preparing to unpack .../20-libswresample4_7%3a6.1.1-3ubuntu5_amd64.deb ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:57.2171480Z Unpacking libswresample4:amd64 (7:6.1.1-3ubuntu5) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:57.2408734Z Selecting previously unselected package libtheora0:amd64.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:57.2536654Z Preparing to unpack .../21-libtheora0_1.1.1+dfsg.1-16.1build3_amd64.deb ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:57.2550509Z Unpacking libtheora0:amd64 (1.1.1+dfsg.1-16.1build3) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:57.2808236Z Selecting previously unselected package libtwolame0:amd64.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:57.2934834Z Preparing to unpack .../22-libtwolame0_0.4.0-2build3_amd64.deb ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:57.2945778Z Unpacking libtwolame0:amd64 (0.4.0-2build3) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:57.3178205Z Selecting previously unselected package libvorbisenc2:amd64.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:57.3307105Z Preparing to unpack .../23-libvorbisenc2_1.3.7-1build3_amd64.deb ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:57.3317322Z Unpacking libvorbisenc2:amd64 (1.3.7-1build3) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:57.3563304Z Selecting previously unselected package libvpx9:amd64.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:57.3691147Z Preparing to unpack .../24-libvpx9_1.14.0-1ubuntu2.3_amd64.deb ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:57.3700561Z Unpacking libvpx9:amd64 (1.14.0-1ubuntu2.3) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:57.4046587Z Selecting previously unselected package libx264-164:amd64.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:57.4170322Z Preparing to unpack .../25-libx264-164_2%3a0.164.3108+git31e19f9-1_amd64.deb ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:57.4184469Z Unpacking libx264-164:amd64 (2:0.164.3108+git31e19f9-1) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:57.4475745Z Selecting previously unselected package libx265-199:amd64.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:57.4600043Z Preparing to unpack .../26-libx265-199_3.5-2build1_amd64.deb ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:57.4609378Z Unpacking libx265-199:amd64 (3.5-2build1) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:57.5261839Z Selecting previously unselected package libxvidcore4:amd64.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:57.5386492Z Preparing to unpack .../27-libxvidcore4_2%3a1.3.7-1build1_amd64.deb ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:57.5395522Z Unpacking libxvidcore4:amd64 (2:1.3.7-1build1) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:57.5619671Z Selecting previously unselected package libzvbi-common.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:57.5743153Z Preparing to unpack .../28-libzvbi-common_0.2.42-2_all.deb ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:57.5752395Z Unpacking libzvbi-common (0.2.42-2) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:57.6423083Z Selecting previously unselected package libzvbi0t64:amd64.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:57.6550350Z Preparing to unpack .../29-libzvbi0t64_0.2.42-2_amd64.deb ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:57.6562416Z Unpacking libzvbi0t64:amd64 (0.2.42-2) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:57.6819225Z Selecting previously unselected package libavcodec60:amd64.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:57.6945758Z Preparing to unpack .../30-libavcodec60_7%3a6.1.1-3ubuntu5_amd64.deb ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:57.6960747Z Unpacking libavcodec60:amd64 (7:6.1.1-3ubuntu5) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:57.7817582Z Selecting previously unselected package libraw1394-11:amd64.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:57.7941575Z Preparing to unpack .../31-libraw1394-11_2.1.2-2build3_amd64.deb ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:57.7951801Z Unpacking libraw1394-11:amd64 (2.1.2-2build3) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:57.8171281Z Selecting previously unselected package libavc1394-0:amd64.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:57.8296626Z Preparing to unpack .../32-libavc1394-0_0.5.4-5build3_amd64.deb ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:57.8307992Z Unpacking libavc1394-0:amd64 (0.5.4-5build3) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:57.8532417Z Selecting previously unselected package libunibreak5:amd64.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:57.8656927Z Preparing to unpack .../33-libunibreak5_5.1-2build1_amd64.deb ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:57.8668009Z Unpacking libunibreak5:amd64 (5.1-2build1) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:57.8890420Z Selecting previously unselected package libass9:amd64.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:57.9014319Z Preparing to unpack .../34-libass9_1%3a0.17.1-2build1_amd64.deb ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:57.9025065Z Unpacking libass9:amd64 (1:0.17.1-2build1) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:57.9254535Z Selecting previously unselected package libudfread0:amd64.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:57.9378070Z Preparing to unpack .../35-libudfread0_1.1.2-1build1_amd64.deb ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:57.9392587Z Unpacking libudfread0:amd64 (1.1.2-1build1) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:57.9629527Z Selecting previously unselected package libbluray2:amd64.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:57.9755329Z Preparing to unpack .../36-libbluray2_1%3a1.3.4-1build1_amd64.deb ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:57.9767513Z Unpacking libbluray2:amd64 (1:1.3.4-1build1) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:58.0010222Z Selecting previously unselected package libchromaprint1:amd64.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:58.0135129Z Preparing to unpack .../37-libchromaprint1_1.5.1-5_amd64.deb ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:58.0146286Z Unpacking libchromaprint1:amd64 (1.5.1-5) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:58.0379603Z Selecting previously unselected package libgme0:amd64.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:58.0502815Z Preparing to unpack .../38-libgme0_0.6.3-7build1_amd64.deb ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:58.0514245Z Unpacking libgme0:amd64 (0.6.3-7build1) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:58.0745241Z Selecting previously unselected package libmpg123-0t64:amd64.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:58.0870545Z Preparing to unpack .../39-libmpg123-0t64_1.32.5-1ubuntu1.1_amd64.deb ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:58.0886753Z Unpacking libmpg123-0t64:amd64 (1.32.5-1ubuntu1.1) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:58.1147446Z Selecting previously unselected package libopenmpt0t64:amd64.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:58.1271921Z Preparing to unpack .../40-libopenmpt0t64_0.7.3-1.1build3_amd64.deb ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:58.1284257Z Unpacking libopenmpt0t64:amd64 (0.7.3-1.1build3) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:58.1566996Z Selecting previously unselected package libcjson1:amd64.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:58.1691282Z Preparing to unpack .../41-libcjson1_1.7.17-1_amd64.deb ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:58.1702095Z Unpacking libcjson1:amd64 (1.7.17-1) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:58.1925090Z Selecting previously unselected package libmbedcrypto7t64:amd64.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:58.2047650Z Preparing to unpack .../42-libmbedcrypto7t64_2.28.8-1_amd64.deb ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:58.2059413Z Unpacking libmbedcrypto7t64:amd64 (2.28.8-1) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:58.2317235Z Selecting previously unselected package librist4:amd64.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:58.2443212Z Preparing to unpack .../43-librist4_0.2.10+dfsg-2_amd64.deb ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:58.2461514Z Unpacking librist4:amd64 (0.2.10+dfsg-2) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:58.2712049Z Selecting previously unselected package libsrt1.5-gnutls:amd64.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:58.2836664Z Preparing to unpack .../44-libsrt1.5-gnutls_1.5.3-1build2_amd64.deb ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:58.2851122Z Unpacking libsrt1.5-gnutls:amd64 (1.5.3-1build2) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:58.3153696Z Selecting previously unselected package libssh-gcrypt-4:amd64.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:58.3278015Z Preparing to unpack .../45-libssh-gcrypt-4_0.10.6-2ubuntu0.4_amd64.deb ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:58.3296114Z Unpacking libssh-gcrypt-4:amd64 (0.10.6-2ubuntu0.4) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:58.3564403Z Selecting previously unselected package libavformat60:amd64.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:58.3731152Z Preparing to unpack .../46-libavformat60_7%3a6.1.1-3ubuntu5_amd64.deb ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:58.3743196Z Unpacking libavformat60:amd64 (7:6.1.1-3ubuntu5) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:58.4083192Z Selecting previously unselected package libbs2b0:amd64.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:58.4208172Z Preparing to unpack .../47-libbs2b0_3.1.0+dfsg-7build1_amd64.deb ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:58.4219860Z Unpacking libbs2b0:amd64 (3.1.0+dfsg-7build1) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:58.4465047Z Selecting previously unselected package libflite1:amd64.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:58.4589116Z Preparing to unpack .../48-libflite1_2.2-6build3_amd64.deb ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:58.4601710Z Unpacking libflite1:amd64 (2.2-6build3) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:58.5731502Z Selecting previously unselected package libserd-0-0:amd64.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:58.5855305Z Preparing to unpack .../49-libserd-0-0_0.32.2-1_amd64.deb ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:58.5868716Z Unpacking libserd-0-0:amd64 (0.32.2-1) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:58.6099830Z Selecting previously unselected package libzix-0-0:amd64.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:58.6225783Z Preparing to unpack .../50-libzix-0-0_0.4.2-2build1_amd64.deb ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:58.6236970Z Unpacking libzix-0-0:amd64 (0.4.2-2build1) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:58.6489359Z Selecting previously unselected package libsord-0-0:amd64.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:58.6615382Z Preparing to unpack .../51-libsord-0-0_0.16.16-2build1_amd64.deb ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:58.6628640Z Unpacking libsord-0-0:amd64 (0.16.16-2build1) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:58.6850122Z Selecting previously unselected package libsratom-0-0:amd64.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:58.6972792Z Preparing to unpack .../52-libsratom-0-0_0.6.16-1build1_amd64.deb ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:58.6984536Z Unpacking libsratom-0-0:amd64 (0.6.16-1build1) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:58.7206071Z Selecting previously unselected package liblilv-0-0:amd64.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:58.7330440Z Preparing to unpack .../53-liblilv-0-0_0.24.22-1build1_amd64.deb ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:58.7340983Z Unpacking liblilv-0-0:amd64 (0.24.22-1build1) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:58.7565325Z Selecting previously unselected package libmysofa1:amd64.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:58.7689671Z Preparing to unpack .../54-libmysofa1_1.3.2+dfsg-2ubuntu2_amd64.deb ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:58.7702235Z Unpacking libmysofa1:amd64 (1.3.2+dfsg-2ubuntu2) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:58.7965223Z Selecting previously unselected package libplacebo338:amd64.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:58.8088766Z Preparing to unpack .../55-libplacebo338_6.338.2-2build1_amd64.deb ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:58.8099527Z Unpacking libplacebo338:amd64 (6.338.2-2build1) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:58.8670962Z Selecting previously unselected package libblas3:amd64.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:58.8797014Z Preparing to unpack .../56-libblas3_3.12.0-3build1.1_amd64.deb ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:58.8826855Z Unpacking libblas3:amd64 (3.12.0-3build1.1) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:58.9072966Z Selecting previously unselected package liblapack3:amd64.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:58.9199714Z Preparing to unpack .../57-liblapack3_3.12.0-3build1.1_amd64.deb ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:58.9229784Z Unpacking liblapack3:amd64 (3.12.0-3build1.1) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:58.9724818Z Selecting previously unselected package libasyncns0:amd64.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:58.9850265Z Preparing to unpack .../58-libasyncns0_0.8-6build4_amd64.deb ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:58.9858604Z Unpacking libasyncns0:amd64 (0.8-6build4) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:59.0081572Z Selecting previously unselected package libflac12t64:amd64.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:59.0206280Z Preparing to unpack .../59-libflac12t64_1.4.3+ds-2.1ubuntu2_amd64.deb ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:59.0216183Z Unpacking libflac12t64:amd64 (1.4.3+ds-2.1ubuntu2) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:59.0458511Z Selecting previously unselected package libsndfile1:amd64.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:59.0583069Z Preparing to unpack .../60-libsndfile1_1.2.2-1ubuntu5.24.04.1_amd64.deb ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:59.0593211Z Unpacking libsndfile1:amd64 (1.2.2-1ubuntu5.24.04.1) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:59.0857746Z Selecting previously unselected package libpulse0:amd64.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:59.0981030Z Preparing to unpack .../61-libpulse0_1%3a16.1+dfsg1-2ubuntu10.1_amd64.deb ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:59.1049572Z Unpacking libpulse0:amd64 (1:16.1+dfsg1-2ubuntu10.1) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:59.1302316Z Selecting previously unselected package libsphinxbase3t64:amd64.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:59.1427168Z Preparing to unpack .../62-libsphinxbase3t64_0.8+5prealpha+1-17build2_amd64.deb ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:59.1437852Z Unpacking libsphinxbase3t64:amd64 (0.8+5prealpha+1-17build2) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:59.1661190Z Selecting previously unselected package libpocketsphinx3:amd64.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:59.1786152Z Preparing to unpack .../63-libpocketsphinx3_0.8.0+real5prealpha+1-15ubuntu5_amd64.deb ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:59.1798675Z Unpacking libpocketsphinx3:amd64 (0.8.0+real5prealpha+1-15ubuntu5) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:59.2024975Z Selecting previously unselected package libpostproc57:amd64.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:59.2149751Z Preparing to unpack .../64-libpostproc57_7%3a6.1.1-3ubuntu5_amd64.deb ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:59.2158452Z Unpacking libpostproc57:amd64 (7:6.1.1-3ubuntu5) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:59.2377291Z Selecting previously unselected package libsamplerate0:amd64.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:59.2504223Z Preparing to unpack .../65-libsamplerate0_0.2.2-4build1_amd64.deb ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:59.2519498Z Unpacking libsamplerate0:amd64 (0.2.2-4build1) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:59.2799615Z Selecting previously unselected package librubberband2:amd64.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:59.2929252Z Preparing to unpack .../66-librubberband2_3.3.0+dfsg-2build1_amd64.deb ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:59.2941152Z Unpacking librubberband2:amd64 (3.3.0+dfsg-2build1) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:59.3204777Z Selecting previously unselected package libswscale7:amd64.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:59.3331337Z Preparing to unpack .../67-libswscale7_7%3a6.1.1-3ubuntu5_amd64.deb ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:59.3341818Z Unpacking libswscale7:amd64 (7:6.1.1-3ubuntu5) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:59.3656581Z Selecting previously unselected package libvidstab1.1:amd64.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:59.3781711Z Preparing to unpack .../68-libvidstab1.1_1.1.0-2build1_amd64.deb ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:59.3792030Z Unpacking libvidstab1.1:amd64 (1.1.0-2build1) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:59.4000770Z Selecting previously unselected package libzimg2:amd64.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:59.4124008Z Preparing to unpack .../69-libzimg2_3.0.5+ds1-1build1_amd64.deb ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:59.4132244Z Unpacking libzimg2:amd64 (3.0.5+ds1-1build1) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:59.4360263Z Selecting previously unselected package libavfilter9:amd64.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:59.4483217Z Preparing to unpack .../70-libavfilter9_7%3a6.1.1-3ubuntu5_amd64.deb ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:59.4492102Z Unpacking libavfilter9:amd64 (7:6.1.1-3ubuntu5) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:59.5227500Z Selecting previously unselected package libcaca0:amd64.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:59.5351802Z Preparing to unpack .../71-libcaca0_0.99.beta20-4ubuntu0.2_amd64.deb ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:59.5361811Z Unpacking libcaca0:amd64 (0.99.beta20-4ubuntu0.2) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:59.5616771Z Selecting previously unselected package libcdio19t64:amd64.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:59.5741985Z Preparing to unpack .../72-libcdio19t64_2.1.0-4.1ubuntu1.2_amd64.deb ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:59.5750346Z Unpacking libcdio19t64:amd64 (2.1.0-4.1ubuntu1.2) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:59.6008855Z Selecting previously unselected package libcdio-cdda2t64:amd64.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:59.6135540Z Preparing to unpack .../73-libcdio-cdda2t64_10.2+2.0.1-1.1build2_amd64.deb ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:59.6145476Z Unpacking libcdio-cdda2t64:amd64 (10.2+2.0.1-1.1build2) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:59.6388605Z Selecting previously unselected package libcdio-paranoia2t64:amd64.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:59.6513405Z Preparing to unpack .../74-libcdio-paranoia2t64_10.2+2.0.1-1.1build2_amd64.deb ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:59.6522209Z Unpacking libcdio-paranoia2t64:amd64 (10.2+2.0.1-1.1build2) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:59.6729701Z Selecting previously unselected package libdc1394-25:amd64.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:59.6854942Z Preparing to unpack .../75-libdc1394-25_2.2.6-4build1_amd64.deb ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:59.6863192Z Unpacking libdc1394-25:amd64 (2.2.6-4build1) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:59.7083619Z Selecting previously unselected package libiec61883-0:amd64.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:59.7209329Z Preparing to unpack .../76-libiec61883-0_1.2.0-6build1_amd64.deb ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:59.7217819Z Unpacking libiec61883-0:amd64 (1.2.0-6build1) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:59.7431363Z Selecting previously unselected package libjack-jackd2-0:amd64.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:59.7556442Z Preparing to unpack .../77-libjack-jackd2-0_1.9.21~dfsg-3ubuntu3_amd64.deb ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:59.7564816Z Unpacking libjack-jackd2-0:amd64 (1.9.21~dfsg-3ubuntu3) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:59.7812045Z Selecting previously unselected package libopenal-data.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:59.7935922Z Preparing to unpack .../78-libopenal-data_1%3a1.23.1-4build1_all.deb ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:59.7944357Z Unpacking libopenal-data (1:1.23.1-4build1) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:59.8181215Z Selecting previously unselected package libsndio7.0:amd64.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:59.8306545Z Preparing to unpack .../79-libsndio7.0_1.9.0-0.3build3_amd64.deb ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:59.8314502Z Unpacking libsndio7.0:amd64 (1.9.0-0.3build3) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:59.8543978Z Selecting previously unselected package libopenal1:amd64.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:59.8669876Z Preparing to unpack .../80-libopenal1_1%3a1.23.1-4build1_amd64.deb ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:59.8680210Z Unpacking libopenal1:amd64 (1:1.23.1-4build1) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:59.8946038Z Selecting previously unselected package libdecor-0-0:amd64.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:59.9073076Z Preparing to unpack .../81-libdecor-0-0_0.2.2-1build2_amd64.deb ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:59.9082346Z Unpacking libdecor-0-0:amd64 (0.2.2-1build2) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:59.9297118Z Selecting previously unselected package libsdl2-2.0-0:amd64.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:59.9422482Z Preparing to unpack .../82-libsdl2-2.0-0_2.30.0+dfsg-1ubuntu3.1_amd64.deb ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:59.9431849Z Unpacking libsdl2-2.0-0:amd64 (2.30.0+dfsg-1ubuntu3.1) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:59.9856236Z Selecting previously unselected package libxcb-shape0:amd64.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:59.9984094Z Preparing to unpack .../83-libxcb-shape0_1.15-1ubuntu2_amd64.deb ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:54:59.9993914Z Unpacking libxcb-shape0:amd64 (1.15-1ubuntu2) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:00.0200377Z Selecting previously unselected package libxv1:amd64.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:00.0326727Z Preparing to unpack .../84-libxv1_2%3a1.0.11-1.1build1_amd64.deb ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:00.0337942Z Unpacking libxv1:amd64 (2:1.0.11-1.1build1) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:00.0552962Z Selecting previously unselected package libavdevice60:amd64.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:00.0681045Z Preparing to unpack .../85-libavdevice60_7%3a6.1.1-3ubuntu5_amd64.deb ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:00.0690666Z Unpacking libavdevice60:amd64 (7:6.1.1-3ubuntu5) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:00.0917325Z Selecting previously unselected package ffmpeg.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:00.1044362Z Preparing to unpack .../86-ffmpeg_7%3a6.1.1-3ubuntu5_amd64.deb ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:00.1057007Z Unpacking ffmpeg (7:6.1.1-3ubuntu5) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:00.1776152Z Selecting previously unselected package libigdgmm12:amd64.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:00.1905195Z Preparing to unpack .../87-libigdgmm12_22.3.17+ds1-1ubuntu1_amd64.deb ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:00.1915494Z Unpacking libigdgmm12:amd64 (22.3.17+ds1-1ubuntu1) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:00.2180893Z Selecting previously unselected package intel-media-va-driver:amd64.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:00.2306423Z Preparing to unpack .../88-intel-media-va-driver_24.1.0+dfsg1-1ubuntu0.2_amd64.deb ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:00.2314894Z Unpacking intel-media-va-driver:amd64 (24.1.0+dfsg1-1ubuntu0.2) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:00.2996962Z Selecting previously unselected package libaacs0:amd64.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:00.3123437Z Preparing to unpack .../89-libaacs0_0.11.1-2build1_amd64.deb ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:00.3131133Z Unpacking libaacs0:amd64 (0.11.1-2build1) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:00.3357321Z Selecting previously unselected package libbdplus0:amd64.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:00.3485707Z Preparing to unpack .../90-libbdplus0_0.2.0-3build1_amd64.deb ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:00.3492455Z Unpacking libbdplus0:amd64 (0.2.0-3build1) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:00.3697368Z Selecting previously unselected package libdecor-0-plugin-1-gtk:amd64.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:00.3823252Z Preparing to unpack .../91-libdecor-0-plugin-1-gtk_0.2.2-1build2_amd64.deb ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:00.3830817Z Unpacking libdecor-0-plugin-1-gtk:amd64 (0.2.2-1build2) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:00.4024094Z Selecting previously unselected package librsvg2-common:amd64.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:00.4149312Z Preparing to unpack .../92-librsvg2-common_2.58.0+dfsg-1build1_amd64.deb ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:00.4157889Z Unpacking librsvg2-common:amd64 (2.58.0+dfsg-1build1) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:00.4370826Z Selecting previously unselected package mesa-va-drivers:amd64.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:00.4498585Z Preparing to unpack .../93-mesa-va-drivers_25.2.8-0ubuntu0.24.04.2_amd64.deb ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:00.4506558Z Unpacking mesa-va-drivers:amd64 (25.2.8-0ubuntu0.24.04.2) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:00.4756285Z Selecting previously unselected package mesa-vdpau-drivers:amd64.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:00.4879621Z Preparing to unpack .../94-mesa-vdpau-drivers_25.2.8-0ubuntu0.24.04.2_amd64.deb ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:00.4887088Z Unpacking mesa-vdpau-drivers:amd64 (25.2.8-0ubuntu0.24.04.2) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:00.5098230Z Selecting previously unselected package i965-va-driver:amd64.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:00.5223397Z Preparing to unpack .../95-i965-va-driver_2.4.1+dfsg1-1ubuntu0.2_amd64.deb ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:00.5230843Z Unpacking i965-va-driver:amd64 (2.4.1+dfsg1-1ubuntu0.2) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:00.5483808Z Selecting previously unselected package va-driver-all:amd64.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:00.5610900Z Preparing to unpack .../96-va-driver-all_2.20.0-2ubuntu0.2_amd64.deb ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:00.5620605Z Unpacking va-driver-all:amd64 (2.20.0-2ubuntu0.2) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:00.5809823Z Selecting previously unselected package vdpau-driver-all:amd64.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:00.5935366Z Preparing to unpack .../97-vdpau-driver-all_1.5-2build1_amd64.deb ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:00.5949012Z Unpacking vdpau-driver-all:amd64 (1.5-2build1) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:00.6140598Z Selecting previously unselected package pocketsphinx-en-us.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:00.6267434Z Preparing to unpack .../98-pocketsphinx-en-us_0.8.0+real5prealpha+1-15ubuntu5_all.deb ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:00.6275420Z Unpacking pocketsphinx-en-us (0.8.0+real5prealpha+1-15ubuntu5) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:00.8276408Z Setting up libgme0:amd64 (0.6.3-7build1) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:00.8311827Z Setting up libchromaprint1:amd64 (1.5.1-5) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:00.8336287Z Setting up libssh-gcrypt-4:amd64 (0.10.6-2ubuntu0.4) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:00.8361534Z Setting up libhwy1t64:amd64 (1.0.7-8.1build1) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:00.8386886Z Setting up libudfread0:amd64 (1.1.2-1build1) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:00.8413296Z Setting up libraw1394-11:amd64 (2.1.2-2build3) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:00.8442898Z Setting up libspeex1:amd64 (1.2.1-2ubuntu2.24.04.1) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:00.8484162Z Setting up libshine3:amd64 (3.1.1-2build1) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:00.8511304Z Setting up libcaca0:amd64 (0.99.beta20-4ubuntu0.2) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:00.8547146Z Setting up libvpl2 (2023.3.0-1build1) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:00.8579340Z Setting up libx264-164:amd64 (2:0.164.3108+git31e19f9-1) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:00.8617434Z Setting up libtwolame0:amd64 (0.4.0-2build3) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:00.8646515Z Setting up libmbedcrypto7t64:amd64 (2.28.8-1) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:00.8676328Z Setting up libgsm1:amd64 (1.0.22-1build1) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:00.8706124Z Setting up libsoxr0:amd64 (0.1.3-4build3) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:00.8727121Z Setting up libzix-0-0:amd64 (0.4.2-2build1) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:00.8748540Z Setting up libcodec2-1.2:amd64 (1.2.0-2build1) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:00.8769963Z Setting up libmysofa1:amd64 (1.3.2+dfsg-2ubuntu2) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:00.8794055Z Setting up libxcb-shape0:amd64 (1.15-1ubuntu2) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:00.8817288Z Setting up libcdio19t64:amd64 (2.1.0-4.1ubuntu1.2) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:00.8847815Z Setting up libsvtav1enc1d1:amd64 (1.7.0+dfsg-2build1) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:00.8871341Z Setting up libigdgmm12:amd64 (22.3.17+ds1-1ubuntu1) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:00.8899299Z Setting up libmpg123-0t64:amd64 (1.32.5-1ubuntu1.1) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:00.8924851Z Setting up libcjson1:amd64 (1.7.17-1) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:00.8951632Z Setting up libxvidcore4:amd64 (2:1.3.7-1build1) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:00.8978984Z Setting up librav1e0:amd64 (0.7.1-2) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:00.9005660Z Setting up libcdio-cdda2t64:amd64 (10.2+2.0.1-1.1build2) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:00.9032391Z Setting up librist4:amd64 (0.2.10+dfsg-2) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:00.9053576Z Setting up librsvg2-2:amd64 (2.58.0+dfsg-1build1) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:00.9076493Z Setting up libblas3:amd64 (3.12.0-3build1.1) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:00.9146400Z update-alternatives: using /usr/lib/x86_64-linux-gnu/blas/libblas.so.3 to provide /usr/lib/x86_64-linux-gnu/libblas.so.3 (libblas.so.3-x86_64-linux-gnu) in auto mode
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:00.9164963Z Setting up libplacebo338:amd64 (6.338.2-2build1) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:00.9192995Z Setting up libva2:amd64 (2.20.0-2ubuntu0.2) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:00.9218735Z Setting up libopus0:amd64 (1.4-1build1) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:00.9241687Z Setting up libcdio-paranoia2t64:amd64 (10.2+2.0.1-1.1build2) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:00.9263948Z Setting up libdc1394-25:amd64 (2.2.6-4build1) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:00.9288842Z Setting up intel-media-va-driver:amd64 (24.1.0+dfsg1-1ubuntu0.2) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:00.9312557Z Setting up libxv1:amd64 (2:1.0.11-1.1build1) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:00.9338507Z Setting up libunibreak5:amd64 (5.1-2build1) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:00.9364366Z Setting up libaacs0:amd64 (0.11.1-2build1) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:00.9389032Z Setting up libjxl0.7:amd64 (0.7.0-10.2ubuntu6.1) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:00.9414118Z Setting up librsvg2-common:amd64 (2.58.0+dfsg-1build1) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:00.9512767Z Setting up pocketsphinx-en-us (0.8.0+real5prealpha+1-15ubuntu5) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:00.9535916Z Setting up libx265-199:amd64 (3.5-2build1) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:00.9570678Z Setting up libsndio7.0:amd64 (1.9.0-0.3build3) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:00.9595850Z Setting up libbdplus0:amd64 (0.2.0-3build1) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:00.9618882Z Setting up libvidstab1.1:amd64 (1.1.0-2build1) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:00.9643477Z Setting up libvpx9:amd64 (1.14.0-1ubuntu2.3) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:00.9669294Z Setting up libsrt1.5-gnutls:amd64 (1.5.3-1build2) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:00.9693920Z Setting up libflite1:amd64 (2.2-6build3) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:00.9719152Z Setting up libdav1d7:amd64 (1.4.1-1build1) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:00.9745689Z Setting up libva-drm2:amd64 (2.20.0-2ubuntu0.2) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:00.9767163Z Setting up ocl-icd-libopencl1:amd64 (2.3.2-1build1) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:00.9789300Z Setting up libasyncns0:amd64 (0.8-6build4) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:00.9812008Z Setting up libvdpau1:amd64 (1.5-2build1) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:00.9842496Z Setting up libbs2b0:amd64 (3.1.0+dfsg-7build1) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:00.9862709Z Setting up libtheora0:amd64 (1.1.1+dfsg.1-16.1build3) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:00.9885128Z Setting up libdecor-0-0:amd64 (0.2.2-1build2) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:00.9907459Z Setting up libzimg2:amd64 (3.0.5+ds1-1build1) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:00.9930115Z Setting up libopenal-data (1:1.23.1-4build1) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:00.9959273Z Setting up libflac12t64:amd64 (1.4.3+ds-2.1ubuntu2) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:00.9982124Z Setting up mesa-va-drivers:amd64 (25.2.8-0ubuntu0.24.04.2) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:01.0001776Z Setting up libbluray2:amd64 (1:1.3.4-1build1) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:01.0022443Z Setting up libsamplerate0:amd64 (0.2.2-4build1) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:01.0048349Z Setting up libva-x11-2:amd64 (2.20.0-2ubuntu0.2) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:01.0070403Z Setting up libdecor-0-plugin-1-gtk:amd64 (0.2.2-1build2) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:01.0094712Z Setting up libopenmpt0t64:amd64 (0.7.3-1.1build3) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:01.0117852Z Setting up libzvbi-common (0.2.42-2) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:01.0140154Z Setting up libmp3lame0:amd64 (3.100-6build1) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:01.0162356Z Setting up i965-va-driver:amd64 (2.4.1+dfsg1-1ubuntu0.2) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:01.0181165Z Setting up libvorbisenc2:amd64 (1.3.7-1build3) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:01.0203208Z Setting up libiec61883-0:amd64 (1.2.0-6build1) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:01.0224594Z Setting up libserd-0-0:amd64 (0.32.2-1) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:01.0246490Z Setting up libavc1394-0:amd64 (0.5.4-5build3) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:01.0266447Z Setting up mesa-vdpau-drivers:amd64 (25.2.8-0ubuntu0.24.04.2) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:01.0286616Z Setting up liblapack3:amd64 (3.12.0-3build1.1) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:01.0347894Z update-alternatives: using /usr/lib/x86_64-linux-gnu/lapack/liblapack.so.3 to provide /usr/lib/x86_64-linux-gnu/liblapack.so.3 (liblapack.so.3-x86_64-linux-gnu) in auto mode
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:01.0364214Z Setting up libzvbi0t64:amd64 (0.2.42-2) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:01.0383939Z Setting up libavutil58:amd64 (7:6.1.1-3ubuntu5) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:01.0407639Z Setting up libopenal1:amd64 (1:1.23.1-4build1) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:01.0429161Z Setting up libass9:amd64 (1:0.17.1-2build1) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:01.0450313Z Setting up libswresample4:amd64 (7:6.1.1-3ubuntu5) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:01.0470669Z Setting up va-driver-all:amd64 (2.20.0-2ubuntu0.2) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:01.0490167Z Setting up libavcodec60:amd64 (7:6.1.1-3ubuntu5) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:01.0514972Z Setting up librubberband2:amd64 (3.3.0+dfsg-2build1) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:01.0640324Z Setting up libjack-jackd2-0:amd64 (1.9.21~dfsg-3ubuntu3) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:01.0684953Z Setting up vdpau-driver-all:amd64 (1.5-2build1) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:01.0707992Z Setting up libsord-0-0:amd64 (0.16.16-2build1) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:01.0743046Z Setting up libpostproc57:amd64 (7:6.1.1-3ubuntu5) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:01.0776423Z Setting up libsratom-0-0:amd64 (0.6.16-1build1) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:01.0798732Z Setting up libsndfile1:amd64 (1.2.2-1ubuntu5.24.04.1) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:01.0820475Z Setting up liblilv-0-0:amd64 (0.24.22-1build1) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:01.0840714Z Setting up libswscale7:amd64 (7:6.1.1-3ubuntu5) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:01.0861983Z Setting up libpulse0:amd64 (1:16.1+dfsg1-2ubuntu10.1) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:01.0936843Z Setting up libavformat60:amd64 (7:6.1.1-3ubuntu5) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:01.0956906Z Setting up libsphinxbase3t64:amd64 (0.8+5prealpha+1-17build2) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:01.0980209Z Setting up libsdl2-2.0-0:amd64 (2.30.0+dfsg-1ubuntu3.1) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:01.1001208Z Setting up libpocketsphinx3:amd64 (0.8.0+real5prealpha+1-15ubuntu5) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:01.1020956Z Setting up libavfilter9:amd64 (7:6.1.1-3ubuntu5) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:01.1041011Z Setting up libavdevice60:amd64 (7:6.1.1-3ubuntu5) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:01.1062690Z Setting up ffmpeg (7:6.1.1-3ubuntu5) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:01.1086611Z Processing triggers for man-db (2.12.0-4build2) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:01.1149181Z Not building database; man-db/auto-update is not 'true'.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:01.1165287Z Processing triggers for libgdk-pixbuf-2.0-0:amd64 (2.42.10+dfsg-3ubuntu3.3) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:01.3117560Z Processing triggers for libc-bin (2.39-0ubuntu8.7) ...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:02.4111045Z 
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:02.4111688Z Running kernel seems to be up-to-date.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:02.4112211Z 
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:02.4112475Z No services need to be restarted.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:02.4112888Z 
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:02.4113136Z No containers need to be restarted.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:02.4113556Z 
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:02.4113854Z No user sessions are running outdated binaries.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:02.4114365Z 
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:02.4114834Z No VM guests are running outdated hypervisor (qemu) binaries on this host.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:03.2516962Z ##[group]Run python -m pip install --upgrade pip
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:03.2517430Z ^[[36;1mpython -m pip install --upgrade pip^[[0m
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:03.2517801Z ^[[36;1mpip install -r requirements.txt^[[0m
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:03.2580101Z shell: /usr/bin/bash -e {0}
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:03.2580393Z env:
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:03.2580986Z   GEMINI_API_KEY: ***
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:03.2581493Z   OPENROUTER_API_KEY: ***
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:03.2581936Z   PEXELS_API_KEY: ***
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:03.2582357Z   MAKE_WEBHOOK_URL: ***
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:03.2582931Z   CONTENT_DOMAIN: ***
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:03.2583215Z   INSTA_USERNAME: ***
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:03.2583495Z   INSTA_PASSWORD: ***
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:03.2583765Z   CLOUDINARY_CLOUD_NAME: ***
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:03.2584068Z   CLOUDINARY_API_KEY: ***
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:03.2584401Z   CLOUDINARY_API_SECRET: ***
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:03.2584858Z   MAKE_ANALYTICS_WEBHOOK_URL: ***
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:03.2585221Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.15/x64
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:03.2585727Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.15/x64/lib/pkgconfig
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:03.2586198Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.15/x64
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:03.2586613Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.15/x64
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:03.2587042Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.15/x64
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:03.2587471Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.15/x64/lib
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:03.2587845Z ##[endgroup]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:04.2534280Z Requirement already satisfied: pip in /opt/hostedtoolcache/Python/3.11.15/x64/lib/python3.11/site-packages (26.1.2)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:05.3070911Z Collecting google-generativeai (from -r requirements.txt (line 1))
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:05.3581134Z   Downloading google_generativeai-0.8.6-py3-none-any.whl.metadata (3.9 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:05.3791229Z Collecting edge-tts (from -r requirements.txt (line 2))
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:05.3839747Z   Downloading edge_tts-7.2.8-py3-none-any.whl.metadata (5.5 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:05.3969381Z Collecting moviepy==1.0.3 (from -r requirements.txt (line 3))
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:05.4008315Z   Downloading moviepy-1.0.3.tar.gz (388 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:05.4765197Z   Installing build dependencies: started
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:06.3089275Z   Installing build dependencies: finished with status 'done'
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:06.3095447Z   Getting requirements to build wheel: started
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:06.7018849Z   Getting requirements to build wheel: finished with status 'done'
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:06.7028031Z   Preparing metadata (pyproject.toml): started
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:06.8900137Z   Preparing metadata (pyproject.toml): finished with status 'done'
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:06.9144913Z Collecting requests (from -r requirements.txt (line 4))
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:06.9182734Z   Downloading requests-2.34.2-py3-none-any.whl.metadata (4.8 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:06.9338849Z Collecting python-dotenv (from -r requirements.txt (line 5))
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:06.9375825Z   Downloading python_dotenv-1.2.2-py3-none-any.whl.metadata (27 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:06.9960627Z Collecting openai (from -r requirements.txt (line 6))
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:06.9995709Z   Downloading openai-2.46.0-py3-none-any.whl.metadata (34 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:07.1509170Z Collecting pillow (from -r requirements.txt (line 7))
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:07.1549849Z   Downloading pillow-12.3.0-cp311-cp311-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl.metadata (9.1 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:07.1918707Z Collecting instagrapi (from -r requirements.txt (line 8))
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:07.1971736Z   Downloading instagrapi-2.18.8-py3-none-any.whl.metadata (18 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:07.2113839Z Collecting schedule (from -r requirements.txt (line 9))
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:07.2147249Z   Downloading schedule-1.2.2-py3-none-any.whl.metadata (3.8 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:07.2275378Z Collecting cloudinary (from -r requirements.txt (line 10))
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:07.2309364Z   Downloading cloudinary-1.45.0-py3-none-any.whl.metadata (8.1 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:07.2449838Z Collecting decorator<5.0,>=4.0.2 (from moviepy==1.0.3->-r requirements.txt (line 3))
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:07.2483343Z   Downloading decorator-4.4.2-py2.py3-none-any.whl.metadata (4.2 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:07.2699415Z Collecting imageio<3.0,>=2.5 (from moviepy==1.0.3->-r requirements.txt (line 3))
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:07.2735203Z   Downloading imageio-2.37.4-py3-none-any.whl.metadata (9.6 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:07.2949252Z Collecting imageio_ffmpeg>=0.2.0 (from moviepy==1.0.3->-r requirements.txt (line 3))
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:07.2983717Z   Downloading imageio_ffmpeg-0.6.0-py3-none-manylinux2014_x86_64.whl.metadata (1.5 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:07.3250271Z Collecting tqdm<5.0,>=4.11.2 (from moviepy==1.0.3->-r requirements.txt (line 3))
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:07.3284347Z   Downloading tqdm-4.69.0-py3-none-any.whl.metadata (57 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:07.5176917Z Collecting numpy>=1.17.3 (from moviepy==1.0.3->-r requirements.txt (line 3))
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:07.5215997Z   Downloading numpy-2.4.6-cp311-cp311-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl.metadata (6.6 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:07.5352860Z Collecting proglog<=1.0.0 (from moviepy==1.0.3->-r requirements.txt (line 3))
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:07.5390752Z   Downloading proglog-0.1.12-py3-none-any.whl.metadata (794 bytes)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:07.6267097Z Collecting charset_normalizer<4,>=2 (from requests->-r requirements.txt (line 4))
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:07.6309473Z   Downloading charset_normalizer-3.4.9-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (41 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:07.6458651Z Collecting idna<4,>=2.5 (from requests->-r requirements.txt (line 4))
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:07.6491581Z   Downloading idna-3.18-py3-none-any.whl.metadata (6.1 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:07.6679508Z Collecting urllib3<3,>=1.26 (from requests->-r requirements.txt (line 4))
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:07.6713742Z   Downloading urllib3-2.7.0-py3-none-any.whl.metadata (6.9 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:07.6872587Z Collecting certifi>=2023.5.7 (from requests->-r requirements.txt (line 4))
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:07.6906231Z   Downloading certifi-2026.6.17-py3-none-any.whl.metadata (2.5 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:07.7081101Z Collecting google-ai-generativelanguage==0.6.15 (from google-generativeai->-r requirements.txt (line 1))
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:07.7115152Z   Downloading google_ai_generativelanguage-0.6.15-py3-none-any.whl.metadata (5.7 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:07.7391825Z Collecting google-api-core (from google-generativeai->-r requirements.txt (line 1))
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:07.7426881Z   Downloading google_api_core-2.32.0-py3-none-any.whl.metadata (3.2 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:07.7838068Z Collecting google-api-python-client (from google-generativeai->-r requirements.txt (line 1))
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:07.7871933Z   Downloading google_api_python_client-2.198.0-py3-none-any.whl.metadata (7.0 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:07.8145240Z Collecting google-auth>=2.15.0 (from google-generativeai->-r requirements.txt (line 1))
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:07.8180738Z   Downloading google_auth-2.56.0-py3-none-any.whl.metadata (6.0 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:07.9546754Z Collecting protobuf (from google-generativeai->-r requirements.txt (line 1))
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:07.9586080Z   Downloading protobuf-7.35.1-cp310-abi3-manylinux2014_x86_64.whl.metadata (595 bytes)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:08.0719860Z Collecting pydantic (from google-generativeai->-r requirements.txt (line 1))
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:08.0755854Z   Downloading pydantic-2.13.4-py3-none-any.whl.metadata (109 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:08.0938906Z Collecting typing-extensions (from google-generativeai->-r requirements.txt (line 1))
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:08.0974908Z   Downloading typing_extensions-4.16.0-py3-none-any.whl.metadata (3.3 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:08.1273273Z Collecting proto-plus<2.0.0dev,>=1.22.3 (from google-ai-generativelanguage==0.6.15->google-generativeai->-r requirements.txt (line 1))
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:08.1309240Z   Downloading proto_plus-1.28.1-py3-none-any.whl.metadata (2.2 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:08.1426171Z Collecting protobuf (from google-generativeai->-r requirements.txt (line 1))
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:08.1458958Z   Downloading protobuf-5.29.6-cp38-abi3-manylinux2014_x86_64.whl.metadata (592 bytes)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:08.1612005Z Collecting googleapis-common-protos<2.0.0,>=1.63.2 (from google-api-core->google-generativeai->-r requirements.txt (line 1))
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:08.1645055Z   Downloading googleapis_common_protos-1.75.0-py3-none-any.whl.metadata (8.6 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:08.6325767Z Collecting grpcio<2.0.0,>=1.41.0 (from google-api-core[grpc]!=2.0.*,!=2.1.*,!=2.10.*,!=2.2.*,!=2.3.*,!=2.4.*,!=2.5.*,!=2.6.*,!=2.7.*,!=2.8.*,!=2.9.*,<3.0.0dev,>=1.34.1->google-ai-generativelanguage==0.6.15->google-generativeai->-r requirements.txt (line 1))
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:08.6366086Z   Downloading grpcio-1.82.1-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.whl.metadata (3.7 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:08.6680282Z Collecting grpcio-status<2.0.0,>=1.41.0 (from google-api-core[grpc]!=2.0.*,!=2.1.*,!=2.10.*,!=2.2.*,!=2.3.*,!=2.4.*,!=2.5.*,!=2.6.*,!=2.7.*,!=2.8.*,!=2.9.*,<3.0.0dev,>=1.34.1->google-ai-generativelanguage==0.6.15->google-generativeai->-r requirements.txt (line 1))
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:08.6714430Z   Downloading grpcio_status-1.82.1-py3-none-any.whl.metadata (1.2 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:08.6923619Z Collecting pyasn1-modules>=0.2.1 (from google-auth>=2.15.0->google-generativeai->-r requirements.txt (line 1))
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:08.6960273Z   Downloading pyasn1_modules-0.4.2-py3-none-any.whl.metadata (3.5 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:08.8517891Z Collecting cryptography>=38.0.3 (from google-auth>=2.15.0->google-generativeai->-r requirements.txt (line 1))
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:08.8556537Z   Downloading cryptography-49.0.0-cp311-abi3-manylinux_2_34_x86_64.whl.metadata (4.3 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:08.8673427Z INFO: pip is looking at multiple versions of grpcio-status to determine which version is compatible with other requirements. This could take a while.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:08.8678792Z Collecting grpcio-status<2.0.0,>=1.41.0 (from google-api-core[grpc]!=2.0.*,!=2.1.*,!=2.10.*,!=2.2.*,!=2.3.*,!=2.4.*,!=2.5.*,!=2.6.*,!=2.7.*,!=2.8.*,!=2.9.*,<3.0.0dev,>=1.34.1->google-ai-generativelanguage==0.6.15->google-generativeai->-r requirements.txt (line 1))
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:08.8712045Z   Downloading grpcio_status-1.81.1-py3-none-any.whl.metadata (1.2 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:08.8797704Z   Downloading grpcio_status-1.81.0-py3-none-any.whl.metadata (1.2 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:08.8862481Z   Downloading grpcio_status-1.80.0-py3-none-any.whl.metadata (1.3 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:08.8958224Z   Downloading grpcio_status-1.78.0-py3-none-any.whl.metadata (1.3 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:08.9029531Z   Downloading grpcio_status-1.76.0-py3-none-any.whl.metadata (1.1 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:08.9098659Z   Downloading grpcio_status-1.75.1-py3-none-any.whl.metadata (1.1 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:08.9164561Z   Downloading grpcio_status-1.75.0-py3-none-any.whl.metadata (1.1 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:08.9196059Z INFO: pip is still looking at multiple versions of grpcio-status to determine which version is compatible with other requirements. This could take a while.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:08.9231445Z   Downloading grpcio_status-1.74.0-py3-none-any.whl.metadata (1.1 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:08.9294963Z   Downloading grpcio_status-1.73.1-py3-none-any.whl.metadata (1.1 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:08.9386976Z   Downloading grpcio_status-1.73.0-py3-none-any.whl.metadata (1.1 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:08.9457673Z   Downloading grpcio_status-1.72.2-py3-none-any.whl.metadata (1.1 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:08.9529768Z   Downloading grpcio_status-1.72.1-py3-none-any.whl.metadata (1.1 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:08.9562036Z INFO: This is taking longer than usual. You might need to provide the dependency resolver with stricter constraints to reduce runtime. See https://pip.pypa.io/warnings/backtracking for guidance. If you want to abort this run, press Ctrl + C.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:08.9597650Z   Downloading grpcio_status-1.71.2-py3-none-any.whl.metadata (1.1 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:09.4734781Z Collecting aiohttp<4.0.0,>=3.8.0 (from edge-tts->-r requirements.txt (line 2))
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:09.4779533Z   Downloading aiohttp-3.14.2-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (8.3 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:09.4916242Z Collecting tabulate<1.0.0,>=0.4.4 (from edge-tts->-r requirements.txt (line 2))
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:09.4952119Z   Downloading tabulate-0.10.0-py3-none-any.whl.metadata (40 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:09.5122226Z Collecting aiohappyeyeballs>=2.5.0 (from aiohttp<4.0.0,>=3.8.0->edge-tts->-r requirements.txt (line 2))
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:09.5158011Z   Downloading aiohappyeyeballs-2.7.1-py3-none-any.whl.metadata (5.9 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:09.5267310Z Collecting aiosignal>=1.4.0 (from aiohttp<4.0.0,>=3.8.0->edge-tts->-r requirements.txt (line 2))
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:09.5301971Z   Downloading aiosignal-1.4.0-py3-none-any.whl.metadata (3.7 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:09.5433322Z Collecting attrs>=17.3.0 (from aiohttp<4.0.0,>=3.8.0->edge-tts->-r requirements.txt (line 2))
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:09.5468231Z   Downloading attrs-26.1.0-py3-none-any.whl.metadata (8.8 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:09.6034795Z Collecting frozenlist>=1.1.1 (from aiohttp<4.0.0,>=3.8.0->edge-tts->-r requirements.txt (line 2))
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:09.6071052Z   Downloading frozenlist-1.8.0-cp311-cp311-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl.metadata (20 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:09.7975297Z Collecting multidict<7.0,>=4.5 (from aiohttp<4.0.0,>=3.8.0->edge-tts->-r requirements.txt (line 2))
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:09.8016033Z   Downloading multidict-6.7.1-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (5.3 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:09.8520136Z Collecting propcache>=0.2.0 (from aiohttp<4.0.0,>=3.8.0->edge-tts->-r requirements.txt (line 2))
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:09.8560939Z   Downloading propcache-0.5.2-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (16 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:10.1130158Z Collecting yarl<2.0,>=1.17.0 (from aiohttp<4.0.0,>=3.8.0->edge-tts->-r requirements.txt (line 2))
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:10.1169716Z   Downloading yarl-1.24.5-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (103 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:10.1513697Z Collecting anyio<5,>=3.5.0 (from openai->-r requirements.txt (line 6))
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:10.1548937Z   Downloading anyio-4.14.2-py3-none-any.whl.metadata (4.6 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:10.1655703Z Collecting distro<2,>=1.7.0 (from openai->-r requirements.txt (line 6))
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:10.1690153Z   Downloading distro-1.9.0-py3-none-any.whl.metadata (6.8 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:10.1844188Z Collecting httpx<1,>=0.23.0 (from openai->-r requirements.txt (line 6))
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:10.1879858Z   Downloading httpx-0.28.1-py3-none-any.whl.metadata (7.1 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:10.2656501Z Collecting jiter<1,>=0.10.0 (from openai->-r requirements.txt (line 6))
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:10.2696129Z   Downloading jiter-0.16.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (5.2 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:10.2850063Z Collecting sniffio (from openai->-r requirements.txt (line 6))
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:10.2883682Z   Downloading sniffio-1.3.1-py3-none-any.whl.metadata (3.9 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:10.3141890Z Collecting httpcore==1.* (from httpx<1,>=0.23.0->openai->-r requirements.txt (line 6))
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:10.3175968Z   Downloading httpcore-1.0.9-py3-none-any.whl.metadata (21 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:10.3294037Z Collecting h11>=0.16 (from httpcore==1.*->httpx<1,>=0.23.0->openai->-r requirements.txt (line 6))
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:10.3327210Z   Downloading h11-0.16.0-py3-none-any.whl.metadata (8.3 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:10.3441767Z Collecting annotated-types>=0.6.0 (from pydantic->google-generativeai->-r requirements.txt (line 1))
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:10.3474161Z   Downloading annotated_types-0.7.0-py3-none-any.whl.metadata (15 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:10.9503798Z Collecting pydantic-core==2.46.4 (from pydantic->google-generativeai->-r requirements.txt (line 1))
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:10.9543172Z   Downloading pydantic_core-2.46.4-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (6.6 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:10.9661506Z Collecting typing-inspection>=0.4.2 (from pydantic->google-generativeai->-r requirements.txt (line 1))
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:10.9695095Z   Downloading typing_inspection-0.4.2-py3-none-any.whl.metadata (2.6 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:10.9832594Z Collecting PySocks<2,>=1.7.1 (from instagrapi->-r requirements.txt (line 8))
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:10.9866267Z   Downloading PySocks-1.7.1-py3-none-any.whl.metadata (13 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:11.0991989Z Collecting pycryptodomex<4,>=3.23.0 (from instagrapi->-r requirements.txt (line 8))
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:11.1035087Z   Downloading pycryptodomex-3.23.0-cp37-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (3.4 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:11.1182503Z Collecting six (from cloudinary->-r requirements.txt (line 10))
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:11.1218567Z   Downloading six-1.17.0-py2.py3-none-any.whl.metadata (1.7 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:11.2300401Z Collecting cffi>=2.0.0 (from cryptography>=38.0.3->google-auth>=2.15.0->google-generativeai->-r requirements.txt (line 1))
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:11.2338812Z   Downloading cffi-2.1.0-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.whl.metadata (2.5 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:11.2450474Z Collecting pycparser (from cffi>=2.0.0->cryptography>=38.0.3->google-auth>=2.15.0->google-generativeai->-r requirements.txt (line 1))
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:11.2486479Z   Downloading pycparser-3.0-py3-none-any.whl.metadata (8.2 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:11.2716876Z Collecting pyasn1<0.7.0,>=0.6.1 (from pyasn1-modules>=0.2.1->google-auth>=2.15.0->google-generativeai->-r requirements.txt (line 1))
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:11.2751606Z   Downloading pyasn1-0.6.4-py3-none-any.whl.metadata (8.4 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:11.2909159Z Collecting httplib2<1.0.0,>=0.19.0 (from google-api-python-client->google-generativeai->-r requirements.txt (line 1))
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:11.2944911Z   Downloading httplib2-0.32.0-py3-none-any.whl.metadata (2.2 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:11.3105738Z Collecting google-auth-httplib2<1.0.0,>=0.2.0 (from google-api-python-client->google-generativeai->-r requirements.txt (line 1))
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:11.3139411Z   Downloading google_auth_httplib2-0.4.0-py3-none-any.whl.metadata (3.0 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:11.3242952Z Collecting uritemplate<5,>=3.0.1 (from google-api-python-client->google-generativeai->-r requirements.txt (line 1))
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:11.3278249Z   Downloading uritemplate-4.2.0-py3-none-any.whl.metadata (2.6 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:11.3494281Z Collecting pyparsing<4,>=3.1 (from httplib2<1.0.0,>=0.19.0->google-api-python-client->google-generativeai->-r requirements.txt (line 1))
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:11.3530022Z   Downloading pyparsing-3.3.2-py3-none-any.whl.metadata (5.8 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:11.3631602Z Downloading requests-2.34.2-py3-none-any.whl (73 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:11.3688571Z Downloading charset_normalizer-3.4.9-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (221 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:11.3756666Z Downloading decorator-4.4.2-py2.py3-none-any.whl (9.2 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:11.3808921Z Downloading idna-3.18-py3-none-any.whl (65 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:11.3860307Z Downloading imageio-2.37.4-py3-none-any.whl (318 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:11.3934005Z Downloading proglog-0.1.12-py3-none-any.whl (6.3 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:11.3983756Z Downloading tqdm-4.69.0-py3-none-any.whl (676 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:11.4067470Z    ΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöü 676.7/676.7 kB 93.9 MB/s  0:00:00
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:11.4106794Z Downloading urllib3-2.7.0-py3-none-any.whl (131 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:11.4166016Z Downloading google_generativeai-0.8.6-py3-none-any.whl (155 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:11.4232438Z Downloading google_ai_generativelanguage-0.6.15-py3-none-any.whl (1.3 MB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:11.4356836Z    ΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöü 1.3/1.3 MB 124.0 MB/s  0:00:00
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:11.4393549Z Downloading google_api_core-2.32.0-py3-none-any.whl (174 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:11.4451707Z Downloading google_auth-2.56.0-py3-none-any.whl (257 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:11.4525097Z Downloading googleapis_common_protos-1.75.0-py3-none-any.whl (300 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:11.4586300Z Downloading grpcio-1.82.1-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (6.9 MB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:11.4925923Z    ΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöü 6.9/6.9 MB 210.9 MB/s  0:00:00
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:11.4963227Z Downloading grpcio_status-1.71.2-py3-none-any.whl (14 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:11.5020915Z Downloading proto_plus-1.28.1-py3-none-any.whl (50 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:11.5072932Z Downloading protobuf-5.29.6-cp38-abi3-manylinux2014_x86_64.whl (320 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:11.5132272Z Downloading typing_extensions-4.16.0-py3-none-any.whl (45 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:11.5184739Z Downloading edge_tts-7.2.8-py3-none-any.whl (31 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:11.5240865Z Downloading aiohttp-3.14.2-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (1.8 MB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:11.5339889Z    ΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöü 1.8/1.8 MB 211.1 MB/s  0:00:00
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:11.5376953Z Downloading multidict-6.7.1-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (246 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:11.5437561Z Downloading tabulate-0.10.0-py3-none-any.whl (39 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:11.5493457Z Downloading yarl-1.24.5-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (111 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:11.5550516Z Downloading python_dotenv-1.2.2-py3-none-any.whl (22 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:11.5602524Z Downloading openai-2.46.0-py3-none-any.whl (1.6 MB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:11.5678810Z    ΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöü 1.6/1.6 MB 251.2 MB/s  0:00:00
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:11.5713215Z Downloading anyio-4.14.2-py3-none-any.whl (125 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:11.5767226Z Downloading distro-1.9.0-py3-none-any.whl (20 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:11.5820458Z Downloading httpx-0.28.1-py3-none-any.whl (73 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:11.5875675Z Downloading httpcore-1.0.9-py3-none-any.whl (78 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:11.5930755Z Downloading jiter-0.16.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (347 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:11.5989830Z Downloading pydantic-2.13.4-py3-none-any.whl (472 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:11.6054967Z Downloading pydantic_core-2.46.4-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (2.1 MB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:11.6147000Z    ΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöü 2.1/2.1 MB 263.0 MB/s  0:00:00
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:11.6186503Z Downloading pillow-12.3.0-cp311-cp311-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl (6.9 MB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:11.6403336Z    ΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöü 6.9/6.9 MB 343.4 MB/s  0:00:00
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:11.6453075Z Downloading instagrapi-2.18.8-py3-none-any.whl (230 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:11.6516558Z Downloading pycryptodomex-3.23.0-cp37-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (2.3 MB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:11.6608268Z    ΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöü 2.3/2.3 MB 295.2 MB/s  0:00:00
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:11.6645027Z Downloading PySocks-1.7.1-py3-none-any.whl (16 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:11.6700470Z Downloading schedule-1.2.2-py3-none-any.whl (12 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:11.6758295Z Downloading cloudinary-1.45.0-py3-none-any.whl (149 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:11.6816706Z Downloading aiohappyeyeballs-2.7.1-py3-none-any.whl (15 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:11.6869939Z Downloading aiosignal-1.4.0-py3-none-any.whl (7.5 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:11.6922073Z Downloading annotated_types-0.7.0-py3-none-any.whl (13 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:11.6975127Z Downloading attrs-26.1.0-py3-none-any.whl (67 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:11.7028346Z Downloading certifi-2026.6.17-py3-none-any.whl (133 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:11.7086608Z Downloading cryptography-49.0.0-cp311-abi3-manylinux_2_34_x86_64.whl (4.7 MB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:11.7249207Z    ΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöü 4.7/4.7 MB 358.5 MB/s  0:00:00
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:11.7286550Z Downloading cffi-2.1.0-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (217 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:11.7347035Z Downloading frozenlist-1.8.0-cp311-cp311-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl (231 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:11.7403938Z Downloading h11-0.16.0-py3-none-any.whl (37 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:11.7459261Z Downloading imageio_ffmpeg-0.6.0-py3-none-manylinux2014_x86_64.whl (29.5 MB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:11.9037102Z    ΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöü 29.5/29.5 MB 189.2 MB/s  0:00:00
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:11.9080860Z Downloading numpy-2.4.6-cp311-cp311-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl (16.9 MB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:11.9672123Z    ΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöü 16.9/16.9 MB 294.2 MB/s  0:00:00
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:11.9712330Z Downloading propcache-0.5.2-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (58 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:11.9767918Z Downloading pyasn1_modules-0.4.2-py3-none-any.whl (181 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:11.9826164Z Downloading pyasn1-0.6.4-py3-none-any.whl (84 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:11.9881924Z Downloading typing_inspection-0.4.2-py3-none-any.whl (14 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:11.9936941Z Downloading google_api_python_client-2.198.0-py3-none-any.whl (15.6 MB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:12.0389834Z    ΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöü 15.6/15.6 MB 364.4 MB/s  0:00:00
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:12.0435887Z Downloading google_auth_httplib2-0.4.0-py3-none-any.whl (9.5 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:12.0487525Z Downloading httplib2-0.32.0-py3-none-any.whl (93 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:12.0542870Z Downloading pyparsing-3.3.2-py3-none-any.whl (122 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:12.0605604Z Downloading uritemplate-4.2.0-py3-none-any.whl (11 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:12.0655721Z Downloading pycparser-3.0-py3-none-any.whl (48 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:12.0707723Z Downloading six-1.17.0-py2.py3-none-any.whl (11 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:12.0760766Z Downloading sniffio-1.3.1-py3-none-any.whl (10 kB)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:12.2006999Z Building wheels for collected packages: moviepy
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:12.2015448Z   Building wheel for moviepy (pyproject.toml): started
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:12.4724193Z   Building wheel for moviepy (pyproject.toml): finished with status 'done'
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:12.4730989Z   Created wheel for moviepy: filename=moviepy-1.0.3-py3-none-any.whl size=110795 sha256=6b78955df03a921fbd08074472520c0dacb0d41eb5fd0e02881732f73d9a1f0a
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:12.4732802Z   Stored in directory: /home/runner/.cache/pip/wheels/83/b1/d9/119ef7c144b44d591ec0a9a140465133c23ea95d2a161184ba
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:12.4757471Z Successfully built moviepy
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:12.5843206Z Installing collected packages: urllib3, uritemplate, typing-extensions, tqdm, tabulate, sniffio, six, schedule, python-dotenv, PySocks, pyparsing, pycryptodomex, pycparser, pyasn1, protobuf, propcache, pillow, numpy, multidict, jiter, imageio_ffmpeg, idna, h11, frozenlist, distro, decorator, charset_normalizer, certifi, attrs, annotated-types, aiohappyeyeballs, yarl, typing-inspection, requests, pydantic-core, pyasn1-modules, proto-plus, proglog, imageio, httplib2, httpcore, grpcio, googleapis-common-protos, cloudinary, cffi, anyio, aiosignal, pydantic, moviepy, httpx, grpcio-status, cryptography, aiohttp, openai, instagrapi, google-auth, edge-tts, google-auth-httplib2, google-api-core, google-api-python-client, google-ai-generativelanguage, google-generativeai
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:20.3698258Z 
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:20.3733651Z Successfully installed PySocks-1.7.1 aiohappyeyeballs-2.7.1 aiohttp-3.14.2 aiosignal-1.4.0 annotated-types-0.7.0 anyio-4.14.2 attrs-26.1.0 certifi-2026.6.17 cffi-2.1.0 charset_normalizer-3.4.9 cloudinary-1.45.0 cryptography-49.0.0 decorator-4.4.2 distro-1.9.0 edge-tts-7.2.8 frozenlist-1.8.0 google-ai-generativelanguage-0.6.15 google-api-core-2.32.0 google-api-python-client-2.198.0 google-auth-2.56.0 google-auth-httplib2-0.4.0 google-generativeai-0.8.6 googleapis-common-protos-1.75.0 grpcio-1.82.1 grpcio-status-1.71.2 h11-0.16.0 httpcore-1.0.9 httplib2-0.32.0 httpx-0.28.1 idna-3.18 imageio-2.37.4 imageio_ffmpeg-0.6.0 instagrapi-2.18.8 jiter-0.16.0 moviepy-1.0.3 multidict-6.7.1 numpy-2.4.6 openai-2.46.0 pillow-12.3.0 proglog-0.1.12 propcache-0.5.2 proto-plus-1.28.1 protobuf-5.29.6 pyasn1-0.6.4 pyasn1-modules-0.4.2 pycparser-3.0 pycryptodomex-3.23.0 pydantic-2.13.4 pydantic-core-2.46.4 pyparsing-3.3.2 python-dotenv-1.2.2 requests-2.34.2 schedule-1.2.2 six-1.17.0 sniffio-1.3.1 tabulate-0.10.0 tqdm-4.69.0 typing-extensions-4.16.0 typing-inspection-0.4.2 uritemplate-4.2.0 urllib3-2.7.0 yarl-1.24.5
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:20.6179153Z ##[group]Run python auto_scheduler.py --mode batch --count 1
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:20.6179680Z ^[[36;1mpython auto_scheduler.py --mode batch --count 1^[[0m
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:20.6238056Z shell: /usr/bin/bash -e {0}
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:20.6238566Z env:
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:20.6239002Z   GEMINI_API_KEY: ***
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:20.6239475Z   OPENROUTER_API_KEY: ***
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:20.6239895Z   PEXELS_API_KEY: ***
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:20.6240314Z   MAKE_WEBHOOK_URL: ***
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:20.6240868Z   CONTENT_DOMAIN: ***
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:20.6241338Z   INSTA_USERNAME: ***
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:20.6241780Z   INSTA_PASSWORD: ***
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:20.6242178Z   CLOUDINARY_CLOUD_NAME: ***
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:20.6242518Z   CLOUDINARY_API_KEY: ***
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:20.6242850Z   CLOUDINARY_API_SECRET: ***
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:20.6243308Z   MAKE_ANALYTICS_WEBHOOK_URL: ***
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:20.6243664Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.15/x64
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:20.6244158Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.15/x64/lib/pkgconfig
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:20.6244617Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.15/x64
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:20.6245029Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.15/x64
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:20.6245448Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.15/x64
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:20.6245861Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.15/x64/lib
+generate-and-post	UNKNOWN STEP	2026-07-21T07:55:20.6246223Z ##[endgroup]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:58:33.0861982Z Running immediate batch: 1 reels
+generate-and-post	UNKNOWN STEP	2026-07-21T07:58:33.0862620Z 
+generate-and-post	UNKNOWN STEP	2026-07-21T07:58:33.0863054Z --- Reel 1/1 ---
+generate-and-post	UNKNOWN STEP	2026-07-21T07:58:33.0863584Z [Pending] No pending posts to retry.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:58:33.0865198Z [2026-07-21 07:55:21] Starting automated reel cycle for domain: *** (Attempt 1/3)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:58:33.0866195Z [Health] analytics: [OK] Analytics webhook responding.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:58:33.0867017Z [Analytics] Fetching live performance data via Make.com (single attempt)...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:58:33.0868684Z [Analytics] Γ¥î CRITICAL ERROR: Your Make.com scenario is missing a 'Webhook Response' module!
+generate-and-post	UNKNOWN STEP	2026-07-21T07:58:33.0869889Z [Analytics] Make.com received the trigger, but returned plain text ('Accepted') instead of JSON data.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:58:33.0871202Z [Analytics] FIX: Add a 'Webhook Response' module at the end of your Make.com scenario and return the JSON array.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:58:33.0872212Z [Feedback] History loaded: PERFORMANCE DATA (0 reels tracked):
+generate-and-post	UNKNOWN STEP	2026-07-21T07:58:33.0872796Z [Dedup] 1 topics in history ΓÇö will avoid repeats.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:58:33.0873596Z [Series] Auto-continuing series: Part 2: The Eye Contact Secret That Shatters The Trap!
+generate-and-post	UNKNOWN STEP	2026-07-21T07:58:33.0874299Z [Series] Using continuation topic: Part 2: The Eye Contact Secret That Shatters The Trap!
+generate-and-post	UNKNOWN STEP	2026-07-21T07:58:33.0874909Z Selected topic: Part 2: The Eye Contact Secret That Shatters The Trap!
+generate-and-post	UNKNOWN STEP	2026-07-21T07:58:33.0875403Z [Voice] Using TTS voice: hi-IN-SwaraNeural (slot 2/2)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:58:33.0875804Z Starting pipeline...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:58:33.0876077Z [Voice] TTS voice: hi-IN-SwaraNeural
+generate-and-post	UNKNOWN STEP	2026-07-21T07:58:33.0876478Z Cleanup complete. Removed 0 old generated files.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:58:33.0876990Z [Analytics] Fetching live performance data via Make.com (single attempt)...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:58:33.0877745Z [Analytics] Γ¥î CRITICAL ERROR: Your Make.com scenario is missing a 'Webhook Response' module!
+generate-and-post	UNKNOWN STEP	2026-07-21T07:58:33.0878768Z [Analytics] Make.com received the trigger, but returned plain text ('Accepted') instead of JSON data.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:58:33.0879962Z [Analytics] FIX: Add a 'Webhook Response' module at the end of your Make.com scenario and return the JSON array.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:58:33.0881045Z [Analytics] Live fetch failed ΓÇö script will use saved history if available.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:58:33.0881790Z Brainstorming script using topic: 'Part 2: The Eye Contact Secret That Shatters The Trap!' and past performance data...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:58:33.0882473Z [Feedback] Injecting performance history into script prompt.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:58:33.0883268Z [Series] Sequenced continuation detected! Injected previous script context (length: 484).
+generate-and-post	UNKNOWN STEP	2026-07-21T07:58:33.0883878Z [OpenRouter] Using model: openrouter/free (attempt 1)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:58:33.0884524Z Script JSON invalid, attempting repair (1/2)...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:58:33.0884950Z [OpenRouter] Using model: openrouter/free (attempt 1)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:58:33.0885367Z Script JSON invalid, attempting repair (2/2)...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:58:33.0885789Z [OpenRouter] Using model: openrouter/free (attempt 1)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:58:33.0886190Z Done Script generated with 1 scenes.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:58:33.0886542Z Processing scene 1/1...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:58:33.0887013Z   Pexels video search: 'sunset woman portrait cinematic natural  cinematic' (mood: calm)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:58:33.0887623Z Generating one continuous narration track for smoother voice flow...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:58:33.0888073Z Generating SEO metadata...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:58:33.0889559Z [OpenRouter] Using model: openrouter/free (attempt 1)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:58:33.0890893Z 
+generate-and-post	UNKNOWN STEP	2026-07-21T07:58:33.0891263Z [OpenRouter] Using model: openrouter/free (attempt 1)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:58:33.0892603Z [OpenRouter] Using model: openrouter/free (attempt 1)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:58:33.0893549Z [SEO] First comment seeded: "Eye contact se ladkiya change nahi karegi, sirf tu faila le...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:58:33.0894468Z [OpenRouter] Using model: openrouter/free (attempt 1)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:58:33.0895240Z [SEO] Series Part 2 queued: Part 3: The Voice Secret That Captures Them
+generate-and-post	UNKNOWN STEP	2026-07-21T07:58:33.0896017Z [OpenRouter] Using model: openrouter/free (attempt 1)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:58:33.0896531Z [SEO] Story poll: Ye Part 2: The Eye Contact Secret That Shatters The Trap! relatable hai?
+generate-and-post	UNKNOWN STEP	2026-07-21T07:58:33.0897016Z Assembling final video...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:58:33.0897296Z Content theme detected: girl
+generate-and-post	UNKNOWN STEP	2026-07-21T07:58:33.0897571Z Processing clip 1...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:58:33.0897907Z Downloading Poppins font to assets/fonts/Poppins-Bold.ttf...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:58:33.0898291Z Poppins font downloaded.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:58:33.0898843Z Concatenating clips...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:58:33.0899280Z [ProgressBar] Warning: could not add progress bar: 'function' object has no attribute 'shape'
+generate-and-post	UNKNOWN STEP	2026-07-21T07:58:33.0899830Z Downloading background music to assets/audio/bg_girl_3.mp3...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:58:33.0900211Z Background music downloaded.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:58:33.0900550Z [BGMusic] Theme: girl | Track: bg_girl_3.mp3 | Volume: 0.25
+generate-and-post	UNKNOWN STEP	2026-07-21T07:58:33.0900914Z Writing file: output_video.mp4
+generate-and-post	UNKNOWN STEP	2026-07-21T07:58:33.0901255Z Moviepy - Building video output_video.mp4.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:58:33.0901642Z MoviePy - Writing audio in output_videoTEMP_MPY_wvf_snd.mp4
+generate-and-post	UNKNOWN STEP	2026-07-21T07:58:33.1027407Z chunk:   0%|          | 0/45 [00:00<?, ?it/s, now=None]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:58:33.1548170Z MoviePy - Done.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:58:33.1549082Z Moviepy - Writing video output_video.mp4
+generate-and-post	UNKNOWN STEP	2026-07-21T07:58:33.1549538Z 
+generate-and-post	UNKNOWN STEP	2026-07-21T07:58:33.1551203Z                                                        
+generate-and-post	UNKNOWN STEP	2026-07-21T07:58:33.1551664Z 
+generate-and-post	UNKNOWN STEP	2026-07-21T07:58:33.5334996Z t:   0%|          | 0/61 [00:00<?, ?it/s, now=None]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:58:34.0158907Z t:   3%|ΓûÄ         | 2/61 [00:00<00:11,  5.29it/s, now=None]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:58:34.4889964Z t:   5%|Γûì         | 3/61 [00:00<00:18,  3.21it/s, now=None]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:58:34.9960013Z t:   7%|Γûï         | 4/61 [00:01<00:21,  2.70it/s, now=None]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:58:35.4710068Z t:   8%|Γûè         | 5/61 [00:01<00:23,  2.39it/s, now=None]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:58:35.9740409Z t:  10%|Γûë         | 6/61 [00:02<00:24,  2.29it/s, now=None]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:58:36.4459849Z t:  11%|ΓûêΓûÅ        | 7/61 [00:02<00:24,  2.18it/s, now=None]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:58:36.9209954Z t:  13%|ΓûêΓûÄ        | 8/61 [00:03<00:24,  2.16it/s, now=None]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:58:37.4010058Z t:  15%|ΓûêΓûì        | 9/61 [00:03<00:24,  2.15it/s, now=None]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:58:37.8713718Z t:  16%|ΓûêΓûï        | 10/61 [00:04<00:24,  2.12it/s, now=None]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:58:38.3406546Z t:  18%|ΓûêΓûè        | 11/61 [00:04<00:23,  2.13it/s, now=None]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:58:38.8293125Z t:  20%|ΓûêΓûë        | 12/61 [00:05<00:23,  2.12it/s, now=None]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:58:39.3149938Z t:  21%|ΓûêΓûêΓûÅ       | 13/61 [00:05<00:22,  2.10it/s, now=None]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:58:39.7990497Z t:  23%|ΓûêΓûêΓûÄ       | 14/61 [00:06<00:22,  2.09it/s, now=None]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:58:40.2799673Z t:  25%|ΓûêΓûêΓûì       | 15/61 [00:06<00:22,  2.08it/s, now=None]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:58:40.7705278Z t:  26%|ΓûêΓûêΓûî       | 16/61 [00:07<00:21,  2.08it/s, now=None]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:58:41.2705533Z t:  28%|ΓûêΓûêΓûè       | 17/61 [00:07<00:21,  2.07it/s, now=None]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:58:41.7582489Z t:  30%|ΓûêΓûêΓûë       | 18/61 [00:08<00:20,  2.05it/s, now=None]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:58:42.2596190Z t:  31%|ΓûêΓûêΓûê       | 19/61 [00:08<00:20,  2.05it/s, now=None]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:58:42.7378184Z t:  33%|ΓûêΓûêΓûêΓûÄ      | 20/61 [00:09<00:20,  2.03it/s, now=None]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:58:43.2286218Z t:  34%|ΓûêΓûêΓûêΓûì      | 21/61 [00:09<00:19,  2.05it/s, now=None]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:58:43.7359949Z t:  36%|ΓûêΓûêΓûêΓûî      | 22/61 [00:10<00:19,  2.04it/s, now=None]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:58:44.2219917Z t:  38%|ΓûêΓûêΓûêΓûè      | 23/61 [00:10<00:18,  2.02it/s, now=None]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:58:44.7249541Z t:  39%|ΓûêΓûêΓûêΓûë      | 24/61 [00:11<00:18,  2.03it/s, now=None]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:58:45.2182363Z t:  41%|ΓûêΓûêΓûêΓûê      | 25/61 [00:11<00:17,  2.02it/s, now=None]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:58:45.6400212Z t:  43%|ΓûêΓûêΓûêΓûêΓûÄ     | 26/61 [00:12<00:17,  2.02it/s, now=None]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:58:46.0809981Z t:  44%|ΓûêΓûêΓûêΓûêΓûì     | 27/61 [00:12<00:16,  2.11it/s, now=None]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:58:46.5424510Z t:  46%|ΓûêΓûêΓûêΓûêΓûî     | 28/61 [00:12<00:15,  2.16it/s, now=None]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:58:46.9720261Z t:  48%|ΓûêΓûêΓûêΓûêΓûè     | 29/61 [00:13<00:14,  2.16it/s, now=None]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:58:47.4356405Z t:  49%|ΓûêΓûêΓûêΓûêΓûë     | 30/61 [00:13<00:14,  2.21it/s, now=None]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:58:47.8937342Z t:  51%|ΓûêΓûêΓûêΓûêΓûê     | 31/61 [00:14<00:13,  2.19it/s, now=None]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:58:48.3698941Z t:  52%|ΓûêΓûêΓûêΓûêΓûêΓûÅ    | 32/61 [00:14<00:13,  2.19it/s, now=None]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:58:48.8609858Z t:  54%|ΓûêΓûêΓûêΓûêΓûêΓûì    | 33/61 [00:15<00:12,  2.16it/s, now=None]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:58:49.3660037Z t:  56%|ΓûêΓûêΓûêΓûêΓûêΓûî    | 34/61 [00:15<00:12,  2.13it/s, now=None]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:58:49.8409957Z t:  57%|ΓûêΓûêΓûêΓûêΓûêΓûï    | 35/61 [00:16<00:12,  2.08it/s, now=None]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:58:50.3225786Z t:  59%|ΓûêΓûêΓûêΓûêΓûêΓûë    | 36/61 [00:16<00:11,  2.08it/s, now=None]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:58:50.8180081Z t:  61%|ΓûêΓûêΓûêΓûêΓûêΓûê    | 37/61 [00:17<00:11,  2.08it/s, now=None]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:58:51.2807099Z t:  62%|ΓûêΓûêΓûêΓûêΓûêΓûêΓûÅ   | 38/61 [00:17<00:11,  2.06it/s, now=None]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:58:51.7690421Z t:  64%|ΓûêΓûêΓûêΓûêΓûêΓûêΓûì   | 39/61 [00:18<00:10,  2.09it/s, now=None]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:58:52.2673890Z t:  66%|ΓûêΓûêΓûêΓûêΓûêΓûêΓûî   | 40/61 [00:18<00:10,  2.08it/s, now=None]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:58:52.7489929Z t:  67%|ΓûêΓûêΓûêΓûêΓûêΓûêΓûï   | 41/61 [00:19<00:09,  2.06it/s, now=None]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:58:53.2460425Z t:  69%|ΓûêΓûêΓûêΓûêΓûêΓûêΓûë   | 42/61 [00:19<00:09,  2.06it/s, now=None]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:58:53.7750108Z t:  70%|ΓûêΓûêΓûêΓûêΓûêΓûêΓûê   | 43/61 [00:20<00:08,  2.04it/s, now=None]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:58:54.2464480Z t:  72%|ΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûÅ  | 44/61 [00:20<00:08,  2.00it/s, now=None]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:58:54.7637979Z t:  74%|ΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûì  | 45/61 [00:21<00:07,  2.03it/s, now=None]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:58:55.2679933Z t:  75%|ΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûî  | 46/61 [00:21<00:07,  2.00it/s, now=None]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:58:55.7590004Z t:  77%|ΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûï  | 47/61 [00:22<00:07,  2.00it/s, now=None]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:58:56.2869099Z t:  79%|ΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûè  | 48/61 [00:22<00:06,  2.01it/s, now=None]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:58:56.7925275Z t:  80%|ΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûê  | 49/61 [00:23<00:06,  1.97it/s, now=None]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:58:57.2761559Z t:  82%|ΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûÅ | 50/61 [00:23<00:05,  1.97it/s, now=None]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:58:57.7859932Z t:  84%|ΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûÄ | 51/61 [00:24<00:05,  2.00it/s, now=None]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:58:58.3269986Z t:  85%|ΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûî | 52/61 [00:24<00:04,  1.99it/s, now=None]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:58:58.8229822Z t:  87%|ΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûï | 53/61 [00:25<00:04,  1.95it/s, now=None]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:58:59.3239903Z t:  89%|ΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûè | 54/61 [00:25<00:03,  1.97it/s, now=None]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:58:59.8330159Z t:  90%|ΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûê | 55/61 [00:26<00:03,  1.98it/s, now=None]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:59:00.3430148Z t:  92%|ΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûÅ| 56/61 [00:26<00:02,  1.97it/s, now=None]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:59:00.8616630Z t:  93%|ΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûÄ| 57/61 [00:27<00:02,  1.97it/s, now=None]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:59:01.3955302Z t:  95%|ΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûî| 58/61 [00:27<00:01,  1.96it/s, now=None]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:59:01.8955575Z t:  97%|ΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûï| 59/61 [00:28<00:01,  1.93it/s, now=None]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:59:02.4270376Z t:  98%|ΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûè| 60/61 [00:28<00:00,  1.95it/s, now=None]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:59:02.8833708Z t: 100%|ΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûê| 61/61 [00:29<00:00,  1.93it/s, now=None]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:59:07.4285870Z Moviepy - Done !
+generate-and-post	UNKNOWN STEP	2026-07-21T07:59:07.4286415Z Moviepy - video ready output_video.mp4
+generate-and-post	UNKNOWN STEP	2026-07-21T07:59:07.4287117Z [Thumbnail] Saved cover thumbnail: output_video_thumbnail.jpg
+generate-and-post	UNKNOWN STEP	2026-07-21T07:59:07.4287821Z Preparing public video URL for Make.com webhook...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:59:07.4288730Z Uploading output_video.mp4 to Cloudinary...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:59:07.4290074Z Cloudinary upload successful -> https://res.cloudinary.com/***/video/upload/v1784620745/r7bdood2p9m0hobvdcmm.mp4
+generate-and-post	UNKNOWN STEP	2026-07-21T07:59:07.4291078Z Preparing public thumbnail URL for Make.com webhook...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:59:07.4291726Z Uploading output_video_thumbnail.jpg to Cloudinary...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:59:07.4292775Z Cloudinary upload successful -> https://res.cloudinary.com/***/image/upload/v1784620746/zlmh4t7dazia6itae7bf.jpg
+generate-and-post	UNKNOWN STEP	2026-07-21T07:59:07.4293744Z Sending JSON payload to Make.com webhook...
+generate-and-post	UNKNOWN STEP	2026-07-21T07:59:07.4294276Z Success! Reel payload sent to Make.com.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:59:07.4294826Z Pipeline complete! Video saved to: output_video.mp4
+generate-and-post	UNKNOWN STEP	2026-07-21T07:59:07.4295947Z Metadata saved to: video_metadata.json
+generate-and-post	UNKNOWN STEP	2026-07-21T07:59:07.4296690Z [Dedup] Topic saved to history: 'Part 2: The Eye Contact Secret That Shatters The Trap!'
+generate-and-post	UNKNOWN STEP	2026-07-21T07:59:07.4297462Z Automated reel cycle finished successfully.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:59:07.4744553Z                                                             
+generate-and-post	UNKNOWN STEP	2026-07-21T07:59:07.4803034Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+generate-and-post	UNKNOWN STEP	2026-07-21T07:59:07.4804344Z ##[group]Run actions/cache/save@v4
+generate-and-post	UNKNOWN STEP	2026-07-21T07:59:07.4804630Z with:
+generate-and-post	UNKNOWN STEP	2026-07-21T07:59:07.4805478Z   path: data/insta_analytics_history.jsonl
+generate-and-post	UNKNOWN STEP	data/pexels_used_ids.json
+generate-and-post	UNKNOWN STEP	data/used_topics.jsonl
+generate-and-post	UNKNOWN STEP	data/reel_outcomes.jsonl
+generate-and-post	UNKNOWN STEP	data/voice_index.txt
+generate-and-post	UNKNOWN STEP	data/pending_posts.jsonl
+generate-and-post	UNKNOWN STEP	data/analytics_fail_count.txt
+generate-and-post	UNKNOWN STEP	data/last_analytics_fetch.txt
+generate-and-post	UNKNOWN STEP	
+generate-and-post	UNKNOWN STEP	2026-07-21T07:59:07.4806404Z   key: reelforge-data-main
+generate-and-post	UNKNOWN STEP	2026-07-21T07:59:07.4806682Z   enableCrossOsArchive: false
+generate-and-post	UNKNOWN STEP	2026-07-21T07:59:07.4806940Z env:
+generate-and-post	UNKNOWN STEP	2026-07-21T07:59:07.4807331Z   GEMINI_API_KEY: ***
+generate-and-post	UNKNOWN STEP	2026-07-21T07:59:07.4807784Z   OPENROUTER_API_KEY: ***
+generate-and-post	UNKNOWN STEP	2026-07-21T07:59:07.4808189Z   PEXELS_API_KEY: ***
+generate-and-post	UNKNOWN STEP	2026-07-21T07:59:07.4809104Z   MAKE_WEBHOOK_URL: ***
+generate-and-post	UNKNOWN STEP	2026-07-21T07:59:07.4809741Z   CONTENT_DOMAIN: ***
+generate-and-post	UNKNOWN STEP	2026-07-21T07:59:07.4810009Z   INSTA_USERNAME: ***
+generate-and-post	UNKNOWN STEP	2026-07-21T07:59:07.4810269Z   INSTA_PASSWORD: ***
+generate-and-post	UNKNOWN STEP	2026-07-21T07:59:07.4810539Z   CLOUDINARY_CLOUD_NAME: ***
+generate-and-post	UNKNOWN STEP	2026-07-21T07:59:07.4810826Z   CLOUDINARY_API_KEY: ***
+generate-and-post	UNKNOWN STEP	2026-07-21T07:59:07.4811135Z   CLOUDINARY_API_SECRET: ***
+generate-and-post	UNKNOWN STEP	2026-07-21T07:59:07.4811585Z   MAKE_ANALYTICS_WEBHOOK_URL: ***
+generate-and-post	UNKNOWN STEP	2026-07-21T07:59:07.4811934Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.15/x64
+generate-and-post	UNKNOWN STEP	2026-07-21T07:59:07.4812393Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.15/x64/lib/pkgconfig
+generate-and-post	UNKNOWN STEP	2026-07-21T07:59:07.4812850Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.15/x64
+generate-and-post	UNKNOWN STEP	2026-07-21T07:59:07.4813257Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.15/x64
+generate-and-post	UNKNOWN STEP	2026-07-21T07:59:07.4813675Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.15/x64
+generate-and-post	UNKNOWN STEP	2026-07-21T07:59:07.4814094Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.15/x64/lib
+generate-and-post	UNKNOWN STEP	2026-07-21T07:59:07.4814450Z ##[endgroup]
+generate-and-post	UNKNOWN STEP	2026-07-21T07:59:07.5950927Z (node:3924) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:59:07.5952214Z (Use `node --trace-deprecation ...` to show where the warning was created)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:59:07.6148755Z [command]/usr/bin/tar --posix -cf cache.tzst --exclude cache.tzst -P -C /home/runner/work/ReelForge-AI/ReelForge-AI --files-from manifest.txt --use-compress-program zstdmt
+generate-and-post	UNKNOWN STEP	2026-07-21T07:59:07.7070811Z Failed to save: Unable to reserve cache with key reelforge-data-main, another job may be creating this cache.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:59:07.7095644Z ##[warning]Cache save failed.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:59:07.7246132Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+generate-and-post	UNKNOWN STEP	2026-07-21T07:59:07.7247421Z Post job cleanup.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:59:07.8466952Z (node:3944) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:59:07.8468003Z (Use `node --trace-deprecation ...` to show where the warning was created)
+generate-and-post	UNKNOWN STEP	2026-07-21T07:59:07.8687243Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+generate-and-post	UNKNOWN STEP	2026-07-21T07:59:07.8689728Z Post job cleanup.
+generate-and-post	UNKNOWN STEP	2026-07-21T07:59:07.9580038Z [command]/usr/bin/git version
+generate-and-post	UNKNOWN STEP	2026-07-21T07:59:07.9626803Z git version 2.54.0
+generate-and-post	UNKNOWN STEP	2026-07-21T07:59:07.9671241Z Temporarily overriding HOME='/home/runner/work/_temp/fb66aea0-fa80-4717-9ace-478d8b57ec1a' before making global git config changes
+generate-and-post	UNKNOWN STEP	2026-07-21T07:59:07.9672755Z Adding repository directory to the temporary git global config as a safe directory
+generate-and-post	UNKNOWN STEP	2026-07-21T07:59:07.9676699Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/ReelForge-AI/ReelForge-AI
+generate-and-post	UNKNOWN STEP	2026-07-21T07:59:07.9718059Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+generate-and-post	UNKNOWN STEP	2026-07-21T07:59:07.9783198Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+generate-and-post	UNKNOWN STEP	2026-07-21T07:59:08.0044663Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+generate-and-post	UNKNOWN STEP	2026-07-21T07:59:08.0073983Z http.https://github.com/.extraheader
+generate-and-post	UNKNOWN STEP	2026-07-21T07:59:08.0085576Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+generate-and-post	UNKNOWN STEP	2026-07-21T07:59:08.0138646Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+generate-and-post	UNKNOWN STEP	2026-07-21T07:59:08.0491278Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+generate-and-post	UNKNOWN STEP	2026-07-21T07:59:08.0542364Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+generate-and-post	UNKNOWN STEP	2026-07-21T07:59:08.0970618Z Cleaning up orphan processes
+generate-and-post	UNKNOWN STEP	2026-07-21T07:59:08.1256838Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/cache/restore@v4, actions/cache/save@v4, actions/checkout@v4, actions/setup-python@v5. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/

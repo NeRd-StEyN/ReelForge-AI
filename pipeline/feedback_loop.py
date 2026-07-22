@@ -114,6 +114,9 @@ def summarize_feedback(limit=30):
                     # (a 500-view reel with 3% like rate = better content than
                     # a 3K-view reel with 0.5% like rate — it just needed better hooks).
                     score = views + (likes * 10) + (like_rate * 100)
+                    is_pinned = bool(item.get("is_pinned", False))
+                    post_date = str(item.get("post_date") or "").strip()
+
                     posts.append({
                         "caption": caption,
                         "views": views,
@@ -121,6 +124,8 @@ def summarize_feedback(limit=30):
                         "comments": comments,
                         "like_rate": like_rate,
                         "score": score,
+                        "is_pinned": is_pinned,
+                        "post_date": post_date,
                     })
                 except (ValueError, TypeError) as e:
                     print(f"[Feedback] Skipping malformed analytics item: {item} ({e})")
@@ -156,8 +161,14 @@ def summarize_feedback(limit=30):
         ])
         for idx, p in enumerate(top, start=1):
             snippet = p["caption"][:110] if p["caption"] else "(no caption)"
+            tag = ""
+            if p.get("is_pinned"):
+                tag = " [PINNED REEL]"
+            elif p.get("post_date"):
+                tag = f" [{p['post_date']}]"
+
             lines.append(
-                f"  {idx}. \"{snippet}\" → {p['views']} views, {p['likes']} likes, "
+                f"  {idx}. \"{snippet}\"{tag} → {p['views']} views, {p['likes']} likes, "
                 f"like rate: {p['like_rate']}%"
             )
 

@@ -48,6 +48,17 @@ def get_insta_client():
     cl = Client()
 
     try:
+        # Restore session file from INSTA_SESSION env variable if file doesn't exist on runner
+        if not os.path.exists("insta_session.json"):
+            env_session = os.getenv("INSTA_SESSION")
+            if env_session and env_session.strip():
+                try:
+                    print("[Analytics] Restoring insta_session.json from INSTA_SESSION secret...")
+                    with open("insta_session.json", "w", encoding="utf-8") as f:
+                        f.write(env_session.strip())
+                except Exception as exc:
+                    print(f"[Analytics] Failed to write INSTA_SESSION to file: {exc}")
+
         # ── Priority 1: Full session file (ONLY reliable method) ──────
         if os.path.exists("insta_session.json"):
             print(f"[Analytics] Loading full session file for @{username}...")
@@ -55,17 +66,17 @@ def get_insta_client():
             print("[Analytics] Session file loaded successfully.")
             # Validate that the session is actually active (not expired)
             if _validate_session(cl):
-                print("[Analytics] ✅ Session validation passed. Ready for Story posting & analytics.")
+                print("[Analytics] [OK] Session validation passed. Ready for Story posting & analytics.")
                 return cl
             else:
-                print("[Analytics] ❌ Session file expired or invalid.")
+                print("[Analytics] [FAIL] Session file expired or invalid.")
                 print("[Analytics] Action required: Run generate_session.py locally and update INSTA_SESSION secret.")
                 print("[Analytics] Session files expire after ~30 days. You must regenerate periodically.")
                 cl = Client()  # Reset client for fallback
 
         # ── Fallback: Password login (often blocked on GitHub Actions) ─
         if password:
-            print(f"[Analytics] ⚠️  No valid session file. Attempting password login for @{username}...")
+            print(f"[Analytics] [WARN] No valid session file. Attempting password login for @{username}...")
             print("[Analytics] WARNING: Password login is frequently blocked by Instagram on cloud IPs.")
             print("[Analytics] For reliable automation, use session file instead (see above).")
             try:
@@ -153,11 +164,22 @@ def get_performance_data(cl):
         for post in recent_posts:
             # Only count Reels (media_type=2, product_type='clips')
             if post.media_type == 2 and post.product_type == "clips":
+                is_pinned = bool(
+                    getattr(post, "is_pinned", False)
+                    or getattr(post, "pinned_for_user", False)
+                )
+                taken_at_dt = getattr(post, "taken_at", None)
+                post_date = taken_at_dt.strftime("%Y-%m-%d") if taken_at_dt else ""
+
                 analytics.append({
                     "topic_snippet": (post.caption_text or "")[:120].replace("\n", " ").strip(),
                     "views": getattr(post, "play_count", None) or getattr(post, "view_count", None) or getattr(post, "video_view_count", None) or 0,
                     "likes": post.like_count or 0,
                     "comments": post.comment_count or 0,
+                    "shares": getattr(post, "share_count", None) or 0,
+                    "saves": getattr(post, "saved_count", None) or 0,
+                    "is_pinned": is_pinned,
+                    "post_date": post_date,
                 })
 
         if not analytics:

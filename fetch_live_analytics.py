@@ -27,7 +27,7 @@ if not cl:
 print("[Step 1] Login OK")
 
 username = os.getenv("INSTA_USERNAME", "")
-print("\n[Step 2] Fetching last 12 posts for @" + username + "...")
+print("\n[Step 2] Fetching recent posts for @" + username + "...")
 try:
     # Use the authenticated session's own user_id — avoids the rate-limited
     # public web_profile_info endpoint that causes 429 errors
@@ -35,7 +35,7 @@ try:
     if not user_id:
         raise ValueError("Session has no user_id — session may be expired. Re-run generate_session.py")
     print("[Step 2] Using session user_id: " + str(user_id))
-    recent_posts = cl.user_medias(user_id, amount=12)
+    recent_posts = cl.user_medias(user_id, amount=25)
 except Exception as e:
     print("ERROR fetching media list: " + str(e))
     sys.exit(1)
@@ -49,12 +49,22 @@ for post in recent_posts:
             or getattr(post, "video_view_count", None)
             or 0
         )
+        is_pinned = bool(
+            getattr(post, "is_pinned", False)
+            or getattr(post, "pinned_for_user", False)
+        )
+        taken_at_dt = getattr(post, "taken_at", None)
+        post_date = taken_at_dt.strftime("%Y-%m-%d") if taken_at_dt else ""
+
         reels.append({
             "topic_snippet": (post.caption_text or "")[:120].replace("\n", " ").strip(),
             "views": views,
             "likes": post.like_count or 0,
             "comments": post.comment_count or 0,
+            "shares": getattr(post, "share_count", None) or 0,
             "saves": getattr(post, "saved_count", None) or 0,
+            "is_pinned": is_pinned,
+            "post_date": post_date,
             "_taken_at": str(post.taken_at),
         })
 
@@ -68,8 +78,9 @@ print("\n[Step 3] Reel list (newest first):")
 print("-" * 60)
 for i, r in enumerate(reels, 1):
     snippet = r["topic_snippet"].encode("ascii", "replace").decode("ascii")
-    print("  #" + str(i) + " | " + r["_taken_at"])
-    print("      views=" + str(r["views"]) + "  likes=" + str(r["likes"]) + "  comments=" + str(r["comments"]) + "  saves=" + str(r["saves"]))
+    pinned_str = " [PINNED]" if r.get("is_pinned") else ""
+    print("  #" + str(i) + pinned_str + " | " + r["_taken_at"])
+    print("      views=" + str(r["views"]) + "  likes=" + str(r["likes"]) + "  comments=" + str(r["comments"]) + "  shares=" + str(r["shares"]))
     print("      Caption: " + snippet[:90])
 print("-" * 60)
 

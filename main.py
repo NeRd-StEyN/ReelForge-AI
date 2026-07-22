@@ -13,7 +13,7 @@ from pipeline.voice_gen import run_generate_voiceover, run_generate_voiceover_wi
 from pipeline.visual_gen import fetch_pexels_video, fetch_pexels_image, create_placeholder_image
 from pipeline.video_editor import create_video
 from pipeline.seo_gen import generate_seo_metadata, save_metadata
-from pipeline.make_handler import fetch_analytics_from_make
+from pipeline.insta_handler import get_insta_client, get_performance_data
 from pipeline.feedback_loop import append_analytics_snapshot, summarize_feedback
 from dotenv import load_dotenv
 
@@ -65,12 +65,13 @@ def main(topic, feedback_summary="", tts_voice_override=None, insta_client=None)
     if _env_flag("AUTO_CLEANUP_ASSETS", "true"):
         cleanup_generated_assets()
 
-    # 0. Optional: Fetch Instagram analytics for feedback-based scripting via Make.com.
+    # 0. Optional: Fetch Instagram analytics directly via Python (0 Make.com credits).
     analytics_data = None
     if _env_flag("ENABLE_INSTAGRAM_ANALYTICS", "true"):
-        analytics_data = fetch_analytics_from_make()
+        cl = get_insta_client()
+        analytics_data = get_performance_data(cl) if cl else None
         if analytics_data:
-            print(f"[Analytics] Live data fetched: {len(analytics_data)} reels.")
+            print(f"[Analytics] Live data fetched via Python: {len(analytics_data)} reels.")
             domain = os.getenv(
                 "CONTENT_DOMAIN",
                 "psychology of attraction, human behavior, horror, unsolved mysteries, and creepy facts",

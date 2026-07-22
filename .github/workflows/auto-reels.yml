@@ -25,9 +25,14 @@ jobs:
       CLOUDINARY_API_KEY: ${{ secrets.CLOUDINARY_API_KEY }}
       CLOUDINARY_API_SECRET: ${{ secrets.CLOUDINARY_API_SECRET }}
       MAKE_ANALYTICS_WEBHOOK_URL: ${{ secrets.MAKE_ANALYTICS_WEBHOOK_URL }}
+      INSTA_SESSION: ${{ secrets.INSTA_SESSION }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Restore Instagram session file
+        if: env.INSTA_SESSION != ''
+        run: echo "$INSTA_SESSION" > insta_session.json
 
       - name: Restore feedback history cache
         uses: actions/cache/restore@v4
