@@ -194,10 +194,21 @@ def main(topic, feedback_summary="", tts_voice_override=None, insta_client=None)
         metadata=metadata,
     )
     
-    # 7. Auto Share to Story (Disabled for Make.com migration)
-    # Story polling has been disabled to prevent Instagrapi blocks. 
-    # Can be re-added via Make.com later if Make adds poll support.
-    
+    # 7. Auto Share to Story with Poll Sticker
+    if _env_flag("AUTO_POST_STORY", "true"):
+        try:
+            story_poll = metadata.get("story_poll")
+            if story_poll and os.path.exists(thumb_path):
+                print(f"[Story] Auto-posting story with poll...")
+                from pipeline.insta_handler import post_poll_story
+                cl = get_insta_client()
+                if cl:
+                    post_poll_story(cl, thumb_path, story_poll)
+                else:
+                    print("[Story] Skipped story auto-post: Instagram client not authenticated.")
+        except Exception as story_err:
+            print(f"[Story] Auto-post story skipped: {story_err}")
+
     print(f"Pipeline complete! Video saved to: {output_file}")
     print(f"Metadata saved to: video_metadata.json")
     return {
