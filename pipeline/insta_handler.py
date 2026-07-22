@@ -60,19 +60,23 @@ def get_insta_client():
                     print(f"[Analytics] Failed to write INSTA_SESSION to file: {exc}")
 
         # ── Priority 1: Full session file (ONLY reliable method) ──────
-        if os.path.exists("insta_session.json"):
-            print(f"[Analytics] Loading full session file for @{username}...")
-            cl.load_settings("insta_session.json")
-            print("[Analytics] Session file loaded successfully.")
-            # Validate that the session is actually active (not expired)
-            if _validate_session(cl):
-                print("[Analytics] [OK] Session validation passed. Ready for Story posting & analytics.")
-                return cl
-            else:
-                print("[Analytics] [FAIL] Session file expired or invalid.")
-                print("[Analytics] Action required: Run generate_session.py locally and update INSTA_SESSION secret.")
-                print("[Analytics] Session files expire after ~30 days. You must regenerate periodically.")
-                cl = Client()  # Reset client for fallback
+        if os.path.exists("insta_session.json") and os.path.getsize("insta_session.json") > 10:
+            try:
+                print(f"[Analytics] Loading full session file for @{username}...")
+                cl.load_settings("insta_session.json")
+                print("[Analytics] Session file loaded successfully.")
+                # Validate that the session is actually active (not expired)
+                if _validate_session(cl):
+                    print("[Analytics] [OK] Session validation passed. Ready for Story posting & analytics.")
+                    return cl
+                else:
+                    print("[Analytics] [FAIL] Session file expired or invalid.")
+                    print("[Analytics] Action required: Run generate_session.py locally and update INSTA_SESSION secret.")
+                    print("[Analytics] Session files expire after ~30 days. You must regenerate periodically.")
+                    cl = Client()  # Reset client for fallback
+            except Exception as load_err:
+                print(f"[Analytics] Failed to parse insta_session.json ({load_err}) — resetting client.")
+                cl = Client()
 
         # ── Fallback: Password login (often blocked on GitHub Actions) ─
         if password:

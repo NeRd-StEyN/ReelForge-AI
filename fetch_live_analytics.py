@@ -37,7 +37,12 @@ try:
     print("[Step 2] Using session user_id: " + str(user_id))
     recent_posts = cl.user_medias(user_id, amount=25)
 except Exception as e:
-    print("ERROR fetching media list: " + str(e))
+    if "Please wait a few minutes" in str(e):
+        print("\n[Instagram Cooldown] Instagram requested a short pause: 'Please wait a few minutes before you try again.'")
+        print("[Instagram Cooldown] This happens when several API calls are made in a very short window.")
+        print("[Instagram Cooldown] Solution: Wait 5 to 10 minutes for the cooldown to reset, then run the command again.")
+    else:
+        print("ERROR fetching media list: " + str(e))
     sys.exit(1)
 
 reels = []
