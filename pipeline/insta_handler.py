@@ -158,7 +158,8 @@ def get_performance_data(cl):
             user_id = cl.user_id_from_username(username)
 
         try:
-            recent_posts = _get_medias_with_timeout(cl, user_id, amount=20, timeout_seconds=30)
+            # Fetch 10 reels (lightweight payload — prevents triggering 429 rate limit cooldowns)
+            recent_posts = _get_medias_with_timeout(cl, user_id, amount=10, timeout_seconds=25)
         except TimeoutError as e:
             print(f"[Analytics] Timeout fetching medias: {e}")
             print("[Analytics] Will skip live analytics this run and use saved history.")
@@ -263,12 +264,20 @@ def post_poll_story(cl, thumbnail_path, story_poll=None):
 
     # ── Step 1: Normal Clean Story Upload (Top Priority & Most Reliable) ─
     print(f"[Story] Step 1: Uploading normal clean story slide using image: {bg_path}...")
-    try:
-        cl.photo_upload_to_story(path=bg_path)
-        print("[Story] ✅ Normal clean story posted successfully!")
-        return True
-    except Exception as normal_exc:
-        print(f"[Story] Normal story upload failed ({normal_exc}) — attempting sticker fallback...")
+    import time
+    for attempt in range(1, 3):
+        try:
+            cl.photo_upload_to_story(path=bg_path)
+            print("[Story] ✅ Normal clean story posted successfully!")
+            return True
+        except Exception as normal_exc:
+            exc_str = str(normal_exc).lower()
+            print(f"[Story] Normal story upload attempt {attempt} failed ({normal_exc})")
+            if "wait a few minutes" in exc_str and attempt == 1:
+                print("[Story] Waiting 5 seconds before retrying story upload...")
+                time.sleep(5)
+                continue
+            break
 
     # ── Step 2: Fallback with Poll Sticker if requested ──────────────────
     if story_poll and isinstance(story_poll, dict):
