@@ -44,81 +44,82 @@ def _save_persistent_blacklist():
 _load_persistent_blacklist()
 
 
-# ── Diverse visual fallback queries with mood/color variety ──────────
-# Each entry has a different visual mood to prevent same-looking thumbnails
+# ── Diverse visual fallback queries strictly anchored to niche aesthetics ──────────
+# All queries are anchored to close-up portraits, eye contact, moody lighting, and subtle facial expressions
 _DIVERSE_FALLBACK_QUERIES = [
-    # Warm/golden mood
-    "woman walking golden hour city street cinematic",
-    "beautiful woman sunset beach golden light portrait",
-    "confident woman cafe window warm light aesthetic",
-    # Cool/neon mood
-    "woman neon lights city night cinematic portrait",
-    "attractive woman dark moody blue lighting portrait",
-    "girl dancing club neon purple lights slow motion",
-    # Natural/bright mood
-    "beautiful woman garden flowers natural light portrait",
-    "woman laughing bright daylight outdoor candid",
-    "girl running through field bright sun cinematic",
-    # Dark/dramatic mood
-    "woman silhouette dramatic lighting studio portrait",
-    "mysterious woman dark background spotlight cinematic",
-    "woman rain night street moody cinematic slow motion",
-    # Horror/Mystery mood
-    "creepy abandoned hospital dark hallway cinematic",
-    "misty dark forest night scary slow motion",
-    "shadowy figure standing in dark room cinematic",
-    "old cursed house vintage footage aesthetic",
-    "unsolved mystery crime scene tape dark moody",
-    # Elegant/luxury mood
-    "elegant woman fashion photoshoot studio lighting",
-    "woman luxury car lifestyle cinematic golden",
-    "model walking runway slow motion dramatic lighting",
-    # Energetic/action mood
-    "woman dancing energetic movement colorful background",
-    "fit woman gym workout cinematic slow motion",
-    "woman spinning dress wind movement aesthetic",
+    # Eye contact & intense glances
+    "intense eye contact woman portrait close up cinematic",
+    "woman looking at camera dramatic eyes portrait moody",
+    "close up woman eyes intense glance cinematic portrait",
+    # Warm/golden attraction mood
+    "confident woman subtle smile camera golden hour portrait",
+    "attractive woman sunset beach eye contact cinematic",
+    "woman close up face warm light aesthetic portrait",
+    # Cool/neon suspense mood
+    "mysterious woman neon lighting close up eyes cinematic",
+    "attractive woman dark moody shadow eye contact portrait",
+    "girl subtle glance club neon lighting slow motion",
+    # Dark/dramatic psychology mood
+    "woman silhouette intense eyes dramatic lighting portrait",
+    "mysterious woman dark background spotlight close up",
+    "woman moody rain lighting face portrait cinematic",
+    # Elegant/subtle mood
+    "elegant woman fashion studio lighting close up face",
+    "woman luxury aesthetic subtle glance cinematic",
+    "model intense gaze dramatic lighting portrait",
 ]
 
-# Mood-specific visual modifiers to inject variety into AI-generated keywords
+# Mood-specific visual modifiers for deep emotional alignment
 _MOOD_MODIFIERS = {
-    "mysterious": ["moody dark lighting", "mysterious shadows", "dim blue tones", "fog atmosphere"],
-    "confident": ["bright natural light", "golden hour warm", "strong pose cinematic", "urban street style"],
-    "dramatic": ["dramatic spotlight", "high contrast", "rain cinematic", "silhouette backlit"],
-    "warm": ["golden hour", "warm tones sunset", "cozy aesthetic lighting", "candlelight intimate"],
-    "dark": ["dark moody", "shadow play", "night neon", "low key lighting"],
-    "horror": ["creepy fog", "abandoned dark", "scary shadow", "horror cinematic", "haunted house lighting"],
-    "energetic": ["vibrant colors", "dynamic movement", "fast paced", "colorful neon"],
-    "elegant": ["studio lighting", "luxury aesthetic", "fashion editorial", "minimalist clean"],
-    "neutral": ["cinematic natural", "soft lighting", "aesthetic portrait", "clean composition"],
+    "mysterious": ["intense glance dark lighting", "mysterious shadows close up", "dim blue eyes portrait", "fog atmosphere face"],
+    "confident": ["direct eye contact camera", "golden hour gaze", "confident smile close up", "urban street portrait"],
+    "dramatic": ["dramatic spotlight eyes", "high contrast face", "rain cinematic glance", "silhouette eyes backlit"],
+    "warm": ["golden hour smile", "warm tones gaze", "intimate eye contact", "candlelight close up face"],
+    "dark": ["dark moody eyes", "shadow play portrait", "night neon gaze", "low key lighting face"],
+    "energetic": ["intense gaze dynamic", "fast zoom eye contact", "vibrant colors portrait"],
+    "elegant": ["studio lighting face", "luxury aesthetic glance", "fashion editorial eyes", "minimalist portrait"],
+    "neutral": ["cinematic eye contact", "soft lighting close up", "aesthetic portrait gaze", "clean face composition"],
 }
+
+# Words that indicate completely off-topic stock footage (must be stripped)
+_OFF_TOPIC_BLACKLIST = [
+    "prosthetic", "balloon", "party", "hospital", "office", "laptop",
+    "sports", "group", "gym", "workout", "abandoned", "zombie", "monster"
+]
 
 
 def _build_realistic_query(query, visual_mood="neutral", scene_index=0):
-    """Build a diverse stock search query with mood-aware modifiers."""
-    base = " ".join(str(query or "").split())
+    """Build a realistic, highly relevant stock search query anchored to face & eye aesthetics."""
+    base = " ".join(str(query or "").split()).lower()
+
+    # Remove off-topic blacklisted words
+    for bad_word in _OFF_TOPIC_BLACKLIST:
+        if bad_word in base:
+            base = base.replace(bad_word, "").strip()
+
+    # Remove cartoon/anime/illustration terms
+    for remove_term in ["cartoon", "anime", "illustration", "drawing", "sketch"]:
+        if remove_term in base:
+            base = base.replace(remove_term, "").strip()
 
     if not base:
         return random.choice(_DIVERSE_FALLBACK_QUERIES)
 
-    lowered = base.lower()
+    # Ensure query has explicit face/eye/portrait anchors for Niche Relevance
+    has_anchor = any(w in base for w in ["eye", "face", "portrait", "glance", "gaze", "close up", "looking"])
+    if not has_anchor:
+        base = f"{base} close up face portrait"
 
-    # Remove cartoon/anime/illustration terms
-    for remove_term in ["cartoon", "anime", "illustration", "drawing", "sketch"]:
-        if remove_term in lowered:
-            base = base.replace(remove_term, "").strip()
-            lowered = base.lower()
-
-    # Ensure we have people-related terms
-    has_person_term = any(w in lowered for w in ["woman", "girl", "female", "lady", "model", "couple", "man", "person", "people"])
-    if not has_person_term:
-        base = f"{base} woman portrait"
+    has_person = any(w in base for w in ["woman", "girl", "female", "lady", "model", "man", "person"])
+    if not has_person:
+        base = f"woman {base}"
 
     # Add mood-specific modifiers for visual variety
     mood_mods = _MOOD_MODIFIERS.get(visual_mood, _MOOD_MODIFIERS["neutral"])
     selected_mod = random.choice(mood_mods)
 
-    # Add scene-index-based color bias to prevent same-looking consecutive scenes
-    color_variety = ["", "warm tones", "cool tones", "high contrast", "soft pastel"][scene_index % 5]
+    # Color bias per scene to keep sequence visually distinct
+    color_variety = ["", "warm tones", "cool tones", "high contrast", "soft light"][scene_index % 5]
 
     return f"{base} {selected_mod} {color_variety} cinematic".strip()
 

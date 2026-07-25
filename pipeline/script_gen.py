@@ -201,22 +201,25 @@ Example: 'Ye [topic] test fail kiya toh [consequence] rahoge forever!'""",
 
 
 def _pick_hook_framework(analytics_data=None, feedback_summary=""):
-    """Choose a hook framework with a healthy balance to prevent audience fatigue.
+    """Choose a hook framework using an Epsilon-Greedy (80/20) policy.
     
-    Instead of spamming the top 2 hooks 100% of the time, we give the top
-    performers a slight bump, but ensure all frameworks rotate evenly.
+    - 80% Exploitation: Pulls from proven high-converting hook styles (curiosity gap, pattern interrupt, contrarian truth)
+    - 20% Exploration: Forces wildcard framework rotation to discover new viral angles & prevent audience burnout
     """
     proven_viral = ["kabhii_nahi", "test_format", "curiosity_gap"]
     
-    # 30% of the time, force one of the proven viral hooks
-    if random.random() < 0.30:
+    # 80% Exploitation of top viral framework patterns
+    if random.random() < 0.80:
         preferred_name = random.choice(proven_viral)
         for framework in _HOOK_FRAMEWORKS:
             if framework["name"] == preferred_name:
+                print(f"[HookEngine] Exploit policy: Using top viral framework '{framework['name']}'")
                 return framework
 
-    # 70% of the time, completely random rotation for variety
-    return random.choice(_HOOK_FRAMEWORKS)
+    # 20% Exploration of wildcard frameworks to prevent echo chamber burnout
+    chosen = random.choice(_HOOK_FRAMEWORKS)
+    print(f"[HookEngine] Explore policy (20% wildcard): Using framework '{chosen['name']}'")
+    return chosen
 
 
 def generate_script(topic, analytics_data=None, feedback_summary=""):
@@ -313,28 +316,23 @@ def generate_script(topic, analytics_data=None, feedback_summary=""):
     HOOK FRAMEWORK (you MUST use this style):
     {hook_framework['instruction']}
 
-    ──── 3-ACT EMOTIONAL ESCALATION ARC ────
+    ── 2-ACT ULTRA-HIGH RETENTION ARC (12–18 SECONDS STRICT) ──
 
-    DURATION: This reel MUST be 25-35 seconds when spoken. NON-NEGOTIABLE.
-    - Total word count: 70-100 words ONLY
-    - Return EXACTLY 3 scenes
-    - Scene 1 (Hook — emotional_beat: "curious"): 20-28 words
-        Impossible-to-skip opening. Bold claim or shocking reveal.
-        Emotion goal: make the viewer feel a sudden jolt of curiosity.
-    - Scene 2 (Build — emotional_beat: "tense"): 22-35 words
-        Deliver the core value. This can be a short list, a surprising psychological fact, or a deep truth.
-        Emotion goal: create an 'aha' moment or realization.
-    - Scene 3 (Payoff + Save CTA + Share Trigger — emotional_beat: "shocked"): 25-35 words
-        Drop the mind-blowing conclusion.
-        Include a natural CTA to save OR share, but mix it up so it doesn't sound robotic.
-        Examples: 'Save this so you don't forget' OR 'Send this to a friend who needs to hear it'.
-        MANDATORY REWATCH TRIGGER: The LAST LINE must loop back to something said in Scene 1.
+    DURATION: This reel MUST be 12-18 seconds when spoken. NON-NEGOTIABLE.
+    - Total word count: 40-55 words ONLY across the whole script.
+    - Return EXACTLY 2 scenes for maximum completion rate (>100% loop probability).
+    - Scene 1 (The Scroll Stopper — 6-9s): 20-25 words
+        CRITICAL: The voiceover MUST start IMMEDIATELY with the hook statement. Do NOT read the title banner or header text aloud!
+        Impossible-to-skip opening statement, pattern interrupt, or provocative truth.
+    - Scene 2 (The Mind-Blow + Engagement Loop — 6-9s): 20-30 words
+        Deliver the core psychological insight fast.
+        End with a 1-sentence comment/share trigger.
+        MANDATORY LOOP TRIGGER: The final 3 words must seamlessly loop back to the first word of Scene 1.
 
     RETENTION TACTICS:
-    - Scene 1 must hook within 2 seconds.
-    - Scene 2 creates tension.
-    - Scene 3 closes the loop AND adds one extra twist that rewards rewatching.
-    - Keep language conversational, raw, street-smart — like a friend sharing secrets.
+    - Launch straight into the hook in word 1.
+    - Keep language conversational, raw, street-smart — like a brother telling secrets.
+    - Zero filler words. Every word must deliver high dopamine intrigue.
 
     MANDATORY COMMENT-DRIVING TRIGGER (NON-NEGOTIABLE):
     The FINAL sentence of Scene 3 MUST include a direct question or poll that forces viewers to comment.

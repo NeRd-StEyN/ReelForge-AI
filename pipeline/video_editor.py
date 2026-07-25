@@ -177,8 +177,8 @@ def create_text_image(text, size=(1080, 1920), font_size=100, highlight_word_ind
 
     line_spacing = int(font_size * 0.3)
     total_h = len(lines) * int(font_size * 1.2) + (max(0, len(lines) - 1) * line_spacing)
-    # Keep subtitles in the lower third
-    base_y = int(size[1] * 0.78) - (total_h // 2)
+    # Position subtitles at 68% height — clears Instagram UI elements (username, audio tag, caption box)
+    base_y = int(size[1] * 0.68) - (total_h // 2)
 
     # Removed the semi-transparent black pill completely to make text pop organically
     # (The thicker stroke handles readability without looking like an automated template)
@@ -888,38 +888,59 @@ def _create_series_banner(title, duration, size=(1080, 1920)):
     Tells the viewer exactly what the next Part is to drive follows.
     """
     import re
-    # Check if this is a part reel
+    import textwrap
+
+    # Check if this is a part reel or has title
     match = re.search(r'part\s*(\d+)', title.lower())
-    if not match:
+    if match:
+        try:
+            current_part = int(match.group(1))
+            next_part = current_part + 1
+            banner_text = f"Follow for Part {next_part} 👇"
+        except ValueError:
+            banner_text = title[:40]
+    else:
+        banner_text = title[:45].strip()
+
+    if not banner_text:
         return None
-        
-    try:
-        current_part = int(match.group(1))
-    except ValueError:
-        return None
-        
-    next_part = current_part + 1
-    banner_text = f"Follow for Part {next_part} 👇"
-    
+
+    # Auto-wrap text if long
+    wrapped_lines = textwrap.wrap(banner_text, width=32)
+    if not wrapped_lines:
+        wrapped_lines = [banner_text]
+
     img = Image.new('RGBA', size, (0, 0, 0, 0))
     draw = ImageDraw.Draw(img)
-    font = _load_caption_font(42) # Elegant, clean small font size for top of screen
+    font = _load_caption_font(38)
     
-    w = draw.textlength(banner_text, font=font)
-    x = (size[0] - w) / 2
-    y = int(size[1] * 0.03) # Placed right at the top
+    line_h = 45
+    total_h = len(wrapped_lines) * line_h
+    max_w = max(draw.textlength(line, font=font) for line in wrapped_lines)
     
+    x_center = size[0] / 2
+    y_start = int(size[1] * 0.04)
+
     # Semi-transparent dark pill background for readability
-    pad_x, pad_y = 20, 8
-    _draw_rounded_rect(draw, (x - pad_x, y - pad_y, x + w + pad_x, y + 45 + pad_y), 12, (0, 0, 0, 160))
-    
-    # Draw outline
-    stroke_w = 3
-    for ax in range(-stroke_w, stroke_w + 1, 2):
-        for ay in range(-stroke_w, stroke_w + 1, 2):
-            draw.text((x + ax, y + ay), banner_text, font=font, fill=(0, 0, 0))
-    draw.text((x, y), banner_text, font=font, fill=(255, 255, 255))
-    
+    pad_x, pad_y = 24, 12
+    _draw_rounded_rect(
+        draw,
+        (x_center - (max_w / 2) - pad_x, y_start - pad_y, x_center + (max_w / 2) + pad_x, y_start + total_h + pad_y),
+        14,
+        (0, 0, 0, 180)
+    )
+
+    stroke_w = 2
+    for idx, line in enumerate(wrapped_lines):
+        line_w = draw.textlength(line, font=font)
+        x = (size[0] - line_w) / 2
+        y = y_start + (idx * line_h)
+
+        for ax in range(-stroke_w, stroke_w + 1, 1):
+            for ay in range(-stroke_w, stroke_w + 1, 1):
+                draw.text((x + ax, y + ay), line, font=font, fill=(0, 0, 0))
+        draw.text((x, y), line, font=font, fill=(255, 255, 255))
+
     banner_clip = ImageClip(np.array(img)).set_duration(duration)
     return banner_clip
 

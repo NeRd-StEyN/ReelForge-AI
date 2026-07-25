@@ -95,6 +95,8 @@ def summarize_feedback(limit=30):
                     views = int(item.get("views") or 0)
                     likes = int(item.get("likes") or 0)
                     comments = int(item.get("comments") or 0)
+                    shares = int(item.get("shares") or 0)
+                    saves = int(item.get("saves") or 0)
                     caption = str(item.get("topic_snippet") or "").strip()
                     
                     # Sanity checks for negative values or invalid data
@@ -107,13 +109,10 @@ def summarize_feedback(limit=30):
                     
                     # Like rate = likes/views — target >3% for healthy engagement
                     like_rate = round((likes / views * 100), 1) if views > 0 else 0.0
-                    # Score by views + likes*10 + like_rate*100 — views and likes
-                    # are the reliable API signals. Likes weighted 10x for quality
-                    # engagement. Like rate weighted 100x so high-engagement content
-                    # that got suppressed by algorithm is still recognized as good
-                    # (a 500-view reel with 3% like rate = better content than
-                    # a 3K-view reel with 0.5% like rate — it just needed better hooks).
-                    score = views + (likes * 10) + (like_rate * 100)
+                    
+                    # Algorithm Score: Weight Shares (25x) and Saves (20x) highest
+                    # (Instagram 2026 distribution algorithm prioritizes virality/DMs and bookmarking)
+                    score = (shares * 25) + (saves * 20) + (comments * 10) + (likes * 2) + views + int(like_rate * 50)
                     is_pinned = bool(item.get("is_pinned", False))
                     post_date = str(item.get("post_date") or "").strip()
 
@@ -122,6 +121,8 @@ def summarize_feedback(limit=30):
                         "views": views,
                         "likes": likes,
                         "comments": comments,
+                        "shares": shares,
+                        "saves": saves,
                         "like_rate": like_rate,
                         "score": score,
                         "is_pinned": is_pinned,
