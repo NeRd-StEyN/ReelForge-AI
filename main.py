@@ -198,20 +198,16 @@ def main(topic, feedback_summary="", tts_voice_override=None, insta_client=None,
         metadata=metadata,
     )
     
-    # 7. Auto Share to Story with Poll Sticker
+    # 7. Auto Share to Story (Clean Normal Photo Story)
     if _env_flag("AUTO_POST_STORY", "true"):
         try:
-            story_poll = metadata.get("story_poll")
-            if story_poll and os.path.exists(thumb_path):
-                print(f"[Story] Auto-posting story with poll...")
+            if os.path.exists(thumb_path):
+                print(f"[Story] Auto-posting clean photo story...")
                 from pipeline.insta_handler import post_poll_story
-                # Reuse the already-authenticated client instead of creating a new one.
-                # On GitHub Actions, get_insta_client() often returns None because
-                # the session is expired — but if the caller already authenticated,
-                # reusing that client avoids the duplicate failure.
+                story_poll = metadata.get("story_poll")
                 cl = insta_client or get_insta_client()
                 if cl:
-                    success = post_poll_story(cl, thumb_path, story_poll)
+                    success = post_poll_story(cl, thumb_path, story_poll=story_poll)
                     if success:
                         print("[Story] ✅ Story posted successfully!")
                     else:
@@ -220,10 +216,7 @@ def main(topic, feedback_summary="", tts_voice_override=None, insta_client=None,
                     print("[Story] Skipped story auto-post: Instagram client not authenticated.")
                     print("[Story] To fix: Run generate_session.py locally and update INSTA_SESSION secret.")
             else:
-                if not story_poll:
-                    print("[Story] No story_poll data in metadata — skipping story post.")
-                elif not os.path.exists(thumb_path):
-                    print(f"[Story] Thumbnail not found at {thumb_path} — skipping story post.")
+                print(f"[Story] Thumbnail not found at {thumb_path} — skipping story post.")
         except Exception as story_err:
             print(f"[Story] Auto-post story failed: {story_err}")
             import traceback
