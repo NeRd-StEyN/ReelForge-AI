@@ -77,7 +77,7 @@ def main(topic, feedback_summary="", tts_voice_override=None, insta_client=None,
             print(f"[Analytics] Live data fetched via Python: {len(analytics_data)} reels.")
             domain = os.getenv(
                 "CONTENT_DOMAIN",
-                "psychology of attraction, human behavior, horror, unsolved mysteries, and creepy facts",
+                "horror thrillers, unsolved mysteries, dark psychology, creepy facts, and urban legends",
             )
             append_analytics_snapshot(domain, analytics_data)
         else:

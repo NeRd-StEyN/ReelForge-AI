@@ -147,55 +147,48 @@ def _postprocess_script_payload(payload):
 # ── Hook framework rotation for maximum variety ──────────────────────
 _HOOK_FRAMEWORKS = [
     {
-        "name": "curiosity_gap",
-        "instruction": "Start with an incomplete statement that creates burning curiosity. Example pattern: 'Ye cheez ladkiyan kabhi nahi bolti, lekin...' — leave the answer dangling so viewer MUST watch.",
-    },
-    {
-        "name": "shock_stat",
-        "instruction": "Open with a surprising statistic or psychological fact that sounds unbelievable. Example pattern: '90% ladkiyan ye secretly karti hain...' — make the number feel exclusive and secret.",
-    },
-    {
-        "name": "challenge",
-        "instruction": "Challenge the viewer's beliefs directly. Example pattern: 'Tum galat sochte ho attraction ke baare mein...' — create a 'prove me wrong' urge.",
-    },
-    {
-        "name": "story_open",
-        "instruction": "Start mid-story as if catching someone in the act. Example pattern: 'Jab ek ladki baar baar ye karti hai toh samajh jaao...' — make it feel like a real moment.",
-    },
-    {
-        "name": "controversial_take",
-        "instruction": "Lead with a bold, polarizing opinion. Example pattern: 'Acche ladke kabhi attract nahi karte, aur reason ye hai...' — force the viewer to pick a side.",
-    },
-    {
         "name": "warning_hook",
-        "instruction": "Start with a direct warning that creates immediate suspense. Example pattern: 'Agar tum akele ho toh ye video mat dekhna...' or 'Ye sach sunne ke baad tum darr jaoge...'",
+        "instruction": "Start with a direct warning that creates immediate suspense and fear. Example pattern: 'Agar tum akele ho toh ye video abhi mat dekhna...' or 'Ye khaufnak sach sunne ke baad tum darr jaoge...'",
     },
     {
         "name": "dark_mystery",
-        "instruction": "Open with an unsolved mystery or creepy phenomenon. Example pattern: 'Duniya ki sabse rahasyamayi jagah jahan se koi wapas nahi aaya...' or 'Ye creepy fact tumhe sone nahi dega...'",
+        "instruction": "Open with an unsolved mystery or creepy phenomenon. Example pattern: 'Duniya ki sabse rahasyamayi jagah jahan se koi wapas nahi aaya...' or 'Ye creepy mystery tumhe raat bhar sone nahi degi...'",
+    },
+    {
+        "name": "unexplained_phenomena",
+        "instruction": "Open with a mind-bending or terrifying true incident that science cannot explain. Example pattern: 'Science ke paas bhi is khaufnak ghatna ka koi jawab nahi hai...'",
+    },
+    {
+        "name": "creepy_fact",
+        "instruction": "Start with a disturbing fact about sleep paralysis, space, the ocean, or the human mind. Example pattern: 'Jab tum sote ho toh tumhare dimaag ke saath kya hota hai...'",
+    },
+    {
+        "name": "curiosity_gap",
+        "instruction": "Start with an incomplete statement that creates burning curiosity. Example pattern: 'Ye khaufnak rahasya duniya se chhupaya gaya tha, lekin...'",
+    },
+    {
+        "name": "shock_stat",
+        "instruction": "Open with a surprising or creepy statistic. Example pattern: '90% log nahi jaante ki sleep paralysis ke waqt...', make it feel eerie.",
     },
     {
         "name": "kabhii_nahi",
         "instruction": """
-This is the PROVEN highest-performing hook framework on this account (drove 2.4K views).
 Open with a 'kabhi nahi...' statement in Devanagari Hindi.
-The sentence MUST be a complete, punchy hook that generates extreme curiosity.
+The sentence MUST be a complete, punchy hook that generates extreme curiosity or chill.
 DO NOT use '...' or truncate the sentence. It must be a full sentence on the first frame.
 Examples of proven-viral openers:
+  - 'ये खौफनाक राज़ आपको कोई नहीं बताएगा!'
+  - 'इंसानी दिमाग का ये काला सच कभी मत भूलना!'
   - 'ये चीज़ लड़कियां कभी सीधे नहीं बतातीं!'
-  - 'लड़कियां कभी भी ये राज़ नहीं खोलतीं!'
 MANDATORY: The very first scene text must be a complete sentence that hooks the viewer instantly.""",
     },
     {
         "name": "test_format",
         "instruction": """
-This is the PROVEN second-highest hook framework — 'Test' framing (drove the 2.4K views reel).
 Frame the entire reel as a test or quiz the viewer can take.
-Pattern: 'Friendzone Test: Spot It Or Stay Stuck?' or '[Topic] Test: [Outcome if you fail]'
-This forces the viewer to COMPLETE the video to get their 'result'.
-High completion rate = algorithm pushes it further.
+Pattern: 'Psychology Test: Spot It Or Stay Stuck?' or '[Topic] Test: [Outcome if you fail]'
 First sentence must name the test and its stakes.
-Example: 'Ye [topic] test fail kiya toh [consequence] rahoge forever!'""",
+Example: 'Ye dark psychology test fail kiya toh [consequence] rahoge forever!'""",
     },
 ]
 
@@ -203,10 +196,10 @@ Example: 'Ye [topic] test fail kiya toh [consequence] rahoge forever!'""",
 def _pick_hook_framework(analytics_data=None, feedback_summary=""):
     """Choose a hook framework using an Epsilon-Greedy (80/20) policy.
     
-    - 80% Exploitation: Pulls from proven high-converting hook styles (curiosity gap, pattern interrupt, contrarian truth)
+    - 80% Exploitation: Pulls from proven high-converting hook styles (warning hook, dark mystery, creepy fact)
     - 20% Exploration: Forces wildcard framework rotation to discover new viral angles & prevent audience burnout
     """
-    proven_viral = ["kabhii_nahi", "test_format", "curiosity_gap"]
+    proven_viral = ["warning_hook", "dark_mystery", "unexplained_phenomena", "creepy_fact", "kabhii_nahi"]
     
     # 80% Exploitation of top viral framework patterns
     if random.random() < 0.80:
@@ -486,16 +479,28 @@ _TOPIC_TIER2_HIGH = [
     "her smile decoded — the difference between polite and genuine",
 ]
 
-# TIER 3 — HORROR & MYSTERY (The new viral pivot)
+# TIER 3 — HORROR, THRILLER & MYSTERY (Primary Viral Focus)
 _TOPIC_TIER3_EXPLORE = [
     "creepy psychological facts that will keep you awake at night",
     "unsolved mysteries that scientists still cannot explain",
     "the most haunted places where people disappeared without a trace",
-    "dark psychology facts about the human mind",
-    "creepy things that happen in the deep ocean or space",
-    "glitch in the matrix real life scary stories",
-    "the dark side of human behavior and psychology",
-    "disturbing facts about dreams and sleep paralysis",
+    "dark psychology secrets about human fear and terror",
+    "creepy things that happen in the deep ocean that sound fake but are real",
+    "glitch in the matrix real life scary stories people experienced",
+    "disturbing facts about dreams sleep paralysis and shadow figures",
+    "real life unsolved vanishing cases that terrify researchers",
+    "creepy psychological phenomena that explain why you feel watched",
+    "terrifying historical incidents that were erased from history books",
+    "the terrifying mystery of skinwalkers and eerie forest encounters",
+    "disturbing deep web mysteries that remain unsolved today",
+    "scariest psychological experiments ever conducted on humans",
+    "creepy space facts that prove how terrifying the universe really is",
+    "unexplained audio signals from space and the deep sea",
+    "horrifying true paranormal stories documented by emergency services",
+    "the eerie phenomenon of deja vu and dark memory loops",
+    "creepy urban legends that turned out to be completely real",
+    "disturbing brain facts: what happens when your mind plays tricks on you",
+    "unsolved cryptid encounters caught on camera that defy science",
 ]
 
 # PROVEN DEAD — NEVER USE AGAIN (based on analytics data)
@@ -506,28 +511,42 @@ _TOPIC_TIER3_EXPLORE = [
 # - "Text Ignore" (138 views despite afternoon post)
 
 
-def _pick_topic_subcategory():
-    """
-    Weighted topic picker designed for balance:
-    - 25% Friendzone/Situationship (Tier 1A)
-    - 25% Mirror Psychology (Tier 1B)
-    - 25% Eye Contact/Body Language (Tier 2)
-    - 25% Horror, Mystery & Dark Psychology (Tier 3)
-    """
-    roll = random.random()
-    if roll < 0.25:
-        return random.choice(_TOPIC_TIER1A_FRIENDZONE)
-    elif roll < 0.50:
-        return random.choice(_TOPIC_TIER1B_MIRROR)
-    elif roll < 0.75:
-        return random.choice(_TOPIC_TIER2_HIGH)
-    else:
-        return random.choice(_TOPIC_TIER3_EXPLORE)
+# ── Anti-Consecutive Topic Rotation System ──────────────────────────────
+_PILLAR_STATE_FILE = os.path.join("data", "last_topic_pillar.txt")
 
+def _get_next_topic_pillar():
+    """
+    Guarantees strict alternating rotation between two core content pillars so that
+    no two consecutive reels are ever of the same type:
+    - Pillar 1: 'horror_mystery' (Horror, Thriller, Unsolved Mysteries, Creepy Facts)
+    - Pillar 2: 'women_psychology' (Female/Women Psychology, Attraction Signals, Relationship Secrets)
+    """
+    last_pillar = ""
+    try:
+        if os.path.exists(_PILLAR_STATE_FILE):
+            with open(_PILLAR_STATE_FILE, "r") as f:
+                last_pillar = f.read().strip().lower()
+    except (ValueError, OSError):
+        pass
+
+    if last_pillar == "horror_mystery":
+        next_pillar = "women_psychology"
+    else:
+        next_pillar = "horror_mystery"
+
+    try:
+        os.makedirs("data", exist_ok=True)
+        with open(_PILLAR_STATE_FILE, "w") as f:
+            f.write(next_pillar)
+    except OSError:
+        pass
+
+    print(f"[TopicEngine] Anti-consecutive rotation: Selected pillar '{next_pillar}' (previous was '{last_pillar or 'none'}')")
+    return next_pillar
 
 
 def generate_topic_from_domain(domain, analytics_data=None, feedback_summary="", used_topics=None):
-    """Generate the next reel topic, avoiding recently used ones."""
+    """Generate the next reel topic, alternating strictly between Horror/Thriller and Women Psychology."""
     # Build deduplication context for the LLM
     used_topics_set = used_topics or set()
     avoid_block = ""
@@ -539,36 +558,52 @@ CRITICAL: DO NOT suggest any of these recently used topics (they were already po
 The new topic must be clearly different in angle and hook style from all of the above.
 """
 
-    # Rotate through sub-categories for content variety
-    subcategory = _pick_topic_subcategory()
+    pillar = _get_next_topic_pillar()
+
+    if pillar == "horror_mystery":
+        subcategory = random.choice(_TOPIC_TIER3_EXPLORE)
+        pillar_instructions = """
+Target Pillar: HORROR, THRILLER, UNSOLVED MYSTERIES & CREEPY FACTS
+Task guidelines:
+1. Focus strictly on scary psychological facts, unsolved mysteries, haunted locations, eerie phenomena, ocean/space horror, or glitch-in-the-matrix stories.
+2. Must create instant fear, suspense, or chilling curiosity.
+3. Examples (don't copy directly):
+   - Duniya ki sabse bhutiya jagah jahan se koi wapas nahi aaya
+   - 3 creepy facts jo tumhe aaj raat sone nahi denge
+   - Sleep paralysis ka dark secret jo koi nahi batata
+   - Science ke paas bhi is khaufnak mystery ka koi jawab nahi hai
+"""
+    else:
+        women_topics_pool = _TOPIC_TIER1A_FRIENDZONE + _TOPIC_TIER1B_MIRROR + _TOPIC_TIER2_HIGH
+        subcategory = random.choice(women_topics_pool)
+        pillar_instructions = """
+Target Pillar: FEMALE & WOMEN PSYCHOLOGY, ATTRACTION SECRETS & RELATIONSHIP SIGNALS
+Task guidelines:
+1. Focus on female/women psychology, subconscious body language signals, attraction secrets, mirror effect, or decoding mixed signals.
+2. Must create intense curiosity about female behavior and relationship dynamics.
+3. Examples (don't copy directly):
+   - Ye cheez ladkiyan kabhi seedhe nahi batati
+   - 3 body language signs jo batati hain ke wo interested hai
+   - Mirror effect psychology — jab wo tumhari tarah act karti hai
+   - Mixed signals ya friendzone — kaise pata karein
+"""
 
     prompt = f"""
 You are a short-form content strategist specialized in viral Instagram Reels. 
-Your target audience is young men (18-30) on Indian Instagram who love dark psychology, attraction secrets, horror, and mysteries.
+Your target audience is viewers on Indian Instagram who love engaging, high-curiosity short reels.
 
 Primary domain: "{domain}"
-Today's angle/subcategory to focus on: "{subcategory}"
+Today's angle/subcategory focus: "{subcategory}"
+{pillar_instructions}
 Historical feedback summary: {feedback_summary or 'No data yet'}
 {avoid_block}
+
 Task:
 Propose exactly ONE topic idea for the next Instagram Reel that:
-1. Stays within the primary domain
-2. Uses today's angle/subcategory as the specific focus
-3. Iterates on what performed best (if analytics data is available)
-4. Has VERY strong hook potential — must create instant curiosity or fear
-5. Focuses on psychology, horror, mysteries, or dark facts
-6. Is bold and intriguing WITHOUT being sexually explicit (Instagram-safe)
-7. Is DIFFERENT from the recently used topics listed above
-
-Great topic examples (for inspiration, don't copy exactly):
-- Duniya ki sabse bhutiya jagah jahan se koi nahi lauta
-- 3 creepy facts jo tumhe aaj raat sone nahi denge
-- Ek cheez jo ladkiyon ko turant attract karti hai
-- Sleep paralysis ka dark secret jo koi nahi batata
-- Body language signs jo batati hain ke wo interested hai
-- Psychology trick jo kisi ko bhi tumhari taraf kheench le
-- Samundar ki gehrayi mein chhupe dark secrets
-- Kaise pata chale ke wo tumhare baare mein sochti hai
+1. Strictly adheres to today's Target Pillar guidelines listed above
+2. Has EXTREMELY STRONG hook potential
+3. Is bold, engaging, and Instagram-safe
+4. Is DIFFERENT from the recently used topics listed above
 
 Return only a single plain-text topic line, max 12 words, no quotes, no numbering.
 """

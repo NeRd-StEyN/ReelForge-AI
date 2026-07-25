@@ -46,6 +46,7 @@ jobs:
             data/pending_posts.jsonl
             data/analytics_fail_count.txt
             data/last_analytics_fetch.txt
+            data/last_topic_pillar.txt
           key: reelforge-data-${{ github.ref_name }}
           restore-keys: |
             reelforge-data-
@@ -84,4 +85,5 @@ jobs:
             data/pending_posts.jsonl
             data/analytics_fail_count.txt
             data/last_analytics_fetch.txt
+            data/last_topic_pillar.txt
           key: reelforge-data-${{ github.ref_name }}-${{ github.run_id }}
