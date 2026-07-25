@@ -235,110 +235,73 @@ def _title_match_score(expected_title, caption_text):
     return hits / len(title_words)
 
 
-def post_poll_story(cl, thumbnail_path, story_poll):
+def post_poll_story(cl, thumbnail_path, story_poll=None):
     """
-    Posts a separate Story slide with a poll sticker.
-    This drives viewers from Stories back to the Reel — one of the highest
-    engagement amplifiers on Instagram.
-
-    Uses a triple-fallback strategy:
-      1. Typed StoryPollSticker (modern instagrapi)
-      2. Legacy dict poll (older instagrapi)
-      3. Plain photo story without poll (last resort — still gets Story reach)
-
-    story_poll dict format:
-        {"question": "...", "option_1": "...", "option_2": "..."}
+    Posts an Instagram Story slide.
+    
+    Primary priority: Post a clean, normal photo story (100% reliable, zero sticker bugs).
+    Optional secondary: Fallback with poll sticker if poll data provided.
     """
     if not cl:
-        print("[Poll] No Instagram client — skipping poll story.")
-        return False
-
-    if not story_poll or not isinstance(story_poll, dict):
-        print("[Poll] No poll data — skipping poll story.")
-        return False
-
-    question = story_poll.get("question", "").strip()
-    opt1     = story_poll.get("option_1", "Haan 🔥").strip()[:20]
-    opt2     = story_poll.get("option_2", "Nahi 🤔").strip()[:20]
-
-    if not question:
-        print("[Poll] Empty question — skipping poll story.")
+        print("[Story] No Instagram client — skipping story post.")
         return False
 
     # Background: use thumbnail if available, else create a plain dark card
     bg_path = thumbnail_path if (thumbnail_path and os.path.exists(thumbnail_path)) else None
     if not bg_path:
-        print("[Poll] No thumbnail found — will use plain black background for poll story.")
+        print("[Story] No thumbnail found — creating plain dark card background...")
         try:
-            from PIL import Image, ImageDraw
+            from PIL import Image
             img = Image.new("RGB", (1080, 1920), color=(15, 15, 15))
             fallback_path = "assets/images/poll_bg.jpg"
             os.makedirs("assets/images", exist_ok=True)
             img.save(fallback_path)
             bg_path = fallback_path
         except Exception as img_err:
-            print(f"[Poll] Could not create fallback image: {img_err}")
+            print(f"[Story] Could not create fallback image: {img_err}")
             return False
 
-    # ── Approach 1: Typed StoryPollSticker (modern instagrapi) ─────────
+    # ── Step 1: Normal Clean Story Upload (Top Priority & Most Reliable) ─
+    print(f"[Story] Step 1: Uploading normal clean story slide using image: {bg_path}...")
     try:
-        from instagrapi.types import StoryPollSticker, StoryPoll
-        print(f"[Poll] Approach 1: Typed StoryPollSticker — '{question}' | {opt1} / {opt2}")
-
-        poll_sticker = StoryPollSticker(
-            poll=StoryPoll(
-                question=question[:80],  # Instagram caps at 80 chars
-                tallies=[
-                    {"text": opt1, "font_size": 35.0},
-                    {"text": opt2, "font_size": 35.0},
-                ],
-            ),
-            x=0.5,
-            y=0.75,
-            width=0.6,
-            height=0.12,
-            rotation=0.0,
-        )
-
-        cl.photo_upload_to_story(
-            path=bg_path,
-            poll_sticker=poll_sticker,
-        )
-        print("[Poll] ✅ Poll story posted successfully (typed StoryPollSticker)!")
-        return True
-
-    except ImportError:
-        print("[Poll] StoryPollSticker not available in this instagrapi version — trying approach 2...")
-    except Exception as exc:
-        print(f"[Poll] Approach 1 failed ({exc}), trying approach 2...")
-
-    # ── Approach 2: Legacy dict poll (older instagrapi builds) ─────────
-    try:
-        print(f"[Poll] Approach 2: Legacy dict — '{question}'")
-        cl.photo_upload_to_story(
-            path=bg_path,
-            poll_sticker={
-                "question": question[:80],
-                "options": [opt1, opt2],
-                "x": 0.5,
-                "y": 0.75,
-            },
-        )
-        print("[Poll] ✅ Poll story posted (legacy dict mode).")
-        return True
-    except Exception as fallback_exc:
-        print(f"[Poll] Approach 2 failed: {fallback_exc}")
-
-    # ── Approach 3: Plain photo story without poll (last resort) ───────
-    # Still valuable — gets Story reach even without the poll sticker
-    try:
-        print("[Poll] Approach 3: Plain photo story (no poll sticker)")
         cl.photo_upload_to_story(path=bg_path)
-        print("[Poll] ⚠️ Story posted WITHOUT poll sticker (poll API unavailable). Still gets Story reach.")
+        print("[Story] ✅ Normal clean story posted successfully!")
         return True
-    except Exception as plain_exc:
-        print(f"[Poll] ❌ All 3 approaches failed. Last error: {plain_exc}")
-        return False
+    except Exception as normal_exc:
+        print(f"[Story] Normal story upload failed ({normal_exc}) — attempting sticker fallback...")
+
+    # ── Step 2: Fallback with Poll Sticker if requested ──────────────────
+    if story_poll and isinstance(story_poll, dict):
+        question = story_poll.get("question", "").strip()
+        opt1     = story_poll.get("option_1", "Haan 🔥").strip()[:20]
+        opt2     = story_poll.get("option_2", "Nahi 🤔").strip()[:20]
+
+        if question:
+            try:
+                from instagrapi.types import StoryPollSticker, StoryPoll
+                print(f"[Story] Step 2: Trying typed poll sticker — '{question}'")
+                poll_sticker = StoryPollSticker(
+                    poll=StoryPoll(
+                        question=question[:80],
+                        tallies=[
+                            {"text": opt1, "font_size": 35.0},
+                            {"text": opt2, "font_size": 35.0},
+                        ],
+                    ),
+                    x=0.5,
+                    y=0.75,
+                    width=0.6,
+                    height=0.12,
+                    rotation=0.0,
+                )
+                cl.photo_upload_to_story(path=bg_path, poll_sticker=poll_sticker)
+                print("[Story] ✅ Story posted with poll sticker!")
+                return True
+            except Exception as poll_exc:
+                print(f"[Story] Poll sticker upload failed: {poll_exc}")
+
+    print("[Story] ❌ All story upload attempts failed.")
+    return False
 
 
 def _share_reel_to_story(cl, post, thumbnail_path, story_poll=None):
