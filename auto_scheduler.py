@@ -196,14 +196,23 @@ def create_and_post_one_reel():
 
             # Fetch live analytics only if the feature flag is on AND we haven't fetched today
             analytics_data = None
+            insta_cl = None  # Keep the client alive for story posting later
             if _env_flag("ENABLE_INSTAGRAM_ANALYTICS", "true"):
                 if _should_fetch_analytics_today():
-                    # Mark it fetched BEFORE the actual fetch to ensure we strictly never try twice a day, even on failure.
+                    insta_cl = get_insta_client()
+                    if insta_cl:
+                        print("[Analytics] Instagram client authenticated. Fetching live analytics...")
+                        analytics_data = get_performance_data(insta_cl)
+                    else:
+                        print("[Analytics] Instagram client not available (session missing/expired).")
+                        print("[Analytics] To fix: Run 'python generate_session.py' locally, then update INSTA_SESSION GitHub Secret.")
+                    # Mark it fetched AFTER the attempt (not before) so if the runner
+                    # crashes mid-run, the next scheduled run will retry today.
                     _mark_analytics_fetched_today()
-                    cl = get_insta_client()
-                    analytics_data = get_performance_data(cl) if cl else None
                 else:
-                    print("[Analytics] Already fetched analytics today. Skipping to save Make.com credits.")
+                    print("[Analytics] Already fetched analytics today. Skipping to avoid rate limits.")
+                    # Still try to get an insta client for story posting even if we skip analytics
+                    insta_cl = get_insta_client()
             else:
                 print("Skipping Instagram analytics fetch (ENABLE_INSTAGRAM_ANALYTICS=false).")
 
@@ -258,8 +267,16 @@ def create_and_post_one_reel():
             # Fix 4: Pick rotating TTS voice
             voice = _pick_next_voice()
 
-            # Run full pipeline — pass feedback_summary + voice 
-            result = run_pipeline(topic, feedback_summary=feedback_summary, tts_voice_override=voice)
+            # Run full pipeline — pass feedback_summary, voice, pre-fetched analytics,
+            # and the authenticated Instagram client so main.py doesn't make duplicate
+            # API calls or fail to post stories due to missing session.
+            result = run_pipeline(
+                topic,
+                feedback_summary=feedback_summary,
+                tts_voice_override=voice,
+                insta_client=insta_cl,
+                analytics_data=analytics_data,
+            )
 
             if isinstance(result, dict):
                 append_reel_outcome(

@@ -32,7 +32,7 @@ jobs:
 
       - name: Restore Instagram session file
         if: env.INSTA_SESSION != ''
-        run: echo "$INSTA_SESSION" > insta_session.json
+        run: python -c "import os; open('insta_session.json', 'w', encoding='utf-8').write(os.environ['INSTA_SESSION'].strip())"
 
       - name: Restore feedback history cache
         uses: actions/cache/restore@v4
@@ -84,4 +84,4 @@ jobs:
             data/pending_posts.jsonl
             data/analytics_fail_count.txt
             data/last_analytics_fetch.txt
-          key: reelforge-data-${{ github.ref_name }}
+          key: reelforge-data-${{ github.ref_name }}-${{ github.run_id }}

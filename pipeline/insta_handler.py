@@ -241,10 +241,19 @@ def post_poll_story(cl, thumbnail_path, story_poll):
     This drives viewers from Stories back to the Reel — one of the highest
     engagement amplifiers on Instagram.
 
+    Uses a triple-fallback strategy:
+      1. Typed StoryPollSticker (modern instagrapi)
+      2. Legacy dict poll (older instagrapi)
+      3. Plain photo story without poll (last resort — still gets Story reach)
+
     story_poll dict format:
         {"question": "...", "option_1": "...", "option_2": "..."}
     """
-    if not cl or not story_poll or not isinstance(story_poll, dict):
+    if not cl:
+        print("[Poll] No Instagram client — skipping poll story.")
+        return False
+
+    if not story_poll or not isinstance(story_poll, dict):
         print("[Poll] No poll data — skipping poll story.")
         return False
 
@@ -271,9 +280,10 @@ def post_poll_story(cl, thumbnail_path, story_poll):
             print(f"[Poll] Could not create fallback image: {img_err}")
             return False
 
+    # ── Approach 1: Typed StoryPollSticker (modern instagrapi) ─────────
     try:
-        from instagrapi.types import StoryPollSticker, StoryPoll, StoryBuildedMedia
-        print(f"[Poll] Posting poll story: '{question}' | {opt1} / {opt2}")
+        from instagrapi.types import StoryPollSticker, StoryPoll
+        print(f"[Poll] Approach 1: Typed StoryPollSticker — '{question}' | {opt1} / {opt2}")
 
         poll_sticker = StoryPollSticker(
             poll=StoryPoll(
@@ -294,16 +304,17 @@ def post_poll_story(cl, thumbnail_path, story_poll):
             path=bg_path,
             poll_sticker=poll_sticker,
         )
-        print("[Poll] ✅ Poll story posted successfully!")
+        print("[Poll] ✅ Poll story posted successfully (typed StoryPollSticker)!")
         return True
 
     except ImportError:
-        print("[Poll] StoryPollSticker not available in this instagrapi version — trying legacy API...")
+        print("[Poll] StoryPollSticker not available in this instagrapi version — trying approach 2...")
     except Exception as exc:
-        print(f"[Poll] poll_sticker API failed ({exc}), trying legacy dict approach...")
+        print(f"[Poll] Approach 1 failed ({exc}), trying approach 2...")
 
-    # Legacy fallback: pass poll as a plain dict (older instagrapi builds)
+    # ── Approach 2: Legacy dict poll (older instagrapi builds) ─────────
     try:
+        print(f"[Poll] Approach 2: Legacy dict — '{question}'")
         cl.photo_upload_to_story(
             path=bg_path,
             poll_sticker={
@@ -316,7 +327,17 @@ def post_poll_story(cl, thumbnail_path, story_poll):
         print("[Poll] ✅ Poll story posted (legacy dict mode).")
         return True
     except Exception as fallback_exc:
-        print(f"[Poll] ❌ Poll story failed entirely: {fallback_exc}")
+        print(f"[Poll] Approach 2 failed: {fallback_exc}")
+
+    # ── Approach 3: Plain photo story without poll (last resort) ───────
+    # Still valuable — gets Story reach even without the poll sticker
+    try:
+        print("[Poll] Approach 3: Plain photo story (no poll sticker)")
+        cl.photo_upload_to_story(path=bg_path)
+        print("[Poll] ⚠️ Story posted WITHOUT poll sticker (poll API unavailable). Still gets Story reach.")
+        return True
+    except Exception as plain_exc:
+        print(f"[Poll] ❌ All 3 approaches failed. Last error: {plain_exc}")
         return False
 
 

@@ -57,7 +57,7 @@ def cleanup_generated_assets():
 
     print(f"Cleanup complete. Removed {removed} old generated files.")
 
-def main(topic, feedback_summary="", tts_voice_override=None, insta_client=None):
+def main(topic, feedback_summary="", tts_voice_override=None, insta_client=None, analytics_data=None):
     print(f"Starting pipeline...")
     tts_voice = tts_voice_override or _get_tts_voice()
     print(f"[Voice] TTS voice: {tts_voice}")
@@ -66,9 +66,12 @@ def main(topic, feedback_summary="", tts_voice_override=None, insta_client=None)
         cleanup_generated_assets()
 
     # 0. Optional: Fetch Instagram analytics directly via Python (0 Make.com credits).
-    analytics_data = None
-    if _env_flag("ENABLE_INSTAGRAM_ANALYTICS", "true"):
-        cl = get_insta_client()
+    # If analytics_data was already provided by the caller (e.g. auto_scheduler),
+    # skip the duplicate fetch entirely to avoid double API calls & double errors.
+    if analytics_data is not None:
+        print(f"[Analytics] Using pre-fetched analytics data ({len(analytics_data)} reels).")
+    elif _env_flag("ENABLE_INSTAGRAM_ANALYTICS", "true"):
+        cl = insta_client or get_insta_client()
         analytics_data = get_performance_data(cl) if cl else None
         if analytics_data:
             print(f"[Analytics] Live data fetched via Python: {len(analytics_data)} reels.")
@@ -201,13 +204,29 @@ def main(topic, feedback_summary="", tts_voice_override=None, insta_client=None)
             if story_poll and os.path.exists(thumb_path):
                 print(f"[Story] Auto-posting story with poll...")
                 from pipeline.insta_handler import post_poll_story
-                cl = get_insta_client()
+                # Reuse the already-authenticated client instead of creating a new one.
+                # On GitHub Actions, get_insta_client() often returns None because
+                # the session is expired — but if the caller already authenticated,
+                # reusing that client avoids the duplicate failure.
+                cl = insta_client or get_insta_client()
                 if cl:
-                    post_poll_story(cl, thumb_path, story_poll)
+                    success = post_poll_story(cl, thumb_path, story_poll)
+                    if success:
+                        print("[Story] ✅ Story posted successfully!")
+                    else:
+                        print("[Story] ⚠️ Story posting returned False — check insta_handler logs above.")
                 else:
                     print("[Story] Skipped story auto-post: Instagram client not authenticated.")
+                    print("[Story] To fix: Run generate_session.py locally and update INSTA_SESSION secret.")
+            else:
+                if not story_poll:
+                    print("[Story] No story_poll data in metadata — skipping story post.")
+                elif not os.path.exists(thumb_path):
+                    print(f"[Story] Thumbnail not found at {thumb_path} — skipping story post.")
         except Exception as story_err:
-            print(f"[Story] Auto-post story skipped: {story_err}")
+            print(f"[Story] Auto-post story failed: {story_err}")
+            import traceback
+            traceback.print_exc()
 
     print(f"Pipeline complete! Video saved to: {output_file}")
     print(f"Metadata saved to: video_metadata.json")
