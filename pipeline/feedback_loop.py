@@ -152,9 +152,10 @@ def summarize_feedback(limit=30):
     ]
 
     if posts:
-        posts.sort(key=lambda x: x["score"], reverse=True)
+        # Sort pinned reels first (ordered by score), then all other reels (ordered by score)
+        posts.sort(key=lambda x: (1 if x.get("is_pinned") else 0, x["score"]), reverse=True)
         top = posts[:5]
-        bottom = posts[-3:] if len(posts) > 5 else []
+        bottom = [p for p in posts if not p.get("is_pinned")][-3:] if len(posts) > 5 else []
 
         lines.extend([
             "",

@@ -161,6 +161,7 @@ def main(topic, feedback_summary="", tts_voice_override=None, insta_client=None,
             full_narration_text,
             full_narration_path,
             voice=tts_voice,
+            rate="-5%",  # Suspenseful dramatic narration pacing
         )
         voice_input = full_narration_path
     else:
