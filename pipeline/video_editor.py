@@ -622,9 +622,15 @@ def _mix_background_music(narration_audio, total_duration, content_theme="defaul
     bg_path = _maybe_download_bg_music(bg_path, bg_url)
     print(f"[BGMusic] Theme: {content_theme} | Track: {bg_filename} | Volume: {bg_volume}")
 
-    if not bg_path:
-        print("[BGMusic] No music available — using narration only.")
-        return narration_audio
+    if not bg_path or not os.path.exists(bg_path):
+        # Fallback: pick any available cached local MP3 in assets/audio
+        local_mp3s = [os.path.join("assets", "audio", f) for f in os.listdir(os.path.join("assets", "audio")) if f.endswith(".mp3")] if os.path.exists(os.path.join("assets", "audio")) else []
+        if local_mp3s:
+            bg_path = local_mp3s[0]
+            print(f"[BGMusic] Using local cached track fallback: {bg_path}")
+        else:
+            print("[BGMusic] No music available — using narration only.")
+            return narration_audio
 
     try:
         bg_music = AudioFileClip(bg_path)
