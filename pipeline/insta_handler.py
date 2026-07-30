@@ -134,104 +134,20 @@ def _get_medias_with_timeout(cl, user_id, amount=20, timeout_seconds=30):
     return result[0]
 
 
-def get_graph_api_performance_data(access_token=None, instagram_account_id=None, limit=15):
-    """
-    Official Instagram Graph API analytics fetcher for Professional / Creator accounts.
-    Runs server-to-server over HTTPS with ZERO datacenter IP blocks on GitHub Actions.
-
-    Env variables required:
-      INSTAGRAM_GRAPH_TOKEN: Long-lived User/Page Access Token
-      INSTAGRAM_ACCOUNT_ID:  Instagram Professional Account ID
-    """
-    token = access_token or os.getenv("INSTAGRAM_GRAPH_TOKEN")
-    account_id = instagram_account_id or os.getenv("INSTAGRAM_ACCOUNT_ID")
-
-    if not token or not account_id:
-        return None
-
-    import requests
-    print(f"[GraphAPI] Fetching analytics via official Instagram Graph API...")
-    url = f"https://graph.facebook.com/v19.0/{account_id}/media"
-    params = {
-        "fields": "id,caption,media_type,media_product_type,like_count,comments_count,timestamp",
-        "limit": limit,
-        "access_token": token,
-    }
-
-    try:
-        resp = requests.get(url, params=params, timeout=20)
-        resp.raise_for_status()
-        data = resp.json().get("data", [])
-
-        analytics = []
-        for item in data:
-            media_type = item.get("media_type")
-            product_type = item.get("media_product_type")
-
-            if media_type == "VIDEO" or product_type == "REELS":
-                media_id = item.get("id")
-                caption = str(item.get("caption") or "").replace("\n", " ").strip()
-                likes = int(item.get("like_count") or 0)
-                comments = int(item.get("comments_count") or 0)
-                timestamp = str(item.get("timestamp") or "")[:10]
-
-                plays, shares, saves = 0, 0, 0
-                try:
-                    insights_url = f"https://graph.facebook.com/v19.0/{media_id}/insights"
-                    ins_params = {
-                        "metric": "plays,reach,saved,shares",
-                        "access_token": token,
-                    }
-                    ins_resp = requests.get(insights_url, params=ins_params, timeout=10)
-                    if ins_resp.status_code == 200:
-                        metrics = {
-                            m["name"]: m["values"][0]["value"]
-                            for m in ins_resp.json().get("data", [])
-                            if "values" in m and m["values"]
-                        }
-                        plays = metrics.get("plays") or metrics.get("reach") or 0
-                        shares = metrics.get("shares") or 0
-                        saves = metrics.get("saved") or 0
-                except Exception:
-                    pass
-
-                analytics.append({
-                    "topic_snippet": caption[:120],
-                    "views": plays,
-                    "likes": likes,
-                    "comments": comments,
-                    "shares": shares,
-                    "saves": saves,
-                    "is_pinned": False,
-                    "post_date": timestamp,
-                })
-
-        if analytics:
-            print(f"[GraphAPI] ✅ Successfully fetched {len(analytics)} reels via Instagram Graph API!")
-            return analytics
-    except Exception as err:
-        print(f"[GraphAPI] Warning: Graph API fetch error ({err}) — falling back to session client.")
-    return None
-
-
 def get_performance_data(cl):
-    """Fetches views and likes for recent reels. Returns a list or None.
+    """Fetches views and likes for the last 20 reels. Returns a list or None.
 
-    Priority 1: Official Instagram Graph API (if INSTAGRAM_GRAPH_TOKEN is configured).
-                Works 100% reliably on GitHub Actions without IP blocks.
-    Priority 2: Instagrapi session client (local PC / session file fallback).
+    Uses cl.user_id (session-based) instead of user_id_from_username() which
+    hits Instagram's rate-limited public API and frequently returns 429 errors
+    on GitHub Actions runners — this was the root cause of analytics silently
+    failing and returning None.
     """
-    # Priority 1: Official Instagram Graph API
-    graph_data = get_graph_api_performance_data()
-    if graph_data:
-        return graph_data
-
     if not cl:
         print("[Analytics] Skipping live fetch — not logged in.")
         return None
 
     try:
-        print("[Analytics] Fetching recent reel performance data via Instagrapi...")
+        print("[Analytics] Fetching recent reel performance data...")
         # Use the session's own user_id — avoids the rate-limited public
         # web_profile_info endpoint that causes 429 errors on cloud IPs.
         user_id = cl.user_id
