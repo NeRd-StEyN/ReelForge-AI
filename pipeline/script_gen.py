@@ -144,62 +144,54 @@ def _postprocess_script_payload(payload):
     return payload
 
 
-# ── Hook framework rotation for maximum variety ──────────────────────
+# ── Hook framework rotation for maximum variety (Female Psychology & Attraction Focus) ──
 _HOOK_FRAMEWORKS = [
     {
-        "name": "warning_hook",
-        "instruction": "Start with a direct warning that creates immediate suspense and fear. Example pattern: 'Agar tum akele ho toh ye video abhi mat dekhna...' or 'Ye khaufnak sach sunne ke baad tum darr jaoge...'",
+        "name": "eye_contact_trap",
+        "instruction": "Open with an intense eye contact or glance signal. Example pattern: 'Jab wo tumse eye contact karke nazrein churati hai, toh iska asli matlab samjho...' or 'Her eye contact trap: Shatter it with THIS secret!'",
     },
     {
-        "name": "dark_mystery",
-        "instruction": "Open with an unsolved mystery or creepy phenomenon. Example pattern: 'Duniya ki sabse rahasyamayi jagah jahan se koi wapas nahi aaya...' or 'Ye creepy mystery tumhe raat bhar sone nahi degi...'",
+        "name": "mixed_signals_decoder",
+        "instruction": "Open with a mixed signal dilemma. Example pattern: 'Her mixed signals: Testing ya friendzoning? The truth hurts...' or 'Agar wo ek din warm aur dusre din cold react kare, toh wo ye test kar rahi hai...'",
     },
     {
-        "name": "unexplained_phenomena",
-        "instruction": "Open with a mind-bending or terrifying true incident that science cannot explain. Example pattern: 'Science ke paas bhi is khaufnak ghatna ka koi jawab nahi hai...'",
+        "name": "mirror_effect_secret",
+        "instruction": "Open with body language mirroring. Example pattern: 'Jab wo tumhari tarah baatein ya gesture copy karne lage, toh dimaag mein ye chal raha hota hai...' or 'Subconscious mirroring: 3 signs jo wo chhupa nahi sakti!'",
     },
     {
-        "name": "creepy_fact",
-        "instruction": "Start with a disturbing fact about sleep paralysis, space, the ocean, or the human mind. Example pattern: 'Jab tum sote ho toh tumhare dimaag ke saath kya hota hai...'",
+        "name": "female_psychology_truth",
+        "instruction": "Start with a direct female psychology rule. Example pattern: 'Ye ek cheez ladkiyan tumhein kabhi seedhe nahi batayengi...' or 'Psychology says: jab ladki tumhare baare mein sochti hai...'",
     },
     {
         "name": "curiosity_gap",
-        "instruction": "Start with an incomplete statement that creates burning curiosity. Example pattern: 'Ye khaufnak rahasya duniya se chhupaya gaya tha, lekin...'",
-    },
-    {
-        "name": "shock_stat",
-        "instruction": "Open with a surprising or creepy statistic. Example pattern: '90% log nahi jaante ki sleep paralysis ke waqt...', make it feel eerie.",
+        "instruction": "Start with an incomplete provocative statement that creates burning curiosity. Example pattern: 'Agar wo tumhara text ignore kar ke online reh rahi hai, toh wo tumhein is test mein phansa rahi hai...'",
     },
     {
         "name": "kabhii_nahi",
         "instruction": """
 Open with a 'kabhi nahi...' statement in Devanagari Hindi.
-The sentence MUST be a complete, punchy hook that generates extreme curiosity or chill.
+The sentence MUST be a complete, punchy hook about female attraction or relationship signals.
 DO NOT use '...' or truncate the sentence. It must be a full sentence on the first frame.
 Examples of proven-viral openers:
-  - 'ये खौफनाक राज़ आपको कोई नहीं बताएगा!'
-  - 'इंसानी दिमाग का ये काला सच कभी मत भूलना!'
   - 'ये चीज़ लड़कियां कभी सीधे नहीं बतातीं!'
+  - 'उसकी ये हरकत कभी इग्नोर मत करना!'
+  - 'ये 3 इशारे लड़कियां सिर्फ खास इंसान को देती हैं!'
 MANDATORY: The very first scene text must be a complete sentence that hooks the viewer instantly.""",
     },
     {
         "name": "test_format",
         "instruction": """
 Frame the entire reel as a test or quiz the viewer can take.
-Pattern: 'Psychology Test: Spot It Or Stay Stuck?' or '[Topic] Test: [Outcome if you fail]'
+Pattern: 'Friendzone Test: Spot It Or Stay Stuck?' or 'Attraction Test: Is She Testing You?'
 First sentence must name the test and its stakes.
-Example: 'Ye dark psychology test fail kiya toh [consequence] rahoge forever!'""",
+Example: 'Ye female psychology test fail kiya toh friendzone mein rahoge forever!'""",
     },
 ]
 
 
 def _pick_hook_framework(analytics_data=None, feedback_summary=""):
-    """Choose a hook framework using an Epsilon-Greedy (80/20) policy.
-    
-    - 80% Exploitation: Pulls from proven high-converting hook styles (warning hook, dark mystery, creepy fact)
-    - 20% Exploration: Forces wildcard framework rotation to discover new viral angles & prevent audience burnout
-    """
-    proven_viral = ["warning_hook", "dark_mystery", "unexplained_phenomena", "creepy_fact", "kabhii_nahi"]
+    """Choose a hook framework using an Epsilon-Greedy (80/20) policy for female psychology."""
+    proven_viral = ["eye_contact_trap", "mixed_signals_decoder", "mirror_effect_secret", "female_psychology_truth", "kabhii_nahi"]
     
     # 80% Exploitation of top viral framework patterns
     if random.random() < 0.80:
@@ -209,7 +201,7 @@ def _pick_hook_framework(analytics_data=None, feedback_summary=""):
                 print(f"[HookEngine] Exploit policy: Using top viral framework '{framework['name']}'")
                 return framework
 
-    # 20% Exploration of wildcard frameworks to prevent echo chamber burnout
+    # 20% Exploration of wildcard frameworks
     chosen = random.choice(_HOOK_FRAMEWORKS)
     print(f"[HookEngine] Explore policy (20% wildcard): Using framework '{chosen['name']}'")
     return chosen
@@ -309,18 +301,21 @@ def generate_script(topic, analytics_data=None, feedback_summary=""):
     HOOK FRAMEWORK (you MUST use this style):
     {hook_framework['instruction']}
 
-    ── 2-ACT ULTRA-HIGH RETENTION ARC (12–18 SECONDS STRICT) ──
+    ── HIGH-RETENTION DECODER ARC (22–30 SECONDS OPTIMAL) ──
 
-    DURATION: This reel MUST be 12-18 seconds when spoken. NON-NEGOTIABLE.
-    - Total word count: 40-55 words ONLY across the whole script.
-    - Return EXACTLY 2 scenes for maximum completion rate (>100% loop probability).
-    - Scene 1 (The Scroll Stopper — 6-9s): 20-25 words
-        CRITICAL: The voiceover MUST start IMMEDIATELY with the hook statement. Do NOT read the title banner or header text aloud!
-        Impossible-to-skip opening statement, pattern interrupt, or provocative truth.
-    - Scene 2 (The Mind-Blow + Engagement Loop — 6-9s): 20-30 words
-        Deliver the core psychological insight fast.
-        End with a 1-sentence comment/share trigger.
-        MANDATORY LOOP TRIGGER: The final 3 words must seamlessly loop back to the first word of Scene 1.
+    DURATION: This reel MUST be 22-30 seconds when spoken.
+    - Total word count: 60-80 words across the whole script.
+    - Return EXACTLY 3 or 4 scenes to build narrative depth, tension, and high watch time.
+    - Scene 1 (The Hook — 5-7s): 15-20 words
+        CRITICAL: The voiceover MUST start IMMEDIATELY with the hook statement. Do NOT read the title banner aloud!
+        Impossible-to-skip opening statement about female psychology or attraction signal.
+    - Scene 2 (The Deep Signal — 7-9s): 20-25 words
+        Explain the psychological reason behind her behavior / body language.
+    - Scene 3 (The Decoder Move — 7-9s): 20-25 words
+        Provide the exact counter-move or decoding tip for the viewer.
+    - Scene 4 (Comment & Share Loop — 4-6s): 10-15 words
+        End with a direct comment question or opinion poll + share trigger.
+        MANDATORY LOOP TRIGGER: The final 3 words should seamlessly connect back to the hook idea.
 
     RETENTION TACTICS:
     - Launch straight into the hook in word 1.
@@ -328,16 +323,13 @@ def generate_script(topic, analytics_data=None, feedback_summary=""):
     - Zero filler words. Every word must deliver high dopamine intrigue.
 
     MANDATORY COMMENT-DRIVING TRIGGER (NON-NEGOTIABLE):
-    The FINAL sentence of Scene 3 MUST include a direct question or poll that forces viewers to comment.
-    CRITICAL: This is what will push your engagement from 2.4% to 3-5%.
+    The FINAL sentence MUST include a direct question or poll that forces viewers to comment.
     Structure: [Controversial Statement] + [Direct Yes/No Question]
     Examples:
-    - 'Tum sochte ho ye testing hai ya genuine interest? Comment karo: Testing / Genuine / Confused'
+    - 'Tum sochte ho ye testing hai ya genuine interest? Comment karo: Testing / Genuine'
     - 'Guilty or innocent? Batao comments mein.'
-    - 'Agar ye tum par hua, toh tum kya karenfe? Share your move in comments.'
-    - 'Mujhe batao: Tumhara last relationship yahi reason se khatam hua ya kuch aur? Comment.'
-    ALSO include one share line: 'Send this to [type of person] who needs to hear it.'
-    Pattern: [Direct Question in comments] + [Share trigger] = maximum engagement.
+    - 'Agar ye tum par hua, toh tum kya karoge? Share your move in comments.'
+    ALSO include one share line: 'Send this to a friend who needs to hear it.'
 
     PATTERN INTERRUPT:
     - Each scene MUST feel visually and tonally distinct from the others
@@ -467,9 +459,46 @@ _TOPIC_TIER1B_MIRROR = [
     "subconscious mirroring — her body is saying what her words won't",
 ]
 
-# TIER 2 — GOOD (1.5K views, proven but not top-tier)
+# ── Topic sub-category pools for maximum retention & viral reach ──────
+# Based on REAL analytics (July 2026):
+# TIER 1A — Friendzone/Situationship/Mixed Signals: 2.5K-6.3K views (HIGHEST VIEWS)
+# TIER 1B — Mirror Psychology & Eye Contact Secrets: 1.5K-3.5K views (HIGHEST SHARE RATE)
+
+_TOPIC_TIER1A_FRIENDZONE = [
+    "friendzone psychology — how to spot it, escape it, or use it",
+    "situationship vs friendzone — how to decode where you really stand",
+    "different stages of a relationship and what each stage reveals",
+    "friendship to love — signs she wants more than just being friends",
+    "stuck in friendzone? psychology of why and how to break out",
+    "situationship red flags — signs you're being kept as a backup",
+    "how to know if she sees you as a friend or something more",
+    "the hidden stage before a relationship that most guys miss",
+    "why girls keep certain guys in the friendzone deliberately",
+    "from talking stage to relationship — what signals matter most",
+    "friendzone test — 3 signs that tell you exactly where you stand",
+    "situationship psychology — why it feels like a relationship but isn't",
+    "how friendships turn into love — the psychology behind it",
+    "mixed signals or friendzone — how to tell the real difference",
+    "the moment she decides you're just a friend — and how to reverse it",
+    "signs she's keeping you as a backup — not as the one",
+    "Part 2: Escape The Friendzone Using This One Shift",
+    "Part 2: Situationship Exit — How to Make Her Choose",
+]
+
+_TOPIC_TIER1B_MIRROR = [
+    "mirror effect psychology — when she copies your behavior it means THIS",
+    "she copies your words gestures energy — what her mirror behavior reveals",
+    "mirror psychology test — does she subconsciously mirror you right now",
+    "body mirroring — the one signal most guys completely miss",
+    "when she starts copying YOU — what the psychology says about attraction",
+    "why girls mirror the guy they like without even knowing it",
+    "Part 2: Mirror Test — 3 Ways To Check If She's Mirroring You",
+    "subconscious mirroring — her body is saying what her words won't",
+]
+
 _TOPIC_TIER2_HIGH = [
     "eye contact secrets — what her first glance really reveals",
+    "eye contact trap — why girls look away when you catch them watching",
     "texting psychology — what her reply speed actually means",
     "jealousy test — one move to check if she genuinely cares",
     "signs she's attracted but hiding it — body language tell",
@@ -479,75 +508,9 @@ _TOPIC_TIER2_HIGH = [
     "her smile decoded — the difference between polite and genuine",
 ]
 
-# TIER 3 — HORROR, THRILLER & MYSTERY (Primary Viral Focus)
-_TOPIC_TIER3_EXPLORE = [
-    "creepy psychological facts that will keep you awake at night",
-    "unsolved mysteries that scientists still cannot explain",
-    "the most haunted places where people disappeared without a trace",
-    "dark psychology secrets about human fear and terror",
-    "creepy things that happen in the deep ocean that sound fake but are real",
-    "glitch in the matrix real life scary stories people experienced",
-    "disturbing facts about dreams sleep paralysis and shadow figures",
-    "real life unsolved vanishing cases that terrify researchers",
-    "creepy psychological phenomena that explain why you feel watched",
-    "terrifying historical incidents that were erased from history books",
-    "the terrifying mystery of skinwalkers and eerie forest encounters",
-    "disturbing deep web mysteries that remain unsolved today",
-    "scariest psychological experiments ever conducted on humans",
-    "creepy space facts that prove how terrifying the universe really is",
-    "unexplained audio signals from space and the deep sea",
-    "horrifying true paranormal stories documented by emergency services",
-    "the eerie phenomenon of deja vu and dark memory loops",
-    "creepy urban legends that turned out to be completely real",
-    "disturbing brain facts: what happens when your mind plays tricks on you",
-    "unsolved cryptid encounters caught on camera that defy science",
-]
-
-# PROVEN DEAD — NEVER USE AGAIN (based on analytics data)
-# - "Her Smile Lies" (posted twice: 133 views + 541 views) — topic is exhausted
-# - "Magnetic Presence / charisma" (127 views, 2 interactions)
-# - "Secret Touch" (generic, no specific signal)
-# - "Micro-Expression" (tutorial feel, doesn't trigger shares)
-# - "Text Ignore" (138 views despite afternoon post)
-
-
-# ── Anti-Consecutive Topic Rotation System ──────────────────────────────
-_PILLAR_STATE_FILE = os.path.join("data", "last_topic_pillar.txt")
-
-def _get_next_topic_pillar():
-    """
-    Guarantees strict alternating rotation between two core content pillars so that
-    no two consecutive reels are ever of the same type:
-    - Pillar 1: 'horror_mystery' (Horror, Thriller, Unsolved Mysteries, Creepy Facts)
-    - Pillar 2: 'women_psychology' (Female/Women Psychology, Attraction Signals, Relationship Secrets)
-    """
-    last_pillar = ""
-    try:
-        if os.path.exists(_PILLAR_STATE_FILE):
-            with open(_PILLAR_STATE_FILE, "r") as f:
-                last_pillar = f.read().strip().lower()
-    except (ValueError, OSError):
-        pass
-
-    if last_pillar == "horror_mystery":
-        next_pillar = "women_psychology"
-    else:
-        next_pillar = "horror_mystery"
-
-    try:
-        os.makedirs("data", exist_ok=True)
-        with open(_PILLAR_STATE_FILE, "w") as f:
-            f.write(next_pillar)
-    except OSError:
-        pass
-
-    print(f"[TopicEngine] Anti-consecutive rotation: Selected pillar '{next_pillar}' (previous was '{last_pillar or 'none'}')")
-    return next_pillar
-
 
 def generate_topic_from_domain(domain, analytics_data=None, feedback_summary="", used_topics=None):
-    """Generate the next reel topic, alternating strictly between Horror/Thriller and Women Psychology."""
-    # Build deduplication context for the LLM
+    """Generate the next reel topic focused 100% on Female Psychology & Attraction Signals."""
     used_topics_set = used_topics or set()
     avoid_block = ""
     if used_topics_set:
@@ -558,39 +521,24 @@ CRITICAL: DO NOT suggest any of these recently used topics (they were already po
 The new topic must be clearly different in angle and hook style from all of the above.
 """
 
-    pillar = _get_next_topic_pillar()
+    women_topics_pool = _TOPIC_TIER1A_FRIENDZONE + _TOPIC_TIER1B_MIRROR + _TOPIC_TIER2_HIGH
+    subcategory = random.choice(women_topics_pool)
 
-    if pillar == "horror_mystery":
-        subcategory = random.choice(_TOPIC_TIER3_EXPLORE)
-        pillar_instructions = """
-Target Pillar: HORROR, THRILLER, UNSOLVED MYSTERIES & CREEPY FACTS
+    pillar_instructions = """
+Target Niche: FEMALE & WOMEN PSYCHOLOGY, ATTRACTION SECRETS, EYE CONTACT & RELATIONSHIP SIGNALS
 Task guidelines:
-1. Focus strictly on scary psychological facts, unsolved mysteries, haunted locations, eerie phenomena, ocean/space horror, or glitch-in-the-matrix stories.
-2. Must create instant fear, suspense, or chilling curiosity.
-3. Examples (don't copy directly):
-   - Duniya ki sabse bhutiya jagah jahan se koi wapas nahi aaya
-   - 3 creepy facts jo tumhe aaj raat sone nahi denge
-   - Sleep paralysis ka dark secret jo koi nahi batata
-   - Science ke paas bhi is khaufnak mystery ka koi jawab nahi hai
-"""
-    else:
-        women_topics_pool = _TOPIC_TIER1A_FRIENDZONE + _TOPIC_TIER1B_MIRROR + _TOPIC_TIER2_HIGH
-        subcategory = random.choice(women_topics_pool)
-        pillar_instructions = """
-Target Pillar: FEMALE & WOMEN PSYCHOLOGY, ATTRACTION SECRETS & RELATIONSHIP SIGNALS
-Task guidelines:
-1. Focus on female/women psychology, subconscious body language signals, attraction secrets, mirror effect, or decoding mixed signals.
+1. Focus strictly on female/women psychology, subconscious body language signals, attraction secrets, mirror effect, eye contact traps, or decoding mixed signals.
 2. Must create intense curiosity about female behavior and relationship dynamics.
-3. Examples (don't copy directly):
-   - Ye cheez ladkiyan kabhi seedhe nahi batati
-   - 3 body language signs jo batati hain ke wo interested hai
-   - Mirror effect psychology — jab wo tumhari tarah act karti hai
-   - Mixed signals ya friendzone — kaise pata karein
+3. Proven Top-Performing Angles (model after these):
+   - Her Mixed Signals: Testing or Friendzoning?
+   - Eye Contact Trap: The REAL Unlock!
+   - Mirror Effect Psychology — Jab wo tumhari tarah act karti hai
+   - Ye 3 signs jo batati hain ke wo interested hai
 """
 
     prompt = f"""
 You are a short-form content strategist specialized in viral Instagram Reels. 
-Your target audience is viewers on Indian Instagram who love engaging, high-curiosity short reels.
+Your target audience is young men (18-30) on Indian Instagram who want female psychology, attraction secrets, and relationship signals deciphered.
 
 Primary domain: "{domain}"
 Today's angle/subcategory focus: "{subcategory}"
@@ -600,9 +548,9 @@ Historical feedback summary: {feedback_summary or 'No data yet'}
 
 Task:
 Propose exactly ONE topic idea for the next Instagram Reel that:
-1. Strictly adheres to today's Target Pillar guidelines listed above
-2. Has EXTREMELY STRONG hook potential
-3. Is bold, engaging, and Instagram-safe
+1. Strictly adheres to today's Target Niche guidelines listed above
+2. Has EXTREMELY STRONG hook potential for views and shares
+3. Is bold, engaging, street-smart, and Instagram-safe
 4. Is DIFFERENT from the recently used topics listed above
 
 Return only a single plain-text topic line, max 12 words, no quotes, no numbering.

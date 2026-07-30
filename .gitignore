@@ -41,3 +41,6 @@ insta_session.json
 # Dev/test scripts — not part of production pipeline
 test_*.py
 upload_to_make.py
+
+# Kaggle server scripts with hardcoded secrets — NEVER commit
+kaggle_infinitetalk_server.py

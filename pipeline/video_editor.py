@@ -515,39 +515,39 @@ def _create_follow_cta(duration=2.5, size=(1080, 1920)):
 _BG_MUSIC_POOL = {
     "horror": [
         # Track 1: from env var (user-configured)
-        {"url_env": "HORROR_BG_MUSIC_URL", "filename": "bg_horror_1.mp3", "volume": 0.09,
+        {"url_env": "HORROR_BG_MUSIC_URL", "filename": "bg_horror_1.mp3", "volume": 0.28,
          "fallback_url": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Gathering%20Darkness.mp3"},
         # Track 2-5: royalty-free horror/dark tracks
         {"url": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Dark%20Fog.mp3",
-         "filename": "bg_horror_2.mp3", "volume": 0.09},
+         "filename": "bg_horror_2.mp3", "volume": 0.28},
         {"url": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Exhilarate.mp3",
-         "filename": "bg_horror_3.mp3", "volume": 0.09},
+         "filename": "bg_horror_3.mp3", "volume": 0.28},
         {"url": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Floating%20Cities.mp3",
-         "filename": "bg_horror_4.mp3", "volume": 0.09},
+         "filename": "bg_horror_4.mp3", "volume": 0.28},
         {"url": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Night%20Cave.mp3",
-         "filename": "bg_horror_5.mp3", "volume": 0.09},
+         "filename": "bg_horror_5.mp3", "volume": 0.28},
     ],
     "girl": [
         # Track 1: from env var (user-configured, currently Mesmerize)
-        {"url_env": "GIRL_BG_MUSIC_URL", "filename": "bg_girl_1.mp3", "volume": 0.09,
+        {"url_env": "GIRL_BG_MUSIC_URL", "filename": "bg_girl_1.mp3", "volume": 0.26,
          "fallback_url": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Mesmerize.mp3"},
         # Track 2-5: royalty-free romantic/chill/atmospheric tracks
         {"url": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Chill%20Wave.mp3",
-         "filename": "bg_girl_2.mp3", "volume": 0.09},
+         "filename": "bg_girl_2.mp3", "volume": 0.26},
         {"url": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Heartbreaking.mp3",
-         "filename": "bg_girl_3.mp3", "volume": 0.09},
+         "filename": "bg_girl_3.mp3", "volume": 0.26},
         {"url": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Midnight%20Ride.mp3",
-         "filename": "bg_girl_4.mp3", "volume": 0.09},
+         "filename": "bg_girl_4.mp3", "volume": 0.26},
         {"url": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Relaxing%20Piano%20Music.mp3",
-         "filename": "bg_girl_5.mp3", "volume": 0.09},
+         "filename": "bg_girl_5.mp3", "volume": 0.26},
     ],
     "default": [
         {"url": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Chill%20Wave.mp3",
-         "filename": "bg_default_1.mp3", "volume": 0.09},
+         "filename": "bg_default_1.mp3", "volume": 0.26},
         {"url": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Mesmerize.mp3",
-         "filename": "bg_default_2.mp3", "volume": 0.09},
+         "filename": "bg_default_2.mp3", "volume": 0.26},
         {"url": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Floating%20Cities.mp3",
-         "filename": "bg_default_3.mp3", "volume": 0.09},
+         "filename": "bg_default_3.mp3", "volume": 0.26},
     ],
 }
 
