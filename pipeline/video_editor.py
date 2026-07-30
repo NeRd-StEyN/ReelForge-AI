@@ -1063,13 +1063,14 @@ def create_video(scenes, voiceovers, visuals, output_file, word_timeline=None, c
             preset="medium",
         )
 
-        # Generate cover thumbnail from first scene title
-        title_for_thumb = scenes[0].get("text", "")[:60] if scenes else ""
+        # Generate cover thumbnail image for Instagram Story auto-posting
         thumb_path = output_file.replace(".mp4", "_thumbnail.jpg")
         try:
-            generate_thumbnail(title_for_thumb, output_path=thumb_path)
+            print(f"[Thumbnail] Saving cover thumbnail image frame to: {thumb_path}")
+            final_video.save_frame(thumb_path, t=min(1.0, max(0.1, final_video.duration * 0.1)))
+            print("[Thumbnail] ✅ Cover thumbnail image created successfully!")
         except Exception as e:
-            print(f"[Thumbnail] Warning: could not generate thumbnail: {e}")
+            print(f"[Thumbnail] Warning: could not generate thumbnail frame: {e}")
 
         return output_file
     
@@ -1129,4 +1130,12 @@ def create_video(scenes, voiceovers, visuals, output_file, word_timeline=None, c
         threads=4,
         preset="medium",  # Better quality compression than ultrafast.
     )
+
+    thumb_path = output_file.replace(".mp4", "_thumbnail.jpg")
+    try:
+        final_video.save_frame(thumb_path, t=min(1.0, max(0.1, final_video.duration * 0.1)))
+        print("[Thumbnail] ✅ Cover thumbnail image created successfully!")
+    except Exception as e:
+        print(f"[Thumbnail] Warning: could not generate thumbnail frame: {e}")
+
     return output_file

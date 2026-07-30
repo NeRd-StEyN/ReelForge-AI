@@ -77,7 +77,7 @@ def main(topic, feedback_summary="", tts_voice_override=None, insta_client=None,
             print(f"[Analytics] Live data fetched via Python: {len(analytics_data)} reels.")
             domain = os.getenv(
                 "CONTENT_DOMAIN",
-                "horror thrillers, unsolved mysteries, dark psychology, creepy facts, and urban legends",
+                "female psychology, attraction secrets, body language signals, eye contact secrets, and relationship dynamics",
             )
             append_analytics_snapshot(domain, analytics_data)
         else:
@@ -161,7 +161,7 @@ def main(topic, feedback_summary="", tts_voice_override=None, insta_client=None,
             full_narration_text,
             full_narration_path,
             voice=tts_voice,
-            rate="-5%",  # Suspenseful dramatic narration pacing
+            rate="+0%",
         )
         voice_input = full_narration_path
     else:
