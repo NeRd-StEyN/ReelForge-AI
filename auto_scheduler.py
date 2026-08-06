@@ -14,7 +14,7 @@ from pipeline.feedback_loop import (
     load_used_topics,
     save_used_topic,
 )
-from pipeline.make_handler import retry_pending_posts, check_make_webhook_health
+from pipeline.make_handler import retry_pending_posts, check_make_webhook_health, fetch_analytics_from_make
 from pipeline.insta_handler import get_insta_client, get_performance_data
 from pipeline.script_gen import generate_topic_from_domain
 
@@ -199,13 +199,21 @@ def create_and_post_one_reel():
             insta_cl = None  # Keep the client alive for story posting later
             if _env_flag("ENABLE_INSTAGRAM_ANALYTICS", "true"):
                 if _should_fetch_analytics_today():
-                    insta_cl = get_insta_client()
-                    if insta_cl:
-                        print("[Analytics] Instagram client authenticated. Fetching live analytics...")
-                        analytics_data = get_performance_data(insta_cl)
+                    # ── Priority 1: Make.com analytics (official Graph API, no cloud IP blocks) ──
+                    print("[Analytics] Trying Make.com analytics first (cloud-IP-safe)...")
+                    analytics_data = fetch_analytics_from_make()
+                    if analytics_data:
+                        print(f"[Analytics] ✅ Make.com analytics fetched: {len(analytics_data)} reels.")
                     else:
-                        print("[Analytics] Instagram client not available (session missing/expired).")
-                        print("[Analytics] To fix: Run 'python generate_session.py' locally, then update INSTA_SESSION GitHub Secret.")
+                        # ── Priority 2: Direct instagrapi (works if session is fresh & IP not blocked) ──
+                        print("[Analytics] Make.com returned no data. Trying direct instagrapi fallback...")
+                        insta_cl = get_insta_client()
+                        if insta_cl:
+                            print("[Analytics] Instagram client authenticated. Fetching live analytics...")
+                            analytics_data = get_performance_data(insta_cl)
+                        else:
+                            print("[Analytics] Instagram client not available (session missing/expired).")
+                            print("[Analytics] To fix: Run 'python generate_session.py' locally, then update INSTA_SESSION GitHub Secret.")
                     # Mark it fetched AFTER the attempt (not before) so if the runner
                     # crashes mid-run, the next scheduled run will retry today.
                     _mark_analytics_fetched_today()
