@@ -214,9 +214,12 @@ def create_and_post_one_reel():
                         else:
                             print("[Analytics] Instagram client not available (session missing/expired).")
                             print("[Analytics] To fix: Run 'python generate_session.py' locally, then update INSTA_SESSION GitHub Secret.")
-                    # Mark it fetched AFTER the attempt (not before) so if the runner
-                    # crashes mid-run, the next scheduled run will retry today.
-                    _mark_analytics_fetched_today()
+                    if isinstance(analytics_data, list) and analytics_data:
+                        # ✅ Success — mark fetched so 2nd run skips (saves credits)
+                        _mark_analytics_fetched_today()
+                    else:
+                        # ❌ Both sources failed — do NOT mark, so 2nd run retries automatically
+                        print("[Analytics] Both Make.com and instagrapi failed. 2nd run will retry.")
                 else:
                     print("[Analytics] Already fetched analytics today. Skipping to avoid rate limits.")
                     # Still try to get an insta client for story posting even if we skip analytics
