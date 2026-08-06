@@ -244,9 +244,28 @@ def _prepare_visual_clip(visual_path, duration):
     # Ken Burns slow zoom (1.0x -> 1.12x) for dynamic feel -- prevents static boring look.
     zoom_start = 1.0
     zoom_end = 1.12
-    clip = clip.resize(lambda t: zoom_start + (zoom_end - zoom_start) * (t / max(0.1, duration)))
-    # Re-crop to 1080x1920 after zoom to keep frame size consistent.
-    clip = clip.resize((1080, 1920))
+    # Apply dynamic zoom scaling over time
+    clip = clip.fl(lambda gf, t: Image.fromarray(gf(t)).resize(
+        (int(1080 * (zoom_start + (zoom_end - zoom_start) * (t / max(0.1, duration)))),
+         int(1920 * (zoom_start + (zoom_end - zoom_start) * (t / max(0.1, duration))))),
+        resample=Image.LANCZOS
+    ).crop((
+        (int(1080 * (zoom_start + (zoom_end - zoom_start) * (t / max(0.1, duration)))) - 1080) // 2,
+        (int(1920 * (zoom_start + (zoom_end - zoom_start) * (t / max(0.1, duration)))) - 1920) // 2,
+        (int(1080 * (zoom_start + (zoom_end - zoom_start) * (t / max(0.1, duration)))) - 1080) // 2 + 1080,
+        (int(1920 * (zoom_start + (zoom_end - zoom_start) * (t / max(0.1, duration)))) - 1920) // 2 + 1920
+    )).getdata() if False else np.array(
+        Image.fromarray(gf(t)).resize(
+            (int(1080 * (zoom_start + (zoom_end - zoom_start) * (t / max(0.1, duration)))),
+             int(1920 * (zoom_start + (zoom_end - zoom_start) * (t / max(0.1, duration))))),
+            resample=Image.BICUBIC
+        ).crop((
+            (int(1080 * (zoom_start + (zoom_end - zoom_start) * (t / max(0.1, duration)))) - 1080) // 2,
+            (int(1920 * (zoom_start + (zoom_end - zoom_start) * (t / max(0.1, duration)))) - 1920) // 2,
+            (int(1080 * (zoom_start + (zoom_end - zoom_start) * (t / max(0.1, duration)))) - 1080) // 2 + 1080,
+            (int(1920 * (zoom_start + (zoom_end - zoom_start) * (t / max(0.1, duration)))) - 1920) // 2 + 1920
+        ))
+    ))
 
     # Apply cinematic colour grade for professional look
     clip = _apply_cinematic_grade(clip)
@@ -314,8 +333,9 @@ def _create_progress_bar_clip(total_duration, size=(1080, 1920), bar_height=8, c
                            fill=(255, 255, 255, 160))
         return np.array(img)
 
+    from moviepy.editor import VideoClip
     bar_clip = (
-        ImageClip(make_bar_frame, ismask=False, duration=total_duration)
+        VideoClip(make_bar_frame, duration=total_duration)
         .set_duration(total_duration)
     )
     return bar_clip

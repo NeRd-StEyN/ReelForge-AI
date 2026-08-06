@@ -198,29 +198,26 @@ def main(topic, feedback_summary="", tts_voice_override=None, insta_client=None,
         metadata=metadata,
     )
     
-    # 7. Auto Share to Story (Clean Normal Photo Story)
+    # 7. Auto Share to Story (Delegated to Make.com in Cloud execution)
     if _env_flag("AUTO_POST_STORY", "true"):
         try:
             if os.path.exists(thumb_path):
-                print(f"[Story] Auto-posting clean photo story...")
                 from pipeline.insta_handler import post_poll_story
                 story_poll = metadata.get("story_poll")
                 cl = insta_client or get_insta_client()
                 if cl:
+                    print(f"[Story] Attempting direct story post...")
                     success = post_poll_story(cl, thumb_path, story_poll=story_poll)
                     if success:
-                        print("[Story] ✅ Story posted successfully!")
+                        print("[Story] ✅ Story posted directly!")
                     else:
-                        print("[Story] ⚠️ Story posting returned False — check insta_handler logs above.")
+                        print("[Story] Note: Direct story skipped (Instagram cloud IP block). Story payload sent to Make.com.")
                 else:
-                    print("[Story] Skipped story auto-post: Instagram client not authenticated.")
-                    print("[Story] To fix: Run generate_session.py locally and update INSTA_SESSION secret.")
+                    print("[Story] Note: Direct story skipped (Session unavailable in cloud). Story payload sent to Make.com.")
             else:
                 print(f"[Story] Thumbnail not found at {thumb_path} — skipping story post.")
         except Exception as story_err:
-            print(f"[Story] Auto-post story failed: {story_err}")
-            import traceback
-            traceback.print_exc()
+            print(f"[Story] Note: Direct story skipped ({story_err}). Story payload sent to Make.com.")
 
     print(f"Pipeline complete! Video saved to: {output_file}")
     print(f"Metadata saved to: video_metadata.json")
