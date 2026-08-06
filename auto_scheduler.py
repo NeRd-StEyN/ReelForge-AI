@@ -229,8 +229,13 @@ def create_and_post_one_reel():
                 append_analytics_snapshot(domain, analytics_data)
                 _reset_analytics_fail_counter()
             elif analytics_data is None and not _should_fetch_analytics_today():
-                # We skipped fetching because we already fetched today. That's fine, no failure.
-                pass
+                # 2nd run of the day — load today's already-saved snapshot from history
+                # so main.py gets real data and doesn't try instagrapi again.
+                from pipeline.feedback_loop import _read_history
+                recent = _read_history(limit=1)
+                if recent and isinstance(recent[-1].get("analytics"), list):
+                    analytics_data = recent[-1]["analytics"]
+                    print(f"[Analytics] 2nd run: using today's cached snapshot ({len(analytics_data)} reels) — no extra API call.")
             else:
                 _increment_analytics_fail_counter()
                 print("[Feedback] No live data to save. Will rely on existing history for feedback.")
