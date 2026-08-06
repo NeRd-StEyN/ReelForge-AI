@@ -446,22 +446,12 @@ def check_make_webhook_health() -> dict:
         status["message"] = "MAKE_WEBHOOK_URL not configured."
         return status
 
-    # Check analytics webhook
+    # Check analytics webhook — only verify it's configured, do NOT call it here.
+    # Calling it would trigger the full Make.com scenario and burn a credit.
+    # The actual fetch happens once per day via fetch_analytics_from_make().
     if not analytics_url:
         status["details"]["analytics"] = "MAKE_ANALYTICS_WEBHOOK_URL not set — feedback loop disabled."
     else:
-        try:
-            resp = requests.get(analytics_url, timeout=15)
-            if 200 <= resp.status_code < 300:
-                status["details"]["analytics"] = "[OK] Analytics webhook responding."
-            else:
-                status["details"]["analytics"] = f"[WARN] Analytics webhook returned {resp.status_code}"
-                # If analytics returns OAuth error text, flag it
-                body = resp.text.lower()
-                if "oauth" in body or "token" in body or "expired" in body:
-                    status["healthy"] = False
-                    status["message"] = "Instagram OAuth token may be expired. Reauthorize in Make.com."
-        except Exception as exc:
-            status["details"]["analytics"] = f"[FAIL] Analytics webhook unreachable: {exc}"
+        status["details"]["analytics"] = "[OK] Analytics webhook URL is configured."
 
     return status
