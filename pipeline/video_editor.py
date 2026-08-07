@@ -244,28 +244,19 @@ def _prepare_visual_clip(visual_path, duration):
     # Ken Burns slow zoom (1.0x -> 1.12x) for dynamic feel -- prevents static boring look.
     zoom_start = 1.0
     zoom_end = 1.12
-    # Apply dynamic zoom scaling over time
-    clip = clip.fl(lambda gf, t: Image.fromarray(gf(t)).resize(
-        (int(1080 * (zoom_start + (zoom_end - zoom_start) * (t / max(0.1, duration)))),
-         int(1920 * (zoom_start + (zoom_end - zoom_start) * (t / max(0.1, duration))))),
-        resample=Image.LANCZOS
-    ).crop((
-        (int(1080 * (zoom_start + (zoom_end - zoom_start) * (t / max(0.1, duration)))) - 1080) // 2,
-        (int(1920 * (zoom_start + (zoom_end - zoom_start) * (t / max(0.1, duration)))) - 1920) // 2,
-        (int(1080 * (zoom_start + (zoom_end - zoom_start) * (t / max(0.1, duration)))) - 1080) // 2 + 1080,
-        (int(1920 * (zoom_start + (zoom_end - zoom_start) * (t / max(0.1, duration)))) - 1920) // 2 + 1920
-    )).getdata() if False else np.array(
-        Image.fromarray(gf(t)).resize(
-            (int(1080 * (zoom_start + (zoom_end - zoom_start) * (t / max(0.1, duration)))),
-             int(1920 * (zoom_start + (zoom_end - zoom_start) * (t / max(0.1, duration))))),
-            resample=Image.BICUBIC
-        ).crop((
-            (int(1080 * (zoom_start + (zoom_end - zoom_start) * (t / max(0.1, duration)))) - 1080) // 2,
-            (int(1920 * (zoom_start + (zoom_end - zoom_start) * (t / max(0.1, duration)))) - 1920) // 2,
-            (int(1080 * (zoom_start + (zoom_end - zoom_start) * (t / max(0.1, duration)))) - 1080) // 2 + 1080,
-            (int(1920 * (zoom_start + (zoom_end - zoom_start) * (t / max(0.1, duration)))) - 1920) // 2 + 1920
-        ))
-    ))
+
+    def _ken_burns_frame(gf, t):
+        """Return an RGB uint8 numpy array of a zoomed+cropped frame."""
+        scale = zoom_start + (zoom_end - zoom_start) * (t / max(0.1, duration))
+        new_w = int(1080 * scale)
+        new_h = int(1920 * scale)
+        pil_img = Image.fromarray(gf(t)).convert("RGB").resize((new_w, new_h), resample=Image.BICUBIC)
+        left = (new_w - 1080) // 2
+        top = (new_h - 1920) // 2
+        pil_img = pil_img.crop((left, top, left + 1080, top + 1920))
+        return np.array(pil_img)
+
+    clip = clip.fl(_ken_burns_frame, apply_to="mask")
 
     # Apply cinematic colour grade for professional look
     clip = _apply_cinematic_grade(clip)
@@ -317,28 +308,34 @@ def _create_progress_bar_clip(total_duration, size=(1080, 1920), bar_height=8, c
     
     Psychologically proven to increase watch time: viewers subconsciously want
     to 'finish' the bar. Placed at the very bottom edge of the frame.
+    The clip uses separate RGB + mask channels so MoviePy compositing never
+    tries to blit a 4-channel RGBA array into a 3-channel RGB buffer.
     """
-    def make_bar_frame(t):
+    def _make_rgba(t):
         img = Image.new('RGBA', size, (0, 0, 0, 0))
         draw = ImageDraw.Draw(img)
-        progress = min(1.0, t / max(0.1, total_duration))
+        progress = min(1.0, max(0.0, t / max(0.1, total_duration)))
         bar_width = int(size[0] * progress)
         bar_y = size[1] - bar_height - 2
         if bar_width > 0:
-            # Main bar
+            # Main neon bar
             draw.rectangle([0, bar_y, bar_width, bar_y + bar_height], fill=color + (220,))
-            # Bright leading edge glow
+            # Bright leading-edge glow
             glow_x = max(0, bar_width - 6)
             draw.rectangle([glow_x, bar_y - 1, bar_width, bar_y + bar_height + 1],
                            fill=(255, 255, 255, 160))
-        return np.array(img)
+        return np.array(img)   # shape (H, W, 4)
+
+    def make_rgb(t):
+        return _make_rgba(t)[:, :, :3]   # (H, W, 3) — RGB only
+
+    def make_mask(t):
+        return _make_rgba(t)[:, :, 3] / 255.0  # (H, W) — float mask
 
     from moviepy.editor import VideoClip
-    bar_clip = (
-        VideoClip(make_bar_frame, duration=total_duration)
-        .set_duration(total_duration)
-    )
-    return bar_clip
+    rgb_clip  = VideoClip(make_rgb,  duration=total_duration).set_duration(total_duration)
+    mask_clip = VideoClip(make_mask, ismask=True, duration=total_duration).set_duration(total_duration)
+    return rgb_clip.set_mask(mask_clip)
 
 
 def _create_flash_frame(duration=0.08, size=(1080, 1920)):
