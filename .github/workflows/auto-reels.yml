@@ -4,9 +4,9 @@ on:
   workflow_dispatch:
   schedule:
     # TIER 1 SLOTS — PROVEN TOP PERFORMERS
-    # 11:00 IST = 05:30 UTC — Morning peak (fresh scroll, high engagement)
+    # 11:00 IST = 05:30 UTC — Morning peak (fetch analytics ONCE here)
     - cron: '30 5 * * *'
-    # 20:00 IST = 14:30 UTC — Evening peak (break time scroll)
+    # 20:00 IST = 14:30 UTC — Evening peak (NO analytics fetch — already used today's credits)
     - cron: '30 14 * * *'
 
 jobs:
@@ -24,8 +24,11 @@ jobs:
       CLOUDINARY_CLOUD_NAME: ${{ secrets.CLOUDINARY_CLOUD_NAME }}
       CLOUDINARY_API_KEY: ${{ secrets.CLOUDINARY_API_KEY }}
       CLOUDINARY_API_SECRET: ${{ secrets.CLOUDINARY_API_SECRET }}
-      MAKE_ANALYTICS_WEBHOOK_URL: ${{ secrets.MAKE_ANALYTICS_WEBHOOK_URL }}
+      # MAKE_ANALYTICS_WEBHOOK_URL is injected selectively per-step (see below).
+      # Keeping it absent here ensures no step accidentally inherits the live key.
       INSTA_SESSION: ${{ secrets.INSTA_SESSION }}
+      # Raw secret stored separately — only the morning step will export it.
+      _MAKE_ANALYTICS_WEBHOOK_SECRET: ${{ secrets.MAKE_ANALYTICS_WEBHOOK_URL }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -47,6 +50,7 @@ jobs:
             data/analytics_fail_count.txt
             data/last_analytics_fetch.txt
             data/last_topic_pillar.txt
+            data/make_analytics_lock.txt
           key: reelforge-data-${{ github.ref_name }}
           restore-keys: |
             reelforge-data-
@@ -68,6 +72,23 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
+      - name: Set analytics URL (morning run only)
+        # Passes the real webhook URL only if:
+        #  a) this is the scheduled morning cron (05:30 UTC), OR
+        #  b) this is a workflow_dispatch AND the current UTC hour is before noon.
+        # In all other cases MAKE_ANALYTICS_WEBHOOK_URL stays empty — the Python
+        # hard lock inside fetch_analytics_from_make is the final safety net.
+        run: |
+          HOUR=$(date -u +%H | sed 's/^0//')
+          SCHEDULE="${{ github.event.schedule }}"
+          if [ "$SCHEDULE" = "30 5 * * *" ] || { [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "$HOUR" -lt 12 ]; }; then
+            echo "MAKE_ANALYTICS_WEBHOOK_URL=$_MAKE_ANALYTICS_WEBHOOK_SECRET" >> $GITHUB_ENV
+            echo "[Analytics] Morning window detected — analytics URL exported."
+          else
+            echo "MAKE_ANALYTICS_WEBHOOK_URL=" >> $GITHUB_ENV
+            echo "[Analytics] Evening/non-morning run — analytics URL suppressed (0 Make credits)."
+          fi
+
       - name: Generate and post one reel
         run: |
           python auto_scheduler.py --mode batch --count 1
@@ -86,4 +107,5 @@ jobs:
             data/analytics_fail_count.txt
             data/last_analytics_fetch.txt
             data/last_topic_pillar.txt
+            data/make_analytics_lock.txt
           key: reelforge-data-${{ github.ref_name }}-${{ github.run_id }}

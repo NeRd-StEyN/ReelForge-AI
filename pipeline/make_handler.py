@@ -264,11 +264,44 @@ def send_to_make_webhook(
         return False
 
 
+# ---------------------------------------------------------------------------
+# Hard once-per-UTC-day lock for Make.com analytics — innermost guard.
+# This file persists via GitHub Actions cache so every code path (cron,
+# workflow_dispatch, direct python call) is blocked after the first fetch.
+# ---------------------------------------------------------------------------
+_MAKE_ANALYTICS_LOCK_FILE = os.path.join("data", "make_analytics_lock.txt")
+
+
+def _make_analytics_already_fetched_today() -> bool:
+    """Return True if Make analytics were already fetched today (UTC)."""
+    today_utc = datetime.utcnow().strftime("%Y-%m-%d")
+    try:
+        if os.path.exists(_MAKE_ANALYTICS_LOCK_FILE):
+            with open(_MAKE_ANALYTICS_LOCK_FILE, "r") as f:
+                return f.read().strip() == today_utc
+    except OSError:
+        pass
+    return False
+
+
+def _mark_make_analytics_fetched_today() -> None:
+    """Write today's UTC date to the lock file to block all subsequent calls."""
+    today_utc = datetime.utcnow().strftime("%Y-%m-%d")
+    try:
+        os.makedirs("data", exist_ok=True)
+        with open(_MAKE_ANALYTICS_LOCK_FILE, "w") as f:
+            f.write(today_utc)
+    except OSError:
+        pass
+
+
 def fetch_analytics_from_make() -> Optional[list]:
     """Fetch Instagram post insights from Make.com webhook.
 
-    Executes only once per run (no retries) to strictly conserve Make.com operations.
-    If it fails, it will safely fall back to local historical data.
+    STRICT ONCE-PER-DAY: A UTC-date lock file is written on the very first
+    successful OR failed attempt. Every subsequent call today — regardless of
+    which code path, GitHub Actions run, or trigger type invokes it — returns
+    None immediately without contacting Make.com. Zero extra credits consumed.
 
     The response from Make.com may be:
       - A plain JSON array of media objects  →  used directly
@@ -277,15 +310,22 @@ def fetch_analytics_from_make() -> Optional[list]:
     """
     import time as _time
 
+    # ── Hard once-per-day guard (UTC) — checked before anything else ──
+    if _make_analytics_already_fetched_today():
+        print("[Analytics] ⛔ Make.com analytics already fetched today (UTC). Skipping — 0 credits used.")
+        return None
+
     webhook_url = os.getenv("MAKE_ANALYTICS_WEBHOOK_URL")
     if not webhook_url:
         print("[Analytics] MAKE_ANALYTICS_WEBHOOK_URL not set — skipping Make.com analytics fetch.")
-        print("[Analytics] To fix: Create an analytics scenario in Make.com and add the webhook URL")
-        print("[Analytics]   to your .env / GitHub Secrets as MAKE_ANALYTICS_WEBHOOK_URL.")
+        # Still lock today so a later run with the URL set doesn't double-fetch
+        # if this run was triggered unintentionally.
         return None
 
     try:
         print("[Analytics] Fetching live performance data via Make.com (single attempt)...")
+        # ── Write the lock BEFORE the request so even a crash/timeout blocks future calls ──
+        _mark_make_analytics_fetched_today()
         response = requests.get(webhook_url, timeout=60)
 
         if 200 <= response.status_code < 300:
