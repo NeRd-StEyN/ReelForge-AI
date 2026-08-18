@@ -7,10 +7,13 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# ── OpenRouter model config ──────────────────────────────
-_OPENROUTER_PRIMARY_MODEL = os.getenv("OPENROUTER_MODEL", "openrouter/free")
-_fallback_env = os.getenv("OPENROUTER_FALLBACK_MODELS", "google/gemma-4-31b-it:free,nvidia/nemotron-3.5-lightning:free,poolside/laguna-s-2.1:free")
-_OPENROUTER_FALLBACK_MODELS = [m.strip() for m in _fallback_env.split(",") if m.strip()]
+# ── OpenRouter model config (hardcoded) ──────────────────────────────
+_OPENROUTER_PRIMARY_MODEL = "google/gemini-2.5-flash"
+_OPENROUTER_FALLBACK_MODELS = [
+    "openai/gpt-4o-mini",
+    "google/gemini-2.0-pro-exp-02-05:free",
+    "meta-llama/llama-3.3-70b-instruct:free",
+]
 _OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1/chat/completions"
 
 
