@@ -156,7 +156,10 @@ Rules:
 Return ONLY the comment text, nothing else.
 """
     try:
-        return _llm_prompt(prompt).strip()
+        result = _llm_prompt(prompt).strip()
+        if not result:
+            raise ValueError("LLM returned empty string")
+        return result
     except Exception:
         fallbacks = [
             "Friendzone exist hi nahi karta — ye sirf ek excuse hai. Sach ya jhooth? 👇",
