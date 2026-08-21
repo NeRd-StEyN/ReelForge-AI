@@ -34,6 +34,28 @@ def _safe_text(value, fallback: str = "") -> str:
     return text
 
 
+def _safe_comment_text(value, max_len: int = 2000) -> str:
+    """Sanitize a comment string for Instagram's API.
+
+    Instagram comment API rejects:
+    - Empty or whitespace-only strings  → return ""
+    - Strings longer than ~2200 chars   → truncate safely
+    - Strings with only emojis or symbols (low text signal) → return ""
+    The caller must check `if not result` and skip posting the comment.
+    """
+    if value is None:
+        return ""
+    if isinstance(value, float) and math.isnan(value):
+        return ""
+    text = str(value).strip()
+    if not text or text.lower() == "nan":
+        return ""
+    # Truncate to safe length (Instagram hard limit ~2200 chars)
+    if len(text) > max_len:
+        text = text[:max_len].rsplit(" ", 1)[0]  # cut at word boundary
+    return text
+
+
 # ---------------------------------------------------------------------------
 # Pending posts — save / load / retry
 # ---------------------------------------------------------------------------
@@ -201,7 +223,7 @@ def send_to_make_webhook(
         caption = f"{safe_title}\n\n{safe_text}".strip()
         metadata = metadata if isinstance(metadata, dict) else {}
         hashtags = metadata.get("hashtags") or []
-        first_comment = _safe_text(metadata.get("first_comment"), "")
+        first_comment = _safe_comment_text(metadata.get("first_comment"))
 
         payload = {
             "url": video_url,
@@ -213,6 +235,11 @@ def send_to_make_webhook(
             "title": safe_title,
             # Story posting: tell Make.com to also post the thumbnail as a Story
             "post_story": True,
+            # CRITICAL: Tell Make.com's comment module to wait this many seconds
+            # after the reel is created before posting the first comment.
+            # Instagram error 9008 occurs when the comment is posted before
+            # the reel finishes processing on Instagram's servers (~30-90s).
+            "comment_delay_seconds": 90,
         }
 
         if cover_url:

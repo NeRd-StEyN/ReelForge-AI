@@ -297,6 +297,12 @@ def create_and_post_one_reel():
                     script_data=result.get("script") or {},
                     metadata=result.get("metadata") or {},
                 )
+                output_file = result.get("output_file", "output_video.mp4")
+                print(f"[Pipeline] ✅ Reel generated: {output_file}")
+                print(f"[Pipeline] ✅ Topic: '{topic}'")
+                print(f"[Pipeline] ✅ Webhook payload sent to Make.com (comment posts in ~90s)")
+            else:
+                print(f"[Pipeline] ⚠️ Pipeline returned unexpected result type: {type(result)}")
 
             # Fix 1: Save used topic after successful run
             save_used_topic(topic)
@@ -306,12 +312,15 @@ def create_and_post_one_reel():
             return  # Success!
 
         except Exception as e:
-            print(f"\n[ERROR] Pipeline crashed on attempt {attempt}/{max_retries}: {e}")
             import traceback
+            err_type = type(e).__name__
+            print(f"\n[ERROR] ❌ Pipeline crashed on attempt {attempt}/{max_retries}")
+            print(f"[ERROR] Type : {err_type}")
+            print(f"[ERROR] Message: {e}")
             traceback.print_exc()
 
             if attempt < max_retries:
-                print("Waiting 60 seconds before retrying from scratch...")
+                print(f"[ERROR] Waiting 60 seconds before retry {attempt + 1}/{max_retries}...")
                 time.sleep(60)
             else:
                 print("[FATAL ERROR] Max retries reached. Pipeline failed permanently.")

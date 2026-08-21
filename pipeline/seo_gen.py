@@ -157,14 +157,21 @@ Return ONLY the comment text, nothing else.
 """
     try:
         result = _llm_prompt(prompt).strip()
-        if not result:
-            raise ValueError("LLM returned empty string")
+        # Validate: must be non-empty and contain real words (not just emoji/punctuation)
+        import re as _re
+        real_words = _re.sub(r'[^\w\s]', '', result, flags=_re.UNICODE).strip()
+        if not result or len(real_words) < 10:
+            raise ValueError(f"LLM returned too-short comment: '{result}'")
+        # Truncate to Instagram-safe length (hard limit ~2200 chars, keep well under)
+        if len(result) > 500:
+            result = result[:500].rsplit(" ", 1)[0]
         return result
     except Exception:
         fallbacks = [
             "Friendzone exist hi nahi karta — ye sirf ek excuse hai. Sach ya jhooth? 👇",
             "Agar wo tumhe copy karti hai toh 100% interested hai. Disagree karo toh reason batao 👇",
             "Ye baat koi nahi bolta but ye sach hai — agree karte ho? 👇",
+            "Mixed signals matlab wo confused hai ya tum? Apna jawab do 👇",
         ]
         return random.choice(fallbacks)
 
