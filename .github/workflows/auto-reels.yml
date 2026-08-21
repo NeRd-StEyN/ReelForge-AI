@@ -3,11 +3,13 @@ name: Auto Reels
 on:
   workflow_dispatch:
   schedule:
-    # TIER 1 SLOTS — PROVEN TOP PERFORMERS
+    # TIER 1 SLOTS — PROVEN TOP PERFORMERS (IST = UTC+5:30)
     # 11:00 IST = 05:30 UTC — Morning peak (fetch analytics ONCE here)
     - cron: '30 5 * * *'
     # 20:00 IST = 14:30 UTC — Evening peak (NO analytics fetch — already used today's credits)
     - cron: '30 14 * * *'
+    # 21:30 IST = 16:00 UTC — Late evening bonus slot (highest competition = highest reach)
+    - cron: '0 16 * * *'
 
 jobs:
   generate-and-post:

@@ -410,11 +410,23 @@ def _normalize_analytics(data: list) -> list:
                 # Strip non-ASCII chars to prevent Windows cp1252 encoding crashes
                 caption = caption.encode("ascii", errors="ignore").decode("ascii").strip()
 
+            # Extract post_date from timestamp field
+            post_date = ""
+            for ts_key in ("timestamp", "post_date", "created_time"):
+                ts_val = item.get(ts_key, "")
+                if ts_val and isinstance(ts_val, str):
+                    post_date = ts_val[:10]  # YYYY-MM-DD
+                    break
+
             posts[post_id] = {
                 "topic_snippet": caption,
                 "views": 0,
                 "likes": int(item.get("like_count") or 0),
                 "comments": int(item.get("comments_count") or 0),
+                "shares": 0,
+                "saves": 0,
+                "is_pinned": bool(item.get("is_pinned", False)),
+                "post_date": post_date,
             }
 
         # Extract metric value from the "name" + "values" structure
@@ -435,6 +447,10 @@ def _normalize_analytics(data: list) -> list:
             posts[post_id]["likes"] = max(posts[post_id]["likes"], metric_value)
         elif metric_name in ("comments", "total_comments"):
             posts[post_id]["comments"] = max(posts[post_id]["comments"], metric_value)
+        elif metric_name in ("shares", "total_shares", "ig_reels_aggregated_all_plays_count"):
+            posts[post_id]["shares"] = max(posts[post_id]["shares"], metric_value)
+        elif metric_name in ("saves", "saved", "bookmarks"):
+            posts[post_id]["saves"] = max(posts[post_id]["saves"], metric_value)
 
     # If the data was already in simple format (not per-metric), handle that too
     if not posts:
@@ -447,6 +463,15 @@ def _normalize_analytics(data: list) -> list:
             )
             likes = item.get("likes") or item.get("like_count") or 0
             comments = item.get("comments") or item.get("comment_count") or 0
+            shares = item.get("shares") or item.get("share_count") or 0
+            saves = item.get("saves") or item.get("saved") or item.get("bookmarks") or 0
+            is_pinned = bool(item.get("is_pinned", False))
+            post_date = ""
+            for ts_key in ("timestamp", "post_date", "created_time"):
+                ts_val = item.get(ts_key, "")
+                if ts_val and isinstance(ts_val, str):
+                    post_date = ts_val[:10]
+                    break
             caption = (
                 item.get("topic_snippet") or item.get("caption")
                 or item.get("text") or ""
@@ -461,6 +486,10 @@ def _normalize_analytics(data: list) -> list:
                     "views": int(views),
                     "likes": int(likes),
                     "comments": int(comments),
+                    "shares": int(shares),
+                    "saves": int(saves),
+                    "is_pinned": is_pinned,
+                    "post_date": post_date,
                 }
             except (ValueError, TypeError):
                 continue

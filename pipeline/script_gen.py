@@ -417,11 +417,12 @@ def generate_script_payload(topic, analytics_data=None, feedback_summary="", max
             raw = _repair_script_json(raw, str(exc))
 
 
-# ── Topic sub-category rotation for content variety ──────────────────
+# ── Topic sub-category pools for maximum retention & viral reach ──────
 # Based on REAL analytics (July 2026):
-# TIER 1A — Friendzone/Situationship: 2.5K-2.6K views, 21-24 shares, 84-93 interactions
-# TIER 1B — Mirror Psychology: 1.5K views BUT 23 shares (1.53% share rate — HIGHEST of all reels)
-# These two content types are the ONLY proven performers. Everything else gets 127-541 views.
+# TIER 1A — Friendzone/Situationship/Mixed Signals: 2.5K-6.3K views (HIGHEST VIEWS)
+# TIER 1B — Mirror Psychology & Eye Contact Secrets: 1.5K-3.5K views (HIGHEST SHARE RATE)
+# TIER 2 HIGH — Eye contact, texting, jealousy: 800-2K views
+# TIER 2 DARK — Dark psychology, power dynamics: emerging viral niche
 
 _TOPIC_TIER1A_FRIENDZONE = [
     "friendzone psychology — how to spot it, escape it, or use it",
@@ -440,8 +441,11 @@ _TOPIC_TIER1A_FRIENDZONE = [
     "mixed signals or friendzone — how to tell the real difference",
     "the moment she decides you're just a friend — and how to reverse it",
     "signs she's keeping you as a backup — not as the one",
+    "why she texts you first but never asks to meet — decoded",
+    "talking stage trap — signs she wants more vs just passing time",
     "Part 2: Escape The Friendzone Using This One Shift",
     "Part 2: Situationship Exit — How to Make Her Choose",
+    "Part 3: The One Mindset That Breaks The Friendzone Forever",
 ]
 
 _TOPIC_TIER1B_MIRROR = [
@@ -454,46 +458,12 @@ _TOPIC_TIER1B_MIRROR = [
     "why girls mirror the guy they like without even knowing it",
     "Part 2: Mirror Test — 3 Ways To Check If She's Mirroring You",
     "subconscious mirroring — her body is saying what her words won't",
-]
-
-# ── Topic sub-category pools for maximum retention & viral reach ──────
-# Based on REAL analytics (July 2026):
-# TIER 1A — Friendzone/Situationship/Mixed Signals: 2.5K-6.3K views (HIGHEST VIEWS)
-# TIER 1B — Mirror Psychology & Eye Contact Secrets: 1.5K-3.5K views (HIGHEST SHARE RATE)
-
-_TOPIC_TIER1A_FRIENDZONE = [
-    "friendzone psychology — how to spot it, escape it, or use it",
-    "situationship vs friendzone — how to decode where you really stand",
-    "different stages of a relationship and what each stage reveals",
-    "friendship to love — signs she wants more than just being friends",
-    "stuck in friendzone? psychology of why and how to break out",
-    "situationship red flags — signs you're being kept as a backup",
-    "how to know if she sees you as a friend or something more",
-    "the hidden stage before a relationship that most guys miss",
-    "why girls keep certain guys in the friendzone deliberately",
-    "from talking stage to relationship — what signals matter most",
-    "friendzone test — 3 signs that tell you exactly where you stand",
-    "situationship psychology — why it feels like a relationship but isn't",
-    "how friendships turn into love — the psychology behind it",
-    "mixed signals or friendzone — how to tell the real difference",
-    "the moment she decides you're just a friend — and how to reverse it",
-    "signs she's keeping you as a backup — not as the one",
-    "Part 2: Escape The Friendzone Using This One Shift",
-    "Part 2: Situationship Exit — How to Make Her Choose",
-]
-
-_TOPIC_TIER1B_MIRROR = [
-    "mirror effect psychology — when she copies your behavior it means THIS",
-    "she copies your words gestures energy — what her mirror behavior reveals",
-    "mirror psychology test — does she subconsciously mirror you right now",
-    "body mirroring — the one signal most guys completely miss",
-    "when she starts copying YOU — what the psychology says about attraction",
-    "why girls mirror the guy they like without even knowing it",
-    "Part 2: Mirror Test — 3 Ways To Check If She's Mirroring You",
-    "subconscious mirroring — her body is saying what her words won't",
+    "she laughs at everything you say — mirror effect or just friendly?",
+    "why she subconsciously changes her voice pitch around you — psychology",
 ]
 
 _TOPIC_TIER2_HIGH = [
+    # Eye contact & texting — proven 800-2K view range
     "eye contact secrets — what her first glance really reveals",
     "eye contact trap — why girls look away when you catch them watching",
     "texting psychology — what her reply speed actually means",
@@ -503,6 +473,31 @@ _TOPIC_TIER2_HIGH = [
     "3 things that instantly kill attraction without you knowing",
     "the psychology of why being too available destroys attraction",
     "her smile decoded — the difference between polite and genuine",
+    "why she watches your story but never replies to your texts",
+    "double blue tick but no reply — what she's really thinking",
+    "she said 'haha' — what different laughing responses actually mean",
+    "when she starts sending you memes — attraction signal decoded",
+    "why she gets angry when you ignore her — psychology explained",
+    "the 3-day rule — does going silent make her miss you more?",
+    "she replied instantly then suddenly went slow — what changed?",
+    "why she says 'I'm fine' but clearly isn't — female psychology",
+    "what it means when she keeps bringing up her ex in conversation",
+]
+
+_TOPIC_TIER2_DARK = [
+    # Dark psychology & power dynamics — emerging viral niche for 18-30 male audience
+    "dark psychology tricks she uses when she wants your attention",
+    "why she plays hard to get — the psychological game behind it",
+    "push-pull psychology — why she gets closer when you pull away",
+    "the silent treatment — psychological power move or genuine hurt?",
+    "why ignoring her completely changes her behavior — dark psychology",
+    "she's testing your confidence — here's how to pass every time",
+    "manipulation vs testing — how to tell the difference instantly",
+    "why she gets cold right when things were getting good — decoded",
+    "social proof psychology — why she wants you more when others do",
+    "the scarcity principle — why less availability creates more attraction",
+    "why she tells her friends about you before telling you she likes you",
+    "gaslighting vs mixed signals — learn the difference before it's too late",
 ]
 
 
@@ -518,7 +513,13 @@ CRITICAL: DO NOT suggest any of these recently used topics (they were already po
 The new topic must be clearly different in angle and hook style from all of the above.
 """
 
-    women_topics_pool = _TOPIC_TIER1A_FRIENDZONE + _TOPIC_TIER1B_MIRROR + _TOPIC_TIER2_HIGH
+    # Weighted pool: TIER1 topics (proven viral) appear 2x more often than TIER2
+    women_topics_pool = (
+        _TOPIC_TIER1A_FRIENDZONE * 2
+        + _TOPIC_TIER1B_MIRROR * 2
+        + _TOPIC_TIER2_HIGH
+        + _TOPIC_TIER2_DARK
+    )
     subcategory = random.choice(women_topics_pool)
 
     pillar_instructions = """
