@@ -22,6 +22,10 @@ cloudinary.config(
 PENDING_POSTS_FILE = os.path.join("data", "pending_posts.jsonl")
 
 
+# Instagram hard limits
+_INSTAGRAM_CAPTION_MAX_CHARS = 2200
+
+
 def _safe_text(value, fallback: str = "") -> str:
     """Return clean text and guard against None/NaN values from upstream systems."""
     if value is None:
@@ -32,6 +36,46 @@ def _safe_text(value, fallback: str = "") -> str:
     if text.lower() == "nan":
         return fallback
     return text
+
+
+def _trim_caption(caption: str, max_len: int = _INSTAGRAM_CAPTION_MAX_CHARS) -> str:
+    """Trim a caption to Instagram's character limit.
+
+    Trims at the last whitespace boundary before *max_len* so words are never
+    cut in half. If the hashtag block is present (separated by dots), it is
+    preserved by trimming the caption body first and re-appending the tags.
+
+    Instagram hard limit: 2 200 characters (enforced by the API — any longer
+    and the CreateAReelPost module throws a caption-too-long error).
+    """
+    if len(caption) <= max_len:
+        return caption
+
+    print(
+        f"[Make] ⚠️  Caption too long ({len(caption)} chars > {max_len} limit). "
+        "Trimming to fit Instagram's 2 200-char limit..."
+    )
+
+    # Detect the hashtag footer (dots separator written by seo_gen.py)
+    # Pattern: "\n.\n.\n.\n.\n.\n" separates caption body from hashtags.
+    DOT_SEP = "\n.\n.\n.\n.\n.\n"
+    if DOT_SEP in caption:
+        body, _, tags = caption.partition(DOT_SEP)
+        # Reserve space for separator + tags; trim body to fit
+        reserved = len(DOT_SEP) + len(tags)
+        body_limit = max_len - reserved
+        if body_limit > 0:
+            if len(body) > body_limit:
+                body = body[:body_limit].rsplit(None, 1)[0].rstrip()
+            trimmed = f"{body}{DOT_SEP}{tags}"
+        else:
+            # Hashtag block alone is close to the limit — just hard-cut
+            trimmed = caption[:max_len].rsplit(None, 1)[0].rstrip()
+    else:
+        trimmed = caption[:max_len].rsplit(None, 1)[0].rstrip()
+
+    print(f"[Make] Caption trimmed to {len(trimmed)} chars.")
+    return trimmed
 
 
 def _safe_comment_text(value, max_len: int = 2000) -> str:
@@ -220,7 +264,8 @@ def send_to_make_webhook(
 
         safe_title = _safe_text(title, "AI Video")
         safe_text = _safe_text(text, "")
-        caption = f"{safe_title}\n\n{safe_text}".strip()
+        raw_caption = f"{safe_title}\n\n{safe_text}".strip()
+        caption = _trim_caption(raw_caption)  # Enforce Instagram's 2 200-char limit
         metadata = metadata if isinstance(metadata, dict) else {}
         hashtags = metadata.get("hashtags") or []
         first_comment = _safe_comment_text(metadata.get("first_comment"))
