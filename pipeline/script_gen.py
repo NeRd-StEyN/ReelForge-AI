@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # ── OpenRouter model config ──────────────────────────────
-_OPENROUTER_PRIMARY_MODEL = os.getenv("OPENROUTER_MODEL", "openrouter/free")
+_OPENROUTER_PRIMARY_MODEL = os.getenv("OPENROUTER_MODEL", "google/gemini-2.5-flash:free")
 _fallback_env = os.getenv("OPENROUTER_FALLBACK_MODELS", "google/gemma-4-31b-it:free,nvidia/nemotron-3.5-lightning:free,poolside/laguna-s-2.1:free")
 _OPENROUTER_FALLBACK_MODELS = [m.strip() for m in _fallback_env.split(",") if m.strip()]
 _OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1/chat/completions"
