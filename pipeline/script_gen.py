@@ -17,6 +17,70 @@ _OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1/chat/completions"
 def _get_content_language():
     return (os.getenv("CONTENT_LANGUAGE") or "hindi").strip().lower()
 
+# Phrases that signal Gemini is leaking its chain-of-thought reasoning.
+# When detected at the start of a response, we skip to the final clean answer.
+_THINKING_PREAMBLE_PATTERNS = [
+    "here's a thinking process",
+    "here is a thinking process",
+    "here's my thinking",
+    "here is my thinking",
+    "let me think through",
+    "let me analyze",
+    "let me break this down",
+    "thinking process:",
+    "my thought process",
+    "step-by-step thinking",
+    "**analyze the request",
+    "1.  **analyze",
+    "1. **analyze",
+]
+
+
+def _strip_thinking_preamble(text: str) -> str:
+    """Remove Gemini chain-of-thought preamble and return only the final answer.
+
+    Gemini 2.5 Flash sometimes returns its internal reasoning as plain text
+    before the actual answer. This function detects that and extracts the
+    last clean paragraph — which is always the real output we want.
+    """
+    lower = text.lower()
+    is_thinking = any(lower.startswith(p) or lower[:120].find(p) != -1
+                      for p in _THINKING_PREAMBLE_PATTERNS)
+    if not is_thinking:
+        return text
+
+    print("[LLM] Detected thinking preamble in response — stripping chain-of-thought...")
+
+    # Split into paragraphs and walk backwards to find the last real answer.
+    # The actual answer is always the last non-empty, non-markdown paragraph.
+    paragraphs = [p.strip() for p in text.split("\n\n") if p.strip()]
+
+    for para in reversed(paragraphs):
+        # Skip paragraphs that look like reasoning steps (numbered lists, headers)
+        lines = para.splitlines()
+        first_line = lines[0].strip() if lines else ""
+        if first_line.startswith(("#", "**", "*", "-", "1.", "2.", "3.")):
+            continue
+        # Skip paragraphs that are clearly meta-commentary
+        lower_para = para.lower()
+        if any(skip in lower_para for skip in (
+            "here's the", "here is the", "final answer", "the comment is",
+            "output:", "result:", "answer:"
+        )):
+            # This is a label — take the next line as the actual content
+            after = para.split(":", 1)[-1].strip()
+            if after:
+                return after
+            continue
+        # This paragraph looks like the real answer
+        if len(para) > 5:
+            return para
+
+    # Fallback: return the last non-empty line
+    lines = [l.strip() for l in text.splitlines() if l.strip()]
+    return lines[-1] if lines else text
+
+
 def _normalize_content(content):
     if isinstance(content, list):
         parts = []
@@ -34,7 +98,9 @@ def _normalize_content(content):
         text = text[3:]
     if text.endswith("```"):
         text = text[:-3]
-    return text.strip()
+    text = text.strip()
+    # Strip Gemini chain-of-thought leakage before returning
+    return _strip_thinking_preamble(text)
 
 def _call_openrouter(prompt, model):
     """Call OpenRouter API with a given model. Returns response text."""
