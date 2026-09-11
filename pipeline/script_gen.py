@@ -7,9 +7,13 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# ── OpenRouter model config ──────────────────────────────
-_OPENROUTER_PRIMARY_MODEL = os.getenv("OPENROUTER_MODEL", "google/gemini-2.5-flash:free")
-_fallback_env = os.getenv("OPENROUTER_FALLBACK_MODELS", "google/gemma-4-31b-it:free,nvidia/nemotron-3.5-lightning:free,poolside/laguna-s-2.1:free")
+# ── Model configuration ──────────────────────────────────
+# 1. Google Gemini via Google AI Studio (100% Free: 1500 req/day, native JSON & Hindi)
+_GEMINI_MODELS = ["gemini-2.0-flash", "gemini-1.5-flash"]
+
+# 2. OpenRouter fallback models
+_OPENROUTER_PRIMARY_MODEL = os.getenv("OPENROUTER_MODEL", "google/gemini-2.0-flash-001")
+_fallback_env = os.getenv("OPENROUTER_FALLBACK_MODELS", "openrouter/free,meta-llama/llama-3.3-70b-instruct:free,google/gemini-1.5-flash")
 _OPENROUTER_FALLBACK_MODELS = [m.strip() for m in _fallback_env.split(",") if m.strip()]
 _OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1/chat/completions"
 
@@ -17,8 +21,7 @@ _OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1/chat/completions"
 def _get_content_language():
     return (os.getenv("CONTENT_LANGUAGE") or "hindi").strip().lower()
 
-# Phrases that signal Gemini is leaking its chain-of-thought reasoning.
-# When detected at the start of a response, we skip to the final clean answer.
+# Phrases that signal Gemini or other models are leaking chain-of-thought reasoning.
 _THINKING_PREAMBLE_PATTERNS = [
     "here's a thinking process",
     "here is a thinking process",
@@ -37,12 +40,7 @@ _THINKING_PREAMBLE_PATTERNS = [
 
 
 def _strip_thinking_preamble(text: str) -> str:
-    """Remove Gemini chain-of-thought preamble and return only the final answer.
-
-    Gemini 2.5 Flash sometimes returns its internal reasoning as plain text
-    before the actual answer. This function detects that and extracts the
-    last clean paragraph — which is always the real output we want.
-    """
+    """Remove chain-of-thought preamble from plain text responses."""
     lower = text.lower()
     is_thinking = any(lower.startswith(p) or lower[:120].find(p) != -1
                       for p in _THINKING_PREAMBLE_PATTERNS)
@@ -51,37 +49,39 @@ def _strip_thinking_preamble(text: str) -> str:
 
     print("[LLM] Detected thinking preamble in response — stripping chain-of-thought...")
 
-    # Split into paragraphs and walk backwards to find the last real answer.
-    # The actual answer is always the last non-empty, non-markdown paragraph.
     paragraphs = [p.strip() for p in text.split("\n\n") if p.strip()]
 
     for para in reversed(paragraphs):
-        # Skip paragraphs that look like reasoning steps (numbered lists, headers)
         lines = para.splitlines()
         first_line = lines[0].strip() if lines else ""
         if first_line.startswith(("#", "**", "*", "-", "1.", "2.", "3.")):
             continue
-        # Skip paragraphs that are clearly meta-commentary
         lower_para = para.lower()
         if any(skip in lower_para for skip in (
             "here's the", "here is the", "final answer", "the comment is",
             "output:", "result:", "answer:"
         )):
-            # This is a label — take the next line as the actual content
             after = para.split(":", 1)[-1].strip()
             if after:
                 return after
             continue
-        # This paragraph looks like the real answer
         if len(para) > 5:
             return para
 
-    # Fallback: return the last non-empty line
     lines = [l.strip() for l in text.splitlines() if l.strip()]
     return lines[-1] if lines else text
 
 
-def _normalize_content(content):
+def _extract_json_block(text):
+    content = str(text or "").strip()
+    start = content.find("{")
+    end = content.rfind("}")
+    if start != -1 and end != -1 and end > start:
+        return content[start : end + 1]
+    return content
+
+
+def _normalize_content(content, json_mode=False):
     if isinstance(content, list):
         parts = []
         for item in content:
@@ -89,7 +89,7 @@ def _normalize_content(content):
                 parts.append(item.get("text", ""))
             elif isinstance(item, str):
                 parts.append(item)
-        content = "\\n".join(parts)
+        content = "\n".join(parts)
 
     text = str(content or "").strip()
     if text.startswith("```json"):
@@ -99,12 +99,56 @@ def _normalize_content(content):
     if text.endswith("```"):
         text = text[:-3]
     text = text.strip()
-    # Strip Gemini chain-of-thought leakage before returning
+
+    # For JSON mode, extract the JSON object directly — NEVER strip paragraphs with preamble stripper
+    if json_mode:
+        return _extract_json_block(text)
+
+    # Strip thinking preamble only on plain-text prompts (captions, topics, etc.)
     return _strip_thinking_preamble(text)
 
-def _call_openrouter(prompt, model):
+
+def _call_gemini_direct(prompt, model="gemini-2.0-flash", json_mode=False):
+    """Call Google Gemini API directly (100% Free via Google AI Studio).
+    
+    Provides best-in-class Hindi Devanagari generation and guaranteed JSON output.
+    """
+    api_key = os.getenv("GEMINI_API_KEY", "").strip()
+    if not api_key:
+        raise ValueError("GEMINI_API_KEY not set")
+
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={api_key}"
+    headers = {"Content-Type": "application/json"}
+    generation_config = {
+        "temperature": 0.7,
+        "maxOutputTokens": 2048,
+    }
+    if json_mode:
+        generation_config["responseMimeType"] = "application/json"
+
+    payload = {
+        "contents": [{"parts": [{"text": prompt}]}],
+        "generationConfig": generation_config,
+    }
+
+    resp = requests.post(url, headers=headers, json=payload, timeout=60)
+    resp.raise_for_status()
+    data = resp.json()
+
+    candidates = data.get("candidates", [])
+    if not candidates:
+        raise ValueError(f"Gemini returned empty candidates: {data}")
+
+    parts = candidates[0].get("content", {}).get("parts", [])
+    if not parts:
+        raise ValueError(f"Gemini response missing text parts: {data}")
+
+    return parts[0].get("text", "")
+
+
+def _call_openrouter(prompt, model, json_mode=False):
     """Call OpenRouter API with a given model. Returns response text."""
-    api_key = os.getenv("OPENROUTER_API_KEY")
+    api_key = os.getenv("OPENROUTER_API_KEY", "").strip()
     if not api_key:
         raise ValueError("OPENROUTER_API_KEY not found in environment variables.")
 
@@ -117,59 +161,124 @@ def _call_openrouter(prompt, model):
     payload = {
         "model": model,
         "messages": [{"role": "user", "content": prompt}],
-        "max_tokens": 1200,
+        "max_tokens": 1500,
     }
-    
+    if json_mode:
+        payload["response_format"] = {"type": "json_object"}
+
     resp = requests.post(_OPENROUTER_BASE_URL, headers=headers, json=payload, timeout=60)
     resp.raise_for_status()
     data = resp.json()
     return data["choices"][0]["message"]["content"]
 
-def _llm_prompt(prompt):
-    """Call LLM via OpenRouter dynamic free routing."""
-    models_to_try = [_OPENROUTER_PRIMARY_MODEL] + _OPENROUTER_FALLBACK_MODELS
-    last_error = None
 
-    for model in models_to_try:
-        max_retries = 3
-        for attempt in range(max_retries):
+def _llm_prompt(prompt, json_mode=False):
+    """Call LLM with Google Gemini (Free via AI Studio) as primary, falling back to OpenRouter."""
+    gemini_key = os.getenv("GEMINI_API_KEY", "").strip()
+
+    # ── 1. Priority 1: Google Gemini (100% Free, Native Hindi & JSON) ──
+    if gemini_key:
+        for model in _GEMINI_MODELS:
             try:
-                print(f"[OpenRouter] Using model: {model} (attempt {attempt + 1})")
-                raw = _call_openrouter(prompt, model)
-                return _normalize_content(raw)
+                print(f"[LLM] Using Google Gemini ({model})...")
+                raw = _call_gemini_direct(prompt, model=model, json_mode=json_mode)
+                return _normalize_content(raw, json_mode=json_mode)
             except Exception as exc:
-                error_str = str(exc)
-                last_error = exc
-                if "429" in error_str or "rate" in error_str.lower():
-                    wait_time = 15 * (attempt + 1)
-                    print(f"[OpenRouter] Rate limit on {model}. Waiting {wait_time}s...")
-                    time.sleep(wait_time)
-                    continue
-                # Non-rate-limit error — skip to next model
-                print(f"[OpenRouter] {model} failed: {exc}. Trying next model...")
-                break
+                print(f"[LLM] Gemini {model} error: {exc}. Trying fallback...")
+                time.sleep(1)
 
-    raise RuntimeError(f"All OpenRouter models failed. Last error: {last_error}")
+    # ── 2. Priority 2: OpenRouter ──
+    openrouter_key = os.getenv("OPENROUTER_API_KEY", "").strip()
+    if openrouter_key:
+        models_to_try = [_OPENROUTER_PRIMARY_MODEL] + _OPENROUTER_FALLBACK_MODELS
+        last_error = None
+        for model in models_to_try:
+            max_retries = 2
+            for attempt in range(max_retries):
+                try:
+                    print(f"[OpenRouter] Using model: {model} (attempt {attempt + 1})")
+                    raw = _call_openrouter(prompt, model, json_mode=json_mode)
+                    return _normalize_content(raw, json_mode=json_mode)
+                except Exception as exc:
+                    last_error = exc
+                    error_str = str(exc)
+                    if "429" in error_str or "rate" in error_str.lower():
+                        time.sleep(5 * (attempt + 1))
+                        continue
+                    print(f"[OpenRouter] {model} failed: {exc}. Trying next model...")
+                    break
+        raise RuntimeError(f"All LLM models failed. Last error: {last_error}")
+
+    raise RuntimeError("Neither GEMINI_API_KEY nor OPENROUTER_API_KEY is configured.")
 
 
+# Dummy placeholder phrases that signify a model gave a broken template
+_DUMMY_SAMPLE_PATTERNS = [
+    "sample title", "sample text", "sample video", "sample narration",
+    "placeholder", "insert title here", "insert text here"
+]
 
-def _extract_json_block(text):
-    content = str(text or "").strip()
-    start = content.find("{")
-    end = content.rfind("}")
-    if start != -1 and end != -1 and end > start:
-        return content[start : end + 1]
-    return content
+
+def _validate_script_payload(payload):
+    """Strict anti-dummy guardrails to prevent 5-second reels and placeholder text."""
+    if not isinstance(payload, dict):
+        raise ValueError("Script payload is not a JSON object")
+
+    title = str(payload.get("title", "")).strip()
+    if not title:
+        raise ValueError("Script payload missing required field: title")
+
+    for bad in _DUMMY_SAMPLE_PATTERNS:
+        if bad in title.lower():
+            raise ValueError(f"Script payload rejected: title contains dummy placeholder '{title}'")
+
+    scenes = payload.get("scenes", [])
+    if not isinstance(scenes, list) or len(scenes) == 0:
+        raise ValueError("Script payload missing list field: scenes")
+
+    # Guardrail: Must have at least 3 scenes (prevent 1-scene 5-second videos)
+    if len(scenes) < 3:
+        raise ValueError(f"Script payload rejected: only {len(scenes)} scenes generated. Reels need at least 3-4 scenes for 20-30s duration.")
+
+    total_words = 0
+    has_hindi = False
+
+    for idx, s in enumerate(scenes):
+        if not isinstance(s, dict):
+            raise ValueError(f"Scene {idx+1} is not a valid object")
+        stext = str(s.get("text", "")).strip()
+        if not stext:
+            raise ValueError(f"Scene {idx+1} has empty text")
+
+        for bad in _DUMMY_SAMPLE_PATTERNS:
+            if bad in stext.lower():
+                raise ValueError(f"Scene {idx+1} rejected: contains dummy placeholder '{stext}'")
+
+        vkey = str(s.get("visual_keyword", "")).strip().lower()
+        for bad in _DUMMY_SAMPLE_PATTERNS:
+            if bad in vkey:
+                raise ValueError(f"Scene {idx+1} rejected: visual_keyword contains placeholder '{vkey}'")
+
+        words = stext.split()
+        total_words += len(words)
+        if any("\u0900" <= ch <= "\u097F" for ch in stext):
+            has_hindi = True
+
+    # Guardrail: Minimum 35 words across scenes (each word ~0.3s -> at least ~15-25s video)
+    if total_words < 35:
+        raise ValueError(f"Script payload rejected: script has only {total_words} words. Minimum required is 35 words to ensure a 20-30s reel.")
+
+    # Guardrail: If Hindi language, verify Devanagari script is actually present
+    if _get_content_language() in {"hindi", "hi", "hi-in"} and not has_hindi:
+        raise ValueError("Script payload rejected: CONTENT_LANGUAGE is hindi but scenes contain no Devanagari characters.")
+
+    return True
 
 
 def _parse_script_payload(raw_text):
-    payload = json.loads(_extract_json_block(raw_text))
-    if not isinstance(payload, dict):
-        raise ValueError("Script payload is not a JSON object")
-    if "scenes" not in payload or not isinstance(payload["scenes"], list):
-        raise ValueError("Script payload missing list field: scenes")
-    if len(payload["scenes"]) == 0:
-        raise ValueError("Script payload contains 0 scenes")
+    clean_json = _extract_json_block(raw_text)
+    payload = json.loads(clean_json)
+    _validate_script_payload(payload)
     return payload
 
 
@@ -179,6 +288,8 @@ You must fix malformed JSON and return valid JSON only.
 
 Rules:
 - Keep the same schema with fields: title, scenes[].id, scenes[].text, scenes[].visual_keyword, scenes[].visual_mood
+- CRITICAL: Provide realistic, full Hindi (Devanagari) script narration for each scene. NEVER output placeholder or dummy words like "Sample", "Sample text", or "Sample Title".
+- Each scene must have complete spoken sentences (at least 15-20 words per scene, 3-4 scenes total).
 - Do not add markdown fences.
 - Escape quotes correctly.
 - Ensure valid commas and brackets.
@@ -189,7 +300,7 @@ Previous parser error:
 Malformed content:
 {raw_text}
 """
-    return _llm_prompt(prompt)
+    return _llm_prompt(prompt, json_mode=True)
 
 
 def _normalize_scene_text(text):
@@ -417,8 +528,8 @@ def generate_script(topic, analytics_data=None, feedback_summary=""):
     {instructions}
 
     RULES:
-    1. Generate exactly 6 to 8 short scenes. This is critical for fast-paced visual cuts.
-    2. Each scene's `text` MUST be very short (1 or 2 sentences max) for high-energy pacing.
+    1. Generate 3 to 5 scenes (total 60-80 words across all scenes). This ensures a full 22-30 second reel.
+    2. Each scene's `text` MUST be a complete spoken thought in pure Devanagari Hindi (15-25 words each).
     3. For `visual_keyword`, YOU MUST provide LITERAL, highly-specific human actions (e.g., "close up couple holding hands", "person looking at phone in dark", "woman smiling over shoulder"). DO NOT use abstract words like "psychology", "mind", or "brain". We need real human B-roll.
     4. Each scene MUST have a `visual_mood` (mysterious, confident, dramatic, intense, dark, energetic, elegant, or horror).
     5. Final scene MUST include a CTA for comments (poll or question) and share trigger.
@@ -455,32 +566,42 @@ def generate_script(topic, analytics_data=None, feedback_summary=""):
     Provide only the valid JSON, no markdown formatting blocks.
     """
 
-    return _llm_prompt(prompt)
+    return _llm_prompt(prompt, json_mode=True)
 
 
 def generate_script_payload(topic, analytics_data=None, feedback_summary="", max_repairs=2):
-    """Generate script and return a validated JSON payload with auto-repair retries."""
+    """Generate script and return a validated JSON payload with auto-repair and retry loops."""
     if feedback_summary:
         print(f"[Feedback] Injecting performance history into script prompt.")
-    raw = generate_script(topic, analytics_data=analytics_data, feedback_summary=feedback_summary)
 
-    for attempt in range(max_repairs + 1):
+    last_error = None
+    for gen_attempt in range(2):
         try:
-            payload = _parse_script_payload(raw)
-            payload = _postprocess_script_payload(payload)
-            if "hook_framework" not in payload:
-                payload["hook_framework"] = _pick_hook_framework(
-                    analytics_data=analytics_data,
-                    feedback_summary=feedback_summary,
-                )["name"]
-            return payload
-        except Exception as exc:
-            if attempt >= max_repairs:
-                raise RuntimeError(
-                    f"Failed to parse script JSON after {max_repairs + 1} attempts: {exc}"
-                ) from exc
-            print(f"Script JSON invalid, attempting repair ({attempt + 1}/{max_repairs})...")
-            raw = _repair_script_json(raw, str(exc))
+            raw = generate_script(topic, analytics_data=analytics_data, feedback_summary=feedback_summary)
+        except Exception as gen_err:
+            print(f"[Script] Generation attempt {gen_attempt + 1} failed: {gen_err}")
+            last_error = gen_err
+            continue
+
+        for attempt in range(max_repairs + 1):
+            try:
+                payload = _parse_script_payload(raw)
+                payload = _postprocess_script_payload(payload)
+                if "hook_framework" not in payload:
+                    payload["hook_framework"] = _pick_hook_framework(
+                        analytics_data=analytics_data,
+                        feedback_summary=feedback_summary,
+                    )["name"]
+                return payload
+            except Exception as exc:
+                last_error = exc
+                if attempt >= max_repairs:
+                    print(f"[Script] Validation/repair attempt {attempt + 1} failed: {exc}")
+                    break
+                print(f"[Script] Script validation issue: {exc}. Attempting repair ({attempt + 1}/{max_repairs})...")
+                raw = _repair_script_json(raw, str(exc))
+
+    raise RuntimeError(f"Failed to generate a valid high-retention script: {last_error}")
 
 
 # ── Topic sub-category pools for maximum retention & viral reach ──────
