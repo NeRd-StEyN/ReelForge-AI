@@ -1,0 +1,42 @@
+name: Fetch Analytics
+
+on:
+  workflow_dispatch:
+
+jobs:
+  fetch-analytics:
+    runs-on: ubuntu-latest
+    env:
+      INSTA_USERNAME: ${{ secrets.INSTA_USERNAME }}
+      INSTA_PASSWORD: ${{ secrets.INSTA_PASSWORD }}
+      INSTA_SESSION: ${{ secrets.INSTA_SESSION }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Restore Instagram session file
+        if: env.INSTA_SESSION != ''
+        run: python -c "import os; open('insta_session.json', 'w', encoding='utf-8').write(os.environ['INSTA_SESSION'].strip())"
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run Fetch Live Analytics
+        run: python fetch_live_analytics.py
+
+      - name: Commit and Push Data
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/insta_analytics_history.jsonl
+          git commit -m "Update analytics history [skip ci]" || echo "No changes to commit"
+          git push

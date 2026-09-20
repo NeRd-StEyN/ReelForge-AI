@@ -701,11 +701,12 @@ The new topic must be clearly different in angle and hook style from all of the 
 """
 
     # Weighted pool: TIER1 topics (proven viral) appear 2x more often than TIER2
+    # NOTE: Removed TIER2_DARK as dark psychology/manipulation topics often trigger
+    # Instagram's safety classifiers resulting in reach being capped at 100-150 views.
     women_topics_pool = (
         _TOPIC_TIER1A_FRIENDZONE * 2
         + _TOPIC_TIER1B_MIRROR * 2
         + _TOPIC_TIER2_HIGH
-        + _TOPIC_TIER2_DARK
     )
     subcategory = random.choice(women_topics_pool)
 
@@ -719,6 +720,7 @@ Task guidelines:
    - Eye Contact Trap: The REAL Unlock!
    - Mirror Effect Psychology — Jab wo tumhari tarah act karti hai
    - Ye 3 signs jo batati hain ke wo interested hai
+4. CRITICAL: NEVER suggest topics about dark psychology, manipulation, gaslighting, or toxic behavior. Instagram's classifier suppresses these topics to 100 views. Keep it positive, analytical, and safe.
 """
 
     prompt = f"""
