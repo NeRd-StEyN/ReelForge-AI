@@ -700,13 +700,11 @@ CRITICAL: DO NOT suggest any of these recently used topics (they were already po
 The new topic must be clearly different in angle and hook style from all of the above.
 """
 
-    # Weighted pool: TIER1 topics (proven viral) appear 2x more often than TIER2
-    # NOTE: Removed TIER2_DARK as dark psychology/manipulation topics often trigger
-    # Instagram's safety classifiers resulting in reach being capped at 100-150 views.
+    # Strict pool: ONLY TIER 1 topics (proven viral: Friendzone & Mirroring)
+    # TIER 2 HIGH was removed as per your request to strictly stick to the best performers.
     women_topics_pool = (
-        _TOPIC_TIER1A_FRIENDZONE * 2
-        + _TOPIC_TIER1B_MIRROR * 2
-        + _TOPIC_TIER2_HIGH
+        _TOPIC_TIER1A_FRIENDZONE
+        + _TOPIC_TIER1B_MIRROR
     )
     subcategory = random.choice(women_topics_pool)
 
