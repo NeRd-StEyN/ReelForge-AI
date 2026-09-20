@@ -540,9 +540,11 @@ def generate_script(topic, analytics_data=None, feedback_summary=""):
         "title": "A catchy viral title (max 8 words)",
         "hook_framework": "curiosity_gap",
         "brainstorming_scratchpad": {{
-            "problems": "List 3 specific pain points the audience has about this.",
-            "hooks": "Brainstorm 5 distinct text hooks.",
-            "selection": "Explain why the chosen hook is the best."
+            "phase_1_problems": "List exactly 10 distinct pain points or frustrations the audience has about this.",
+            "phase_2_hooks_verbal": "Brainstorm exactly 10 distinct verbal hooks.",
+            "phase_3_hooks_text": "Brainstorm exactly 10 distinct short on-screen text hooks.",
+            "phase_4_ctas": "Brainstorm exactly 10 different CTAs for driving comments or shares.",
+            "selection_logic": "Explain which problem, verbal hook, text hook, and CTA you selected and why it's the strongest combination."
         }},
         "scenes": [
             {{
@@ -619,17 +621,19 @@ def _audit_script_payload(payload):
     import json
     print("[Script] Running Retention Engineering audit pass...")
     prompt = f"""
-    You are a Retention Editor for Instagram Reels.
-    Your task is to take this generated JSON script and optimize it for maximum retention.
+    You are a Retention Editor and Quality Control Specialist for Instagram Reels.
+    Your task is to take this generated JSON script and optimize it for maximum retention, following a strict Phase 9 Quality Control process.
     
     RULES:
-    1. Remove all slow introductions, filler words, and unnecessary fluff.
-    2. Shorten sentences to make them punchier.
-    3. Maximize curiosity gaps in the on_screen_text and hook.
-    4. Keep the exact same JSON schema and keys. Do not change the overall structure.
+    1. First, silently score the script from 1-10 on: Hook strength, Audience relevance, Value, Specificity, and Retention potential.
+    2. Remove all slow introductions, filler words, and generic AI phrasing. Every sentence must earn its place.
+    3. Shorten sentences to make them conversational and punchy.
+    4. Maximize curiosity gaps, pattern interrupts, and open loops.
+    5. Ensure the CTA matches the reel goal perfectly.
+    6. Keep the exact same JSON schema and keys. Do not change the overall structure.
     
     Original Script JSON:
-    {json.dumps(payload, ensure_ascii=False, indent=2)}
+    {{json.dumps(payload, ensure_ascii=False, indent=2)}}
     
     Return only the optimized JSON.
     """
