@@ -3,6 +3,9 @@ name: Fetch Analytics
 on:
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   fetch-analytics:
     runs-on: ubuntu-latest
