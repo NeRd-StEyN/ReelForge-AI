@@ -1025,7 +1025,7 @@ def create_video(scenes, voiceovers, visuals, output_file, word_timeline=None, c
             if i == 0:
                 hook_duration = min(2.0, duration * 0.4)
                 hook_overlay = _create_hook_overlay(
-                    topic=scene.get("text", ""),
+                    topic=scene.get("on_screen_text", scene.get("text", "")),
                     duration=hook_duration,
                 )
                 extra_overlays.append(hook_overlay)

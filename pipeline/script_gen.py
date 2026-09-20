@@ -486,7 +486,7 @@ def generate_script(topic, analytics_data=None, feedback_summary=""):
     - Scene 2 (The Deep Signal — 7-9s): 20-25 words
         Explain the psychological reason behind her behavior / body language.
     - Scene 3 (The Decoder Move — 7-9s): 20-25 words
-        Provide the exact counter-move or decoding tip for the viewer.
+        Provide a clear, highly practical action or solution the viewer can take today. Not abstract psychology, but a tangible fix.
     - Scene 4 (Comment & Share Loop — 4-6s): 10-15 words
         End with a direct comment question or opinion poll + share trigger.
         MANDATORY LOOP TRIGGER: The final 3 words should seamlessly connect back to the hook idea.
@@ -539,10 +539,16 @@ def generate_script(topic, analytics_data=None, feedback_summary=""):
     {{
         "title": "A catchy viral title (max 8 words)",
         "hook_framework": "curiosity_gap",
+        "brainstorming_scratchpad": {{
+            "problems": "List 3 specific pain points the audience has about this.",
+            "hooks": "Brainstorm 5 distinct text hooks.",
+            "selection": "Explain why the chosen hook is the best."
+        }},
         "scenes": [
             {{
                 "id": 1,
                 "text": "Scene 1 narration (Hook — curious energy)",
+                "on_screen_text": "Short 3-5 word scroll-stopping text (MUST be different from narration)",
                 "visual_keyword": "Descriptive visual search term with mood and lighting",
                 "visual_mood": "mysterious",
                 "emotional_beat": "curious"
@@ -592,6 +598,10 @@ def generate_script_payload(topic, analytics_data=None, feedback_summary="", max
                         analytics_data=analytics_data,
                         feedback_summary=feedback_summary,
                     )["name"]
+                
+                # Retention Engineering Pass
+                payload = _audit_script_payload(payload)
+                
                 return payload
             except Exception as exc:
                 last_error = exc
@@ -602,6 +612,35 @@ def generate_script_payload(topic, analytics_data=None, feedback_summary="", max
                 raw = _repair_script_json(raw, str(exc))
 
     raise RuntimeError(f"Failed to generate a valid high-retention script: {last_error}")
+
+
+def _audit_script_payload(payload):
+    """Retention Engineering pass: audit the generated script for filler words and curiosity gaps."""
+    import json
+    print("[Script] Running Retention Engineering audit pass...")
+    prompt = f"""
+    You are a Retention Editor for Instagram Reels.
+    Your task is to take this generated JSON script and optimize it for maximum retention.
+    
+    RULES:
+    1. Remove all slow introductions, filler words, and unnecessary fluff.
+    2. Shorten sentences to make them punchier.
+    3. Maximize curiosity gaps in the on_screen_text and hook.
+    4. Keep the exact same JSON schema and keys. Do not change the overall structure.
+    
+    Original Script JSON:
+    {json.dumps(payload, ensure_ascii=False, indent=2)}
+    
+    Return only the optimized JSON.
+    """
+    optimized_raw = _llm_prompt(prompt, json_mode=True)
+    try:
+        optimized_payload = json.loads(optimized_raw)
+        return optimized_payload
+    except Exception as e:
+        print(f"[Script] Audit pass failed to return valid JSON ({{e}}). Falling back to original payload.")
+        return payload
+
 
 
 # ── Topic sub-category pools for maximum retention & viral reach ──────
@@ -732,13 +771,13 @@ Historical feedback summary: {feedback_summary or 'No data yet'}
 {avoid_block}
 
 Task:
-Propose exactly ONE topic idea for the next Instagram Reel that:
+Propose exactly ONE core emotional problem or burning question for the next Instagram Reel that:
 1. Strictly adheres to today's Target Niche guidelines listed above
-2. Has EXTREMELY STRONG hook potential for views and shares
-3. Is bold, engaging, street-smart, and Instagram-safe
-4. Is DIFFERENT from the recently used topics listed above
+2. Represents a specific, painful, or confusing situation the audience faces (e.g. "I don't know if she is testing me or friendzoning me").
+3. Is bold, relatable, street-smart, and Instagram-safe
+4. Is DIFFERENT from the recently used problems listed above
 
-Return only a single plain-text topic line, max 12 words, no quotes, no numbering.
+Return only a single plain-text problem statement, max 15 words, no quotes, no numbering.
 """
 
     content = _llm_prompt(prompt)
