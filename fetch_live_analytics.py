@@ -35,7 +35,7 @@ try:
     if not user_id:
         raise ValueError("Session has no user_id — session may be expired. Re-run generate_session.py")
     print("[Step 2] Using session user_id: " + str(user_id))
-    recent_posts = cl.user_medias(user_id, amount=150)
+    recent_posts = cl.user_medias(user_id, amount=75)
 except Exception as e:
     if "Please wait a few minutes" in str(e):
         print("\n[Instagram Cooldown] Instagram requested a short pause: 'Please wait a few minutes before you try again.'")
