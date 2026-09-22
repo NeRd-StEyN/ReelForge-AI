@@ -12,8 +12,8 @@ load_dotenv()
 _GEMINI_MODELS = ["gemini-2.0-flash", "gemini-1.5-flash"]
 
 # 2. OpenRouter fallback models
-_OPENROUTER_PRIMARY_MODEL = os.getenv("OPENROUTER_MODEL", "google/gemini-2.0-flash-001")
-_fallback_env = os.getenv("OPENROUTER_FALLBACK_MODELS", "openrouter/free,meta-llama/llama-3.3-70b-instruct:free,google/gemini-1.5-flash")
+_OPENROUTER_PRIMARY_MODEL = os.getenv("OPENROUTER_MODEL", "google/gemini-2.0-flash")
+_fallback_env = os.getenv("OPENROUTER_FALLBACK_MODELS", "google/gemini-2.0-flash-exp:free,google/gemini-1.5-flash,openrouter/free")
 _OPENROUTER_FALLBACK_MODELS = [m.strip() for m in _fallback_env.split(",") if m.strip()]
 _OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1/chat/completions"
 
@@ -640,9 +640,12 @@ def _audit_script_payload(payload):
     optimized_raw = _llm_prompt(prompt, json_mode=True)
     try:
         optimized_payload = json.loads(optimized_raw)
+        if not isinstance(optimized_payload, dict) or "scenes" not in optimized_payload:
+            print(f"[Script] Audit pass returned valid JSON but missing 'scenes'. Falling back to original payload.")
+            return payload
         return optimized_payload
     except Exception as e:
-        print(f"[Script] Audit pass failed to return valid JSON ({{e}}). Falling back to original payload.")
+        print(f"[Script] Audit pass failed to return valid JSON ({e}). Falling back to original payload.")
         return payload
 
 
