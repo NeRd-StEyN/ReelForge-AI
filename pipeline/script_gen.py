@@ -121,7 +121,7 @@ def _call_gemini_direct(prompt, model="gemini-2.0-flash", json_mode=False):
     headers = {"Content-Type": "application/json"}
     generation_config = {
         "temperature": 0.7,
-        "maxOutputTokens": 2048,
+        "maxOutputTokens": 3000,
     }
     if json_mode:
         generation_config["responseMimeType"] = "application/json"
@@ -161,7 +161,7 @@ def _call_openrouter(prompt, model, json_mode=False):
     payload = {
         "model": model,
         "messages": [{"role": "user", "content": prompt}],
-        "max_tokens": 1500,
+        "max_tokens": 2500,
     }
     if json_mode:
         payload["response_format"] = {"type": "json_object"}
@@ -318,78 +318,58 @@ def _postprocess_script_payload(payload):
     return payload
 
 
-# ── Hook framework rotation for maximum variety (Female Psychology & Attraction Focus) ──
+# ── Hook framework rotation for maximum variety & emotional tension ──
 _HOOK_FRAMEWORKS = [
     {
-        "name": "eye_contact_trap",
-        "instruction": "Open with an intense eye contact or glance signal. Example pattern: 'Jab wo tumse eye contact karke nazrein churati hai, toh iska asli matlab samjho...' or 'Her eye contact trap: Shatter it with THIS secret!'",
+        "name": "situational_dilemma",
+        "instruction": "Open with an ultra-relatable real-life situation. Example pattern: 'Jab wo ek din 2 minute mein reply kare aur agle din 10 ghante gayab... toh iska matlab samjho.' or 'Ever noticed her mood shift the second you stop texting first?'",
     },
     {
-        "name": "mixed_signals_decoder",
-        "instruction": "Open with a mixed signal dilemma. Example pattern: 'Her mixed signals: Testing ya friendzoning? The truth hurts...' or 'Agar wo ek din warm aur dusre din cold react kare, toh wo ye test kar rahi hai...'",
+        "name": "contrarian_truth",
+        "instruction": "Shatter a common belief with psychological reality. Example pattern: 'Har ladka sochta hai ki 24 ghante available rehna care dikhata hai, lekin female psychology kehti hai ye attraction ko destroy karta hai.'",
     },
     {
-        "name": "mirror_effect_secret",
-        "instruction": "Open with body language mirroring. Example pattern: 'Jab wo tumhari tarah baatein ya gesture copy karne lage, toh dimaag mein ye chal raha hota hai...' or 'Subconscious mirroring: 3 signs jo wo chhupa nahi sakti!'",
+        "name": "micro_body_language",
+        "instruction": "Decode a subtle, subconscious physical gesture. Example pattern: 'Jab koi ladki baat karte waqt bar bar eye contact break karke subtle smile kare, uska subconscious ye bol raha hota hai.'",
     },
     {
-        "name": "female_psychology_truth",
-        "instruction": "Start with a direct female psychology rule. Example pattern: 'Ye ek cheez ladkiyan tumhein kabhi seedhe nahi batayengi...' or 'Psychology says: jab ladki tumhare baare mein sochti hai...'",
-    },
-    {
-        "name": "curiosity_gap",
-        "instruction": "Start with an incomplete provocative statement that creates burning curiosity. Example pattern: 'Agar wo tumhara text ignore kar ke online reh rahi hai, toh wo tumhein is test mein phansa rahi hai...'",
+        "name": "the_curiosity_test",
+        "instruction": "Frame an instant interactive test. Example pattern: 'Ye 5-second psychology test bata dega ki wo tumhe dost samajhti hai ya something more.' First frame must establish high stakes.",
     },
     {
         "name": "kabhii_nahi",
-        "instruction": """
-Open with a 'kabhi nahi...' statement in Devanagari Hindi.
-The sentence MUST be a complete, punchy hook about female attraction or relationship signals.
-DO NOT use '...' or truncate the sentence. It must be a full sentence on the first frame.
-Examples of proven-viral openers:
-  - 'ये चीज़ लड़कियां कभी सीधे नहीं बतातीं!'
-  - 'उसकी ये हरकत कभी इग्नोर मत करना!'
-  - 'ये 3 इशारे लड़कियां सिर्फ खास इंसान को देती हैं!'
-MANDATORY: The very first scene text must be a complete sentence that hooks the viewer instantly.""",
+        "instruction": "Open with a punchy 'kabhi nahi' statement in Devanagari Hindi. Example: 'ये 3 गलतियां लड़कियां कभी उस लड़के के साथ नहीं करतीं जिसे वो पसंद करती हैं!' Full sentence on the very first frame.",
     },
     {
-        "name": "test_format",
-        "instruction": """
-Frame the entire reel as a test or quiz the viewer can take.
-Pattern: 'Friendzone Test: Spot It Or Stay Stuck?' or 'Attraction Test: Is She Testing You?'
-First sentence must name the test and its stakes.
-Example: 'Ye female psychology test fail kiya toh friendzone mein rahoge forever!'""",
+        "name": "unspoken_female_rule",
+        "instruction": "Expose an unspoken behavioral dynamic. Example pattern: 'लड़कियों का एक unspoken rule होता है जो वो कभी मुंह से नहीं बोलेंगी, बस उनके behavior में दिखेगा...'",
+    },
+    {
+        "name": "eye_contact_tension",
+        "instruction": "Focus on gaze and tension. Example pattern: 'Jab wo kisi aur se baat karte hue bhi bar-bar tumhari taraf dekhe, toh dimaag mein kya chal raha hota hai? Decoded.'",
+    },
+    {
+        "name": "withdrawal_effect",
+        "instruction": "Focus on emotional boundaries and mystery. Example pattern: 'Jaise hi tum chase karna band karte ho, achanak uska interest kyu badh jata hai? Understand the psychology behind pull-back.'",
     },
 ]
 
 
 def _pick_hook_framework(analytics_data=None, feedback_summary=""):
-    """Choose a hook framework using an Epsilon-Greedy (80/20) policy for female psychology."""
-    proven_viral = ["eye_contact_trap", "mixed_signals_decoder", "mirror_effect_secret", "female_psychology_truth", "kabhii_nahi"]
-    
-    # 80% Exploitation of top viral framework patterns
-    if random.random() < 0.80:
-        preferred_name = random.choice(proven_viral)
-        for framework in _HOOK_FRAMEWORKS:
-            if framework["name"] == preferred_name:
-                print(f"[HookEngine] Exploit policy: Using top viral framework '{framework['name']}'")
-                return framework
-
-    # 20% Exploration of wildcard frameworks
+    """Choose a diverse hook framework to ensure constant variety and pattern interrupts."""
     chosen = random.choice(_HOOK_FRAMEWORKS)
-    print(f"[HookEngine] Explore policy (20% wildcard): Using framework '{chosen['name']}'")
+    print(f"[HookEngine] Selected hook framework: '{chosen['name']}'")
     return chosen
 
 
 def generate_script(topic, analytics_data=None, feedback_summary=""):
-    """Generates a highly viral, SHORT video script optimized for completion rate."""
+    """Generates a highly viral, punchy video script optimized for completion rate and natural conversational flow."""
     language = _get_content_language()
     language_rules = """
     Language rules:
-    - Narration text MUST be in pure Hindi using STRICTLY Devanagari script (e.g. "लड़कियां" NOT "ladkiyan").
-    - DO NOT use Roman/Latin letters for the narration text. This is a hard requirement.
-    - Keep pronunciation natural for Hindi TTS.
-    - CRITICAL: The `title` MUST be in English or Roman Hinglish. NEVER use Devanagari script in the `title`.
+    - Narration text MUST be in natural, conversational Hindi using STRICTLY Devanagari script (e.g. "लड़कियां" NOT "ladkiyan").
+    - Keep pronunciation natural for Hindi TTS. Use conversational phrasing that flows smoothly when spoken.
+    - CRITICAL: The `title` and `on_screen_text` MUST be in English or Roman Hinglish. NEVER use Devanagari script for titles or on-screen banners.
     """ if language in {"hindi", "hi", "hi-in"} else ""
 
     # Check if this is a continuation part and retrieve the previous script to ensure continuity
@@ -413,7 +393,7 @@ def generate_script(topic, analytics_data=None, feedback_summary=""):
     2. DO NOT repeat the same tips, signs, or facts. The audience wants to learn the next steps.
     3. Ensure the transition between the parts feels continuous and logical.
     """
-            print(f"[Series] Sequenced continuation detected! Injected previous script context (length: {len(scenes_text)}).")
+            print(f"[Series] Sequenced continuation detected! Injected previous script context.")
     except Exception as e:
         print(f"[Series] Warning check: could not fetch previous script context: {e}")
 
@@ -421,157 +401,88 @@ def generate_script(topic, analytics_data=None, feedback_summary=""):
     instructions = ""
     if feedback_summary and feedback_summary.strip():
         instructions = f"""
-    ══ REAL PERFORMANCE DATA FROM YOUR ACCOUNT ══
+    ══ REAL PERFORMANCE INSIGHTS ══
     {feedback_summary}
-    ══════════════════════════════════════════════
-    Use this data to write a BETTER script:
-    - Model your hook style after the TOP performers above.
-    - Avoid angles or tones used in the LOWEST performers.
-    - The goal is to beat your current average view count.
-    """
-    elif isinstance(analytics_data, list) and analytics_data:
-        # Fallback: raw list (no summarized history yet)
-        raw_str = "; ".join(
-            f"{p.get('topic_snippet', '')[:60]} ({p.get('views', 0)} views, {p.get('likes', 0)} likes)"
-            for p in analytics_data[:5]
-        )
-        instructions = f"""
-    RECENT POST DATA (use to improve hook angle):
-    {raw_str}
-    Write a hook that outperforms these.
+    ═══════════════════════════════
+    Use this to craft a fresh, high-retention angle that outperforms previous reels.
     """
 
-    # Rotate hook framework randomly for variety
     hook_framework = _pick_hook_framework(analytics_data=analytics_data, feedback_summary=feedback_summary)
 
     prompt = f"""
-    You are "The Decoder", an expert Instagram Reels psychologist. Your goal: maximum completion rate and engagement.
-    Your audience is young men (18-30) on Indian Instagram who want you to DECODE female psychology, mixed signals, and relationship tests.
+    You are an expert viral content creator specializing in human behavior, relationship dynamics, and attraction psychology for Instagram Reels.
+    Target Audience: Young men (18-30) in India looking for genuine, street-smart psychological clarity.
+    Tone: Confident, insightful, relatable, like an older brother sharing game-changing truths. Not academic, not robotic, not depressing.
+
+    Topic: "{topic}"
+    Hook Framework: {hook_framework['name']} - {hook_framework['instruction']}
     {instructions}
     {language_rules}
     {previous_script_context}
 
-    Create a PUNCHY, fast-paced reel script for this topic: "{topic}".
-
-    ── THE DECODER PERSONA & TITLE RULES (CRITICAL) ──
-    - You must act as the expert who "hacks" or deciphers psychology.
-    - Ban all vague, depressing, or purely emotional angles. Focus purely on actionable decoding, tests, and hard truths.
-    - The `title` field (which is the on-screen hook) MUST follow this format: `[Trigger Word] + [Question/Promise]`
-      Examples of perfect titles: "Mixed Signals: Testing or Friendzone?", "Confused Signals? Friendzone DECIPHERED!", "Friendzone Test: Spot it or Stay Stuck?"
-    - The `title` field MUST NEVER use Devanagari script (Hindi characters). Use pure English or Roman Hinglish.
-    - Heavily favor terms like "Test", "Deciphered", "Secret", or numbered lists in your approach.
-
-    ── MAXIMIZING ENGAGEMENT WITHOUT REPETITION ──
-    To break past the 3.5K view ceiling, we need COMMENTS (most important), SAVES, and SHARES.
-    Current engagement is 2.43% — target 3-5%. Comments are the #1 ranking factor.
-    DO NOT use a numbered checklist (e.g., "3 signs hai") for every single video. 
-    Mix up the structure! Some videos should be a story, some a single deep psychological truth, and some a numbered list.
-    1. COMMENTS (PRIORITY #1): End with a DIRECT QUESTION that requires a yes/no/opinion answer in comments
-       Examples: 'Tell me in comments: kabhi aapko ye hua?' OR 'Guilty or Not Guilty? Comment now.'
-       Make viewers feel like they MUST answer — create FOMO of missing the discussion.
-    2. SAVES: When appropriate, use specific advice or a checklist that viewers want to refer back to.
-    3. SHARES: Include a relatable moment or realization that makes them want to DM a friend ("Agar koi dost isme phansa hai...").
-
-    HOOK FRAMEWORK (you MUST use this style):
-    {hook_framework['instruction']}
-
-    ── HIGH-RETENTION DECODER ARC (22–30 SECONDS OPTIMAL) ──
-
-    DURATION: This reel MUST be 22-30 seconds when spoken.
-    - Total word count: 60-80 words across the whole script.
-    - Return EXACTLY 3 or 4 scenes to build narrative depth, tension, and high watch time.
-    - Scene 1 (The Hook — 5-7s): 15-20 words
-        CRITICAL: The voiceover MUST start IMMEDIATELY with the hook statement. Do NOT read the title banner aloud!
-        Impossible-to-skip opening statement about female psychology or attraction signal.
-    - Scene 2 (The Deep Signal — 7-9s): 20-25 words
-        Explain the psychological reason behind her behavior / body language.
-    - Scene 3 (The Decoder Move — 7-9s): 20-25 words
-        Provide a clear, highly practical action or solution the viewer can take today. Not abstract psychology, but a tangible fix.
-    - Scene 4 (Comment & Share Loop — 4-6s): 10-15 words
-        End with a direct comment question or opinion poll + share trigger.
-        MANDATORY LOOP TRIGGER: The final 3 words should seamlessly connect back to the hook idea.
-
-    RETENTION TACTICS:
-    - Launch straight into the hook in word 1.
-    - Keep language conversational, raw, street-smart — like a brother telling secrets.
-    - Zero filler words. Every word must deliver high dopamine intrigue.
-
-    MANDATORY COMMENT-DRIVING TRIGGER (NON-NEGOTIABLE):
-    The FINAL sentence MUST include a direct question or poll that forces viewers to comment.
-    Structure: [Controversial Statement] + [Direct Yes/No Question]
-    Examples:
-    - 'Tum sochte ho ye testing hai ya genuine interest? Comment karo: Testing / Genuine'
-    - 'Guilty or innocent? Batao comments mein.'
-    - 'Agar ye tum par hua, toh tum kya karoge? Share your move in comments.'
-    ALSO include one share line: 'Send this to a friend who needs to hear it.'
-
-    PATTERN INTERRUPT:
-    - Each scene MUST feel visually and tonally distinct from the others
-    - Scene 1: mysterious/teasing energy
-    - Scene 2: building tension/revealing energy
-    - Scene 3: confident/mindblowing energy
-
-    CONTENT BOUNDARIES:
-    - Be intriguing and bold but stay Instagram-safe — NO explicit content
-    - Focus on psychology, body language, behavioral insights, confidence, and attraction dynamics
-    - Avoid overly suggestive or sexual language — Instagram's content classifier will suppress reach
-    - Think "Psychology Today meets street wisdom" not "clickbait"
-    - CRITICAL: DO NOT use any emojis in the text. Our custom font does not support emojis and will display broken square symbols.
-
-    VISUAL KEYWORDS:
-    - Each scene must have a visual_keyword for stock footage search
-    - Keywords should describe the MOOD and SETTING, not just "hot girl"
-    - CRITICAL FOR SCENE 1: The first scene's visual MUST be HIGH-IMPACT and stop scrolls within 0.5 seconds.
-      Rules:
-      * Use BOLD color contrast (neon green/magenta on black, bright red, vivid yellow, electric blue)
-      * Close-ups of faces or hands ALWAYS work better than wide shots
-    {instructions}
+    ── RETENTION & ENGAGEMENT BLUEPRINT (20–25 SECONDS TOTAL) ──
+    Total Script Length: 55 to 75 spoken Hindi words across EXACTLY 3 or 4 scenes.
+    
+    Scene Breakdown:
+    - Scene 1 (THE HOOK — 4-6s, 12-16 words):
+      Voiceover MUST start INSTANTLY with an impossible-to-skip curiosity gap or relatable scenario.
+      No intro, no fluff, no "Namaste". Launch right into the revelation or dilemma.
+      Provide a punchy 3-5 word English/Hinglish `on_screen_text` hook that stops the thumb scroll.
+    
+    - Scene 2 (THE CORE PSYCHOLOGICAL TRUTH — 6-8s, 16-22 words):
+      Explain the real subconscious mechanism or reason behind this behavior.
+      Keep it grounded in human nature (e.g. how perception of value, comfort, or mystery actually works).
+    
+    - Scene 3 (THE TACTICAL SHIFT — 6-8s, 16-22 words):
+      Deliver a clear, actionable mindset shift or practical response. What should the viewer actually do or understand?
+    
+    - Scene 4 (ENGAGEMENT & SHARE TRIGGER — 4-5s, 10-14 words):
+      End with a conversational question that naturally makes viewers want to share their opinion or experience in comments.
+      Include a natural share trigger (e.g., "Send this to a friend who needs this reminder").
 
     RULES:
-    1. Generate 3 to 5 scenes (total 60-80 words across all scenes). This ensures a full 22-30 second reel.
-    2. Each scene's `text` MUST be a complete spoken thought in pure Devanagari Hindi (15-25 words each).
-    3. For `visual_keyword`, YOU MUST provide LITERAL, highly-specific human actions (e.g., "close up couple holding hands", "person looking at phone in dark", "woman smiling over shoulder"). DO NOT use abstract words like "psychology", "mind", or "brain". We need real human B-roll.
-    4. Each scene MUST have a `visual_mood` (mysterious, confident, dramatic, intense, dark, energetic, elegant, or horror).
-    5. Final scene MUST include a CTA for comments (poll or question) and share trigger.
-    6. Output strict JSON only.
+    1. Narration text (`text`) MUST be in fluent, natural Devanagari Hindi. Use conversational, punchy sentence rhythm.
+    2. NEVER use generic AI cliches ("dekho dosto", "aaj hum baat karenge", "psychology kehti hai").
+    3. `title`: Catchy English hook title (3-6 words, e.g. "The Silent Withdrawal Effect", "Testing or Disinterested?").
+    4. `visual_keyword`: Provide cinematic, SITUATIONAL B-roll search terms (e.g. "man checking phone in dark room", "couple awkward silence cafe", "woman looking away contemplative street", "friends talking city night"). Avoid generic abstract words like 'psychology' or 'brain'.
+    5. Output STRICT JSON ONLY. Do NOT include markdown code fences or conversational text.
 
-    JSON STRUCTURE:
+    JSON SCHEMA:
     {{
-        "title": "A catchy viral title (max 8 words)",
-        "hook_framework": "curiosity_gap",
-        "brainstorming_scratchpad": {{
-            "phase_1_problems": "List exactly 10 distinct pain points or frustrations the audience has about this.",
-            "phase_2_hooks_verbal": "Brainstorm exactly 10 distinct verbal hooks.",
-            "phase_3_hooks_text": "Brainstorm exactly 10 distinct short on-screen text hooks.",
-            "phase_4_ctas": "Brainstorm exactly 10 different CTAs for driving comments or shares.",
-            "selection_logic": "Explain which problem, verbal hook, text hook, and CTA you selected and why it's the strongest combination."
-        }},
+        "title": "Catchy Viral Title",
+        "hook_framework": "{hook_framework['name']}",
         "scenes": [
             {{
                 "id": 1,
-                "text": "Scene 1 narration (Hook — curious energy)",
-                "on_screen_text": "Short 3-5 word scroll-stopping text (MUST be different from narration)",
-                "visual_keyword": "Descriptive visual search term with mood and lighting",
+                "text": "Scene 1 Hindi narration in Devanagari",
+                "on_screen_text": "3-5 word English hook",
+                "visual_keyword": "cinematic situational b-roll term",
                 "visual_mood": "mysterious",
                 "emotional_beat": "curious"
             }},
             {{
                 "id": 2,
-                "text": "Scene 2 narration (Build — tense energy)",
-                "visual_keyword": "Different visual search term with contrasting mood",
+                "text": "Scene 2 Hindi narration in Devanagari",
+                "visual_keyword": "cinematic b-roll term",
                 "visual_mood": "dramatic",
                 "emotional_beat": "tense"
             }},
             {{
                 "id": 3,
-                "text": "Scene 3 narration (Payoff — shocked energy, rewatch callback to Scene 1)",
-                "visual_keyword": "Third unique visual search term with final mood",
+                "text": "Scene 3 Hindi narration in Devanagari",
+                "visual_keyword": "cinematic b-roll term",
                 "visual_mood": "confident",
-                "emotional_beat": "shocked"
+                "emotional_beat": "enlightened"
+            }},
+            {{
+                "id": 4,
+                "text": "Scene 4 Hindi narration in Devanagari with comment trigger",
+                "visual_keyword": "cinematic b-roll term",
+                "visual_mood": "warm",
+                "emotional_beat": "empowered"
             }}
         ]
     }}
-    Provide only the valid JSON, no markdown formatting blocks.
     """
 
     return _llm_prompt(prompt, json_mode=True)
@@ -580,7 +491,7 @@ def generate_script(topic, analytics_data=None, feedback_summary=""):
 def generate_script_payload(topic, analytics_data=None, feedback_summary="", max_repairs=2):
     """Generate script and return a validated JSON payload with auto-repair and retry loops."""
     if feedback_summary:
-        print(f"[Feedback] Injecting performance history into script prompt.")
+        print("[Feedback] Injecting performance history into script prompt.")
 
     last_error = None
     for gen_attempt in range(2):
@@ -601,9 +512,6 @@ def generate_script_payload(topic, analytics_data=None, feedback_summary="", max
                         feedback_summary=feedback_summary,
                     )["name"]
                 
-                # Retention Engineering Pass
-                payload = _audit_script_payload(payload)
-                
                 return payload
             except Exception as exc:
                 last_error = exc
@@ -616,180 +524,198 @@ def generate_script_payload(topic, analytics_data=None, feedback_summary="", max
     raise RuntimeError(f"Failed to generate a valid high-retention script: {last_error}")
 
 
-def _audit_script_payload(payload):
-    """Retention Engineering pass: audit the generated script for filler words and curiosity gaps."""
-    import json
-    print("[Script] Running Retention Engineering audit pass...")
-    prompt = f"""
-    You are a Retention Editor and Quality Control Specialist for Instagram Reels.
-    Your task is to take this generated JSON script and optimize it for maximum retention, following a strict Phase 9 Quality Control process.
-    
-    RULES:
-    1. First, silently score the script from 1-10 on: Hook strength, Audience relevance, Value, Specificity, and Retention potential.
-    2. Remove all slow introductions, filler words, and generic AI phrasing. Every sentence must earn its place.
-    3. Shorten sentences to make them conversational and punchy.
-    4. Maximize curiosity gaps, pattern interrupts, and open loops.
-    5. Ensure the CTA matches the reel goal perfectly.
-    6. Keep the exact same JSON schema and keys. Do not change the overall structure.
-    
-    Original Script JSON:
-    {{json.dumps(payload, ensure_ascii=False, indent=2)}}
-    
-    Return only the optimized JSON.
-    """
-    optimized_raw = _llm_prompt(prompt, json_mode=True)
-    try:
-        optimized_payload = json.loads(optimized_raw)
-        if not isinstance(optimized_payload, dict) or "scenes" not in optimized_payload:
-            print(f"[Script] Audit pass returned valid JSON but missing 'scenes'. Falling back to original payload.")
-            return payload
-        return optimized_payload
-    except Exception as e:
-        print(f"[Script] Audit pass failed to return valid JSON ({e}). Falling back to original payload.")
-        return payload
+# ── Strategic Topic Pillars for Rich, Diverse Content ─────────────────
+# 6 High-Performance Pillars designed to avoid audience fatigue:
 
-
-
-# ── Topic sub-category pools for maximum retention & viral reach ──────
-# Based on REAL analytics (July 2026):
-# TIER 1A — Friendzone/Situationship/Mixed Signals: 2.5K-6.3K views (HIGHEST VIEWS)
-# TIER 1B — Mirror Psychology & Eye Contact Secrets: 1.5K-3.5K views (HIGHEST SHARE RATE)
-# TIER 2 HIGH — Eye contact, texting, jealousy: 800-2K views
-# TIER 2 DARK — Dark psychology, power dynamics: emerging viral niche
-
-_TOPIC_TIER1A_FRIENDZONE = [
-    "friendzone psychology — how to spot it, escape it, or use it",
-    "situationship vs friendzone — how to decode where you really stand",
-    "different stages of a relationship and what each stage reveals",
-    "friendship to love — signs she wants more than just being friends",
-    "stuck in friendzone? psychology of why and how to break out",
-    "situationship red flags — signs you're being kept as a backup",
-    "how to know if she sees you as a friend or something more",
-    "the hidden stage before a relationship that most guys miss",
-    "why girls keep certain guys in the friendzone deliberately",
-    "from talking stage to relationship — what signals matter most",
-    "friendzone test — 3 signs that tell you exactly where you stand",
-    "situationship psychology — why it feels like a relationship but isn't",
-    "how friendships turn into love — the psychology behind it",
-    "mixed signals or friendzone — how to tell the real difference",
-    "the moment she decides you're just a friend — and how to reverse it",
-    "signs she's keeping you as a backup — not as the one",
-    "why she texts you first but never asks to meet — decoded",
-    "talking stage trap — signs she wants more vs just passing time",
-    "Part 2: Escape The Friendzone Using This One Shift",
-    "Part 2: Situationship Exit — How to Make Her Choose",
-    "Part 3: The One Mindset That Breaks The Friendzone Forever",
+_PILLAR_BODY_LANGUAGE = [
+    "micro-expressions when someone is hiding attraction",
+    "eye contact dynamics — what looking away downward vs to the side means",
+    "the subtle physical proximity test people do without realizing",
+    "nervous fidgeting vs comfortable silence in conversation",
+    "voice pitch changes when talking to someone she finds attractive",
+    "the head tilt and exposed wrist gesture decoded",
+    "genuine smile vs polite social smile — how to spot the difference instantly",
+    "why people touch their hair or neck when feeling emotional tension",
+    "subconscious pupil dilation and what eye focus reveals",
+    "directional feet placement — where someone's subconscious interest lies",
+    "mirroring body language naturally vs faking it",
+    "what prolonged eye contact in a crowd actually indicates",
+    "the difference between friendly laughter and attraction laughter",
+    "crossing arms — defensive barrier or just feeling cold?",
+    "micro-glances across the room when they think you aren't looking",
+    "the sudden adjustment of clothes or hair when you enter the room",
+    "how body language changes when someone feels intimidated vs interested",
+    "touch barriers — accidental touches that aren't actually accidental",
+    "why confident silence is more attractive than constant talking",
+    "facial tension signs when someone wants to text you but resists",
 ]
 
-_TOPIC_TIER1B_MIRROR = [
-    # Mirror psychology: 1.53% share rate (highest) — people DM this to friends
-    "mirror effect psychology — when she copies your behavior it means THIS",
-    "she copies your words gestures energy — what her mirror behavior reveals",
-    "mirror psychology test — does she subconsciously mirror you right now",
-    "body mirroring — the one signal most guys completely miss",
-    "when she starts copying YOU — what the psychology says about attraction",
-    "why girls mirror the guy they like without even knowing it",
-    "Part 2: Mirror Test — 3 Ways To Check If She's Mirroring You",
-    "subconscious mirroring — her body is saying what her words won't",
-    "she laughs at everything you say — mirror effect or just friendly?",
-    "why she subconsciously changes her voice pitch around you — psychology",
+_PILLAR_TEXTING_DIGITAL = [
+    "why she views your stories in seconds but replies to texts after hours",
+    "the psychology behind sudden dry one-word replies",
+    "late-night texting vs daytime texting dynamics explained",
+    "the double-text dilemma — when it works and when it destroys leverage",
+    "what it means when someone sends voice notes instead of typing",
+    "the sudden shift from paragraphs to short replies decoded",
+    "social media soft-launching and what profile interactions reveal",
+    "the 24-hour reply delay — strategic calculation or disinterest?",
+    "why people keep someone on delivered while staying active online",
+    "meme-sharing psychology — the modern talking stage currency",
+    "how to reset the vibe when a text conversation starts dying",
+    "the unsend button psychology — what impulsive unsending reveals",
+    "why asking open-ended questions beats the boring interview format",
+    "what sudden disappearance followed by a random meme means",
+    "the psychology of left on read — how to handle it with high value",
+    "typing indicator anxiety and modern digital attachment",
+    "why over-texting kills attraction before the first meetup",
+    "the difference between texting for attention vs texting for connection",
+    "how to transition from digital chat to real-world plans effortlessly",
+    "why people check your profile repeatedly when there is silent friction",
 ]
 
-_TOPIC_TIER2_HIGH = [
-    # Eye contact & texting — proven 800-2K view range
-    "eye contact secrets — what her first glance really reveals",
-    "eye contact trap — why girls look away when you catch them watching",
-    "texting psychology — what her reply speed actually means",
-    "jealousy test — one move to check if she genuinely cares",
-    "signs she's attracted but hiding it — body language tell",
-    "what happens when you go silent — the power of withdrawal",
-    "3 things that instantly kill attraction without you knowing",
-    "the psychology of why being too available destroys attraction",
-    "her smile decoded — the difference between polite and genuine",
-    "why she watches your story but never replies to your texts",
-    "double blue tick but no reply — what she's really thinking",
-    "she said 'haha' — what different laughing responses actually mean",
-    "when she starts sending you memes — attraction signal decoded",
-    "why she gets angry when you ignore her — psychology explained",
-    "the 3-day rule — does going silent make her miss you more?",
-    "she replied instantly then suddenly went slow — what changed?",
-    "why she says 'I'm fine' but clearly isn't — female psychology",
-    "what it means when she keeps bringing up her ex in conversation",
+_PILLAR_MIXED_SIGNALS_TESTS = [
+    "compliance tests vs genuine boundaries — how to tell the difference",
+    "the hot-and-cold cycle — why people pull back right when it gets close",
+    "priority vs emotional backup — 3 brutal indicators of where you stand",
+    "why some people test your emotional stability when they like you",
+    "mixed signals mean one thing: mixed interest decoded",
+    "the talking stage trap — how to avoid staying stuck for months",
+    "why bringing up other suitors is often a subtle qualification test",
+    "situationships vs intentional dating — recognizing the signs early",
+    "the difference between playing hard to get and genuinely not caring",
+    "what happens when you refuse to react to emotional bait",
+    "how to handle unexpected cancellations with supreme calm",
+    "the sudden cold shoulder after a great conversation explained",
+    "why validation seekers keep you hooked without ever progressing",
+    "the difference between healthy independence and emotional unavailability",
+    "when someone says they are 'not ready for a relationship right now'",
+    "testing your boundaries — why setting clear limits increases respect",
+    "how to respond when someone gives you mixed signals repeatedly",
+    "the fear of vulnerability masked as emotional coolness",
+    "why over-explaining yourself instantly fails subtle tests",
+    "the moment you stop chasing — how mixed signal givers react",
 ]
 
-_TOPIC_TIER2_DARK = [
-    # Dark psychology & power dynamics — emerging viral niche for 18-30 male audience
-    "dark psychology tricks she uses when she wants your attention",
-    "why she plays hard to get — the psychological game behind it",
-    "push-pull psychology — why she gets closer when you pull away",
-    "the silent treatment — psychological power move or genuine hurt?",
-    "why ignoring her completely changes her behavior — dark psychology",
-    "she's testing your confidence — here's how to pass every time",
-    "manipulation vs testing — how to tell the difference instantly",
-    "why she gets cold right when things were getting good — decoded",
-    "social proof psychology — why she wants you more when others do",
-    "the scarcity principle — why less availability creates more attraction",
-    "why she tells her friends about you before telling you she likes you",
-    "gaslighting vs mixed signals — learn the difference before it's too late",
+_PILLAR_ATTRACTION_SCARCITY = [
+    "the scarcity principle — why 24/7 availability destroys attraction",
+    "why people value what they have to invest effort to earn",
+    "the quiet confidence shift that changes how others treat you",
+    "why desperate approval-seeking repels emotional connection",
+    "the art of holding your ground without getting aggressive",
+    "why chasing validation from outside makes you easy to manipulate",
+    "the power of walking away when your value isn't respected",
+    "why emotional self-control is the rarest modern superpower",
+    "the danger of putting anyone on an imaginary pedestal",
+    "how having a mission outside dating naturally builds attraction",
+    "why agreeing with everything makes conversations utterly boring",
+    "the difference between arrogance and unshakeable self-respect",
+    "why mystery and personal boundaries create natural intrigue",
+    "the psychological cost of constantly apologizing for existing",
+    "how needy energy leaks through even the smoothest words",
+    "why people respect those who are comfortable saying 'no'",
+    "the attraction law: you attract what you accept, not what you want",
+    "why losing yourself to please someone always leads to heartbreak",
+    "the difference between being kind and being a people-pleaser",
+    "why high-value people never compete for someone's basic attention",
+]
+
+_PILLAR_CONTRARIAN_TRUTHS = [
+    "the 'nice guy' paradox — why harmlessness is not the same as goodness",
+    "what people say they want vs what actually sparks chemistry",
+    "why being too understanding often leads to being taken for granted",
+    "the brutal truth about being 'too nice' in early talking stages",
+    "why people fall for emotional predictability vs dynamic presence",
+    "the myth that effort equals attraction — the law of emotional return",
+    "why closure is a myth and self-respect is the real answer",
+    "the paradox of choice in modern dating — why more options make people lonelier",
+    "why trying to 'fix' someone is a disguised ego trap",
+    "the difference between genuine chemistry and trauma bonding",
+    "why people stay in toxic dynamics longer than healthy ones",
+    "the illusion of the 'one that got away' explained psychologically",
+    "why silence after disrespect speaks louder than angry arguments",
+    "the psychology of why jealousy is a confession of insecurity",
+    "why unconditional support before commitment gets you friendzoned",
+    "the brutal reality of emotional rebound connections",
+    "why self-respect is the ultimate filter for genuine people",
+    "the psychology of regret: why people only miss you after you move on",
+    "why being comfortable alone makes you magnetic to others",
+    "the truth about why people ghost instead of having an honest conversation",
+]
+
+_PILLAR_CONVERSATION_TENSION = [
+    "how to break out of the boring interview mode in conversations",
+    "the power of playful teasing vs boring validation in banter",
+    "how to handle awkward silences without rushing to fill them",
+    "the secret to storytelling that holds anyone's full attention",
+    "why reacting less makes your words carry ten times more weight",
+    "how to create emotional peaks and valleys in everyday talks",
+    "the difference between being funny and being a clown for approval",
+    "how to disagree playfully without creating bitter conflict",
+    "the art of the pause — why slowing down your speech commands respect",
+    "how to ask questions that make people open up about their passions",
+    "why listening to what is NOT said is the ultimate social skill",
+    "how to give compliments that feel genuine rather than desperate",
+    "the psychology of conversational rhythm — matching energy effectively",
+    "how to steer conversations away from mundane small talk",
+    "why holding back personal details creates intense curiosity",
+    "how to exit a conversation at the peak to leave them wanting more",
+    "the power of self-deprecating humor without destroying your status",
+    "how to respond to backhanded compliments with effortless composure",
+    "the difference between deep conversation and trauma dumping",
+    "why charismatic people make others feel like the only person in the room",
+]
+
+_ALL_PILLARS = [
+    ("Body Language & Micro-Signals", _PILLAR_BODY_LANGUAGE),
+    ("Texting & Digital Psychology", _PILLAR_TEXTING_DIGITAL),
+    ("Mixed Signals & Attraction Tests", _PILLAR_MIXED_SIGNALS_TESTS),
+    ("Attraction Physics & Scarcity", _PILLAR_ATTRACTION_SCARCITY),
+    ("Contrarian Truths & Human Nature", _PILLAR_CONTRARIAN_TRUTHS),
+    ("Conversation & Emotional Tension", _PILLAR_CONVERSATION_TENSION),
 ]
 
 
 def generate_topic_from_domain(domain, analytics_data=None, feedback_summary="", used_topics=None):
-    """Generate the next reel topic focused 100% on Female Psychology & Attraction Signals."""
+    """Generate the next reel topic dynamically across 6 core psychology & attraction pillars."""
     used_topics_set = used_topics or set()
     avoid_block = ""
     if used_topics_set:
-        recent_list = ", ".join(f'"{t}"' for t in list(used_topics_set)[-15:])
+        recent_list = ", ".join(f'"{t}"' for t in list(used_topics_set)[-40:])
         avoid_block = f"""
-CRITICAL: DO NOT suggest any of these recently used topics (they were already posted):
+CRITICAL DEDUPLICATION RULE:
+Do NOT repeat or copy any of these recently used topics/problems:
 {recent_list}
-The new topic must be clearly different in angle and hook style from all of the above.
+Your new topic MUST explore a fresh, distinctive scenario or angle that has NOT been covered recently.
 """
 
-    # Strict pool: ONLY TIER 1 topics (proven viral: Friendzone & Mirroring)
-    # TIER 2 HIGH was removed as per your request to strictly stick to the best performers.
-    women_topics_pool = (
-        _TOPIC_TIER1A_FRIENDZONE
-        + _TOPIC_TIER1B_MIRROR
-    )
-    subcategory = random.choice(women_topics_pool)
-
-    pillar_instructions = """
-Target Niche: FEMALE & WOMEN PSYCHOLOGY, ATTRACTION SECRETS, EYE CONTACT & RELATIONSHIP SIGNALS
-Task guidelines:
-1. Focus strictly on female/women psychology, subconscious body language signals, attraction secrets, mirror effect, eye contact traps, or decoding mixed signals.
-2. Must create intense curiosity about female behavior and relationship dynamics.
-3. Proven Top-Performing Angles (model after these):
-   - Her Mixed Signals: Testing or Friendzoning?
-   - Eye Contact Trap: The REAL Unlock!
-   - Mirror Effect Psychology — Jab wo tumhari tarah act karti hai
-   - Ye 3 signs jo batati hain ke wo interested hai
-4. CRITICAL: NEVER suggest topics about dark psychology, manipulation, gaslighting, or toxic behavior. Instagram's classifier suppresses these topics to 100 views. Keep it positive, analytical, and safe.
-"""
+    # Pick a random pillar and seed angle to guarantee fresh content variety
+    pillar_name, seed_pool = random.choice(_ALL_PILLARS)
+    seed_angle = random.choice(seed_pool)
+    print(f"[TopicEngine] Active Pillar: '{pillar_name}' | Seed Angle: '{seed_angle}'")
 
     prompt = f"""
-You are a short-form content strategist specialized in viral Instagram Reels. 
-Your target audience is young men (18-30) on Indian Instagram who want female psychology, attraction secrets, and relationship signals deciphered.
+You are a viral Instagram Reels strategist who understands human psychology, attraction dynamics, and young male relationship dilemmas in India (age 18-30).
 
-Primary domain: "{domain}"
-Today's angle/subcategory focus: "{subcategory}"
-{pillar_instructions}
-Historical feedback summary: {feedback_summary or 'No data yet'}
+Domain: "{domain}"
+Current Strategic Pillar: "{pillar_name}"
+Seed Concept for inspiration: "{seed_angle}"
 {avoid_block}
 
 Task:
-Propose exactly ONE core emotional problem or burning question for the next Instagram Reel that:
-1. Strictly adheres to today's Target Niche guidelines listed above
-2. Represents a specific, painful, or confusing situation the audience faces (e.g. "I don't know if she is testing me or friendzoning me").
-3. Is bold, relatable, street-smart, and Instagram-safe
-4. Is DIFFERENT from the recently used problems listed above
+Formulate exactly ONE fresh, high-curiosity emotional dilemma, burning question, or psychological truth for the next Instagram Reel that:
+1. Addresses a specific, relatable real-world situation young men encounter in modern dating, texting, or social dynamics.
+2. Has immediate scroll-stopping curiosity (makes someone think: "Wait, why does this happen?").
+3. Is street-smart, psychologically grounded, and 100% Instagram-safe (no toxic manipulation or explicit content).
+4. Is DIFFERENT from the recently used topics listed above.
 
-Return only a single plain-text problem statement, max 15 words, no quotes, no numbering.
+Return ONLY a single plain-text statement or question, max 14 words, no quotes, no numbering.
 """
 
     content = _llm_prompt(prompt)
-    lines = content.splitlines()
+    lines = [l.strip() for l in content.splitlines() if l.strip()]
     if not lines:
         raise ValueError("LLM returned empty topic")
-    return lines[0].strip()
+    topic = lines[0].strip(' "\'')
+    return topic
+
 

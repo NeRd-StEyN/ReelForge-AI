@@ -44,41 +44,37 @@ def _save_persistent_blacklist():
 _load_persistent_blacklist()
 
 
-# ── Diverse visual fallback queries strictly anchored to niche aesthetics ──────────
-# All queries are anchored to close-up portraits, eye contact, moody lighting, and subtle facial expressions
+# ── Diverse visual fallback queries with cinematic situational storytelling ──────────
 _DIVERSE_FALLBACK_QUERIES = [
+    # Situational & Relatable Moments
+    "man looking at phone in dark room moody cinematic",
+    "person texting on smartphone night street cinematic",
+    "couple sitting together cafe awkward silence cinematic",
+    "woman checking phone notification subtle expression cinematic",
+    "person walking away down empty street night lights",
+    "thoughtful person looking out window rain cinematic",
+    "subtle eye contact across room crowd slow motion",
+    "hands holding coffee cup tension conversation",
     # Eye contact & intense glances
     "intense eye contact woman portrait close up cinematic",
-    "woman looking at camera dramatic eyes portrait moody",
-    "close up woman eyes intense glance cinematic portrait",
-    # Warm/golden attraction mood
     "confident woman subtle smile camera golden hour portrait",
-    "attractive woman sunset beach eye contact cinematic",
-    "woman close up face warm light aesthetic portrait",
-    # Cool/neon suspense mood
     "mysterious woman neon lighting close up eyes cinematic",
     "attractive woman dark moody shadow eye contact portrait",
-    "girl subtle glance club neon lighting slow motion",
-    # Dark/dramatic psychology mood
+    "man deep thought urban street night cinematic",
     "woman silhouette intense eyes dramatic lighting portrait",
-    "mysterious woman dark background spotlight close up",
-    "woman moody rain lighting face portrait cinematic",
-    # Elegant/subtle mood
-    "elegant woman fashion studio lighting close up face",
-    "woman luxury aesthetic subtle glance cinematic",
-    "model intense gaze dramatic lighting portrait",
+    "couple talking evening city aesthetic slow motion",
 ]
 
 # Mood-specific visual modifiers for deep emotional alignment
 _MOOD_MODIFIERS = {
-    "mysterious": ["intense glance dark lighting", "mysterious shadows close up", "dim blue eyes portrait", "fog atmosphere face"],
-    "confident": ["direct eye contact camera", "golden hour gaze", "confident smile close up", "urban street portrait"],
-    "dramatic": ["dramatic spotlight eyes", "high contrast face", "rain cinematic glance", "silhouette eyes backlit"],
-    "warm": ["golden hour smile", "warm tones gaze", "intimate eye contact", "candlelight close up face"],
-    "dark": ["dark moody eyes", "shadow play portrait", "night neon gaze", "low key lighting face"],
-    "energetic": ["intense gaze dynamic", "fast zoom eye contact", "vibrant colors portrait"],
-    "elegant": ["studio lighting face", "luxury aesthetic glance", "fashion editorial eyes", "minimalist portrait"],
-    "neutral": ["cinematic eye contact", "soft lighting close up", "aesthetic portrait gaze", "clean face composition"],
+    "mysterious": ["dark lighting", "mysterious shadows", "neon reflection", "fog atmosphere"],
+    "confident": ["direct gaze camera", "golden hour", "confident smile", "urban street cinematic"],
+    "dramatic": ["dramatic spotlight", "high contrast", "rain cinematic", "silhouette backlit"],
+    "warm": ["golden hour warm tones", "intimate setting", "soft candlelight", "cozy coffee shop"],
+    "dark": ["dark moody aesthetic", "shadow play", "night city neon", "low key lighting"],
+    "energetic": ["dynamic motion", "fast zoom eye contact", "vibrant colors", "city lights"],
+    "elegant": ["studio lighting", "luxury aesthetic", "minimalist portrait", "cinematic film look"],
+    "neutral": ["cinematic lighting", "aesthetic composition", "natural street look", "shallow depth of field"],
 }
 
 # Words that indicate completely off-topic stock footage (must be stripped)
@@ -89,7 +85,7 @@ _OFF_TOPIC_BLACKLIST = [
 
 
 def _build_realistic_query(query, visual_mood="neutral", scene_index=0):
-    """Build a realistic, highly relevant stock search query anchored to face & eye aesthetics."""
+    """Build a realistic, highly relevant stock search query supporting both facial and situational b-roll."""
     base = " ".join(str(query or "").split()).lower()
 
     # Remove off-topic blacklisted words
@@ -105,20 +101,29 @@ def _build_realistic_query(query, visual_mood="neutral", scene_index=0):
     if not base:
         return random.choice(_DIVERSE_FALLBACK_QUERIES)
 
-    # Ensure query has explicit face/eye/portrait anchors for Niche Relevance
+    # Situational context check
+    situational_terms = [
+        "phone", "text", "cafe", "street", "walking", "sitting", "couple",
+        "night", "dark", "silence", "conversation", "hands", "window",
+        "shadow", "room", "city", "crowd", "car"
+    ]
+    has_situation = any(term in base for term in situational_terms)
     has_anchor = any(w in base for w in ["eye", "face", "portrait", "glance", "gaze", "close up", "looking"])
-    if not has_anchor:
-        base = f"{base} close up face portrait"
+    has_person = any(w in base for w in ["woman", "girl", "female", "lady", "model", "man", "guy", "couple", "person", "someone", "people"])
 
-    has_person = any(w in base for w in ["woman", "girl", "female", "lady", "model", "man", "person"])
-    if not has_person:
-        base = f"woman {base}"
+    # If neither person nor situation is specified, add natural subject
+    if not has_person and not has_situation:
+        base = f"person {base}"
+    
+    # If no facial anchor and no situation, anchor to expressive portrait
+    if not has_anchor and not has_situation:
+        base = f"{base} close up portrait"
 
     # Add mood-specific modifiers for visual variety
     mood_mods = _MOOD_MODIFIERS.get(visual_mood, _MOOD_MODIFIERS["neutral"])
     selected_mod = random.choice(mood_mods)
 
-    # Color bias per scene to keep sequence visually distinct
+    # Color variety per scene
     color_variety = ["", "warm tones", "cool tones", "high contrast", "soft light"][scene_index % 5]
 
     return f"{base} {selected_mod} {color_variety} cinematic".strip()

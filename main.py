@@ -219,6 +219,13 @@ def main(topic, feedback_summary="", tts_voice_override=None, insta_client=None,
         except Exception as story_err:
             print(f"[Story] Note: Direct story skipped ({story_err}). Story payload sent to Make.com.")
 
+    # Ensure topic is recorded in deduplication log
+    try:
+        from pipeline.feedback_loop import save_used_topic
+        save_used_topic(topic)
+    except Exception:
+        pass
+
     print(f"Pipeline complete! Video saved to: {output_file}")
     print(f"Metadata saved to: video_metadata.json")
     return {

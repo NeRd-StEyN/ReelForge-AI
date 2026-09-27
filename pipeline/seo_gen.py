@@ -21,8 +21,8 @@ SPECIAL RULE for this hook framework: The first line MUST use either:
 This is our PROVEN highest-performing opener style on this account."""
 
     prompt = f"""
-You are an Instagram caption specialist for viral Reels.
-Write a SHORT, punchy caption for this reel about relationship psychology.
+You are an Instagram caption specialist for viral relationship & psychology Reels.
+Write a SHORT, magnetic caption for this reel.
 
 Reel title: "{title}"
 Reel topic: "{topic}"
@@ -31,36 +31,16 @@ Script preview: {scene_texts}
 {test_format_tip}
 
 Rules:
-- CRITICAL: The VERY FIRST LINE must be under 90 characters total (including spaces and emoji).
-  Instagram cuts off captions at ~125 chars before "more" — the hook MUST land fully in the first line.
-  Example of a good first line (under 90 chars): "🔥 90% ladke ek cheez nahi karte jo attract karti hai"
-- First line: 1 provocative hook sentence that makes people STOP and read. Use an emoji at the start.
-- Second line: A MANDATORY comment-bait question with a NUMBERED reply prompt.
-  This forces the algorithm to prioritize the reel based on comment volume. Examples:
-    "कितनो के साथ ये हो चुका है? Comment 1 अगर हाँ, 2 अगर नहीं 👇"
-    "आपका kya answer hai? 1 = हाँ, 2 = नहीं, 3 = नहीं पता 👇"
-    The question MUST end with a numbered option list + 👇 emoji.
-- Third line: A SPECIFIC, urgent SAVE-focused CTA that references the NUMBERED LIST in the reel.
-    Since the reel contains a numbered checklist, tell them to save it because they can't remember all points.
-    Examples:
-    "Save this list — agli baar jab confused ho, dekhna 📌"
-    "Is list ko save karo — ye 3 signs bhool jaoge warna 📌"
-    "Screenshot karo ye teen signs — real life mein test karo 📌"
-    Make the reason SPECIFIC to THIS reel's content — not generic 'save for later'.
-- Fourth line: A like-bait line that triggers emotional resonance WITHOUT literally saying 'like karo'.
-  Examples:
-    "Like karo agar ye tumhare saath bhi hua hai 💯"
-    "Agar tumne ye feel kiya hai, double tap karo ❤️"
-    "92% log ye miss karte hain — tum nahi karte agar ye dekh raha hai 🔥"
-- Fifth line (exact, do not change): "Follow @itsun.known6969 for daily relationship psychology secrets 🔑"
-- Write in Hinglish (mix of Hindi and English) — natural Gen-Z Indian Instagram style
-- Do NOT use generic phrases like "Tag a bro", "Double tap", "Share with bestie"
-- Make it feel like a REAL person wrote it, not a bot
-- CRITICAL: The caption's save CTA must reference the specific LIST/SIGNS/TEST from the reel — never generic.
-  This is because the reel script now contains numbered checklists. The caption must reinforce:
-  'Save this list' not just 'save this'
+- Line 1 (THE HOOK): Must be under 90 characters total (including emoji). Instagram cuts off before 'more'. Make it impossible not to tap 'more'.
+- Line 2 (THE CORE INSIGHT): 1-2 punchy sentences in conversational Hinglish expanding on the reel's psychological insight.
+- Line 3 (THE ENGAGEMENT TRIGGER): An authentic, provocative question that makes people want to write their own opinion or personal story in the comments. End with 👇.
+  (Do NOT use rigid 'Comment 1 or 2' voting — ask for genuine thoughts, agreement/disagreement, or experiences).
+- Line 4 (VALUE/SAVE CTA): A natural reason to bookmark or share this reel (e.g., "Is insight ko save kar lo — real life mein kaam aayega 📌").
+- Line 5 (Exact handle CTA): "Follow @itsun.known6969 for daily relationship psychology secrets 🔑"
+- Style: Fluent Hinglish (mix of Hindi & English) — natural Gen-Z / millennial Indian Instagram style.
+- Make it sound like a real person sharing an eye-opening observation, NOT an automated template.
 
-Return ONLY the caption text, no quotes, no markdown.
+Return ONLY the 5-line caption text, no quotes, no markdown fences.
 """
     raw = _llm_prompt(prompt).strip()
 

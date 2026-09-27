@@ -1039,10 +1039,18 @@ def create_video(scenes, voiceovers, visuals, output_file, word_timeline=None, c
             # (Removed static like-bait overlay based on AI critique. The voiceover handles comments now.)
 
             # Dynamic header banner for series reels (e.g. Follow for Part 2)
+            # Starts only after hook_overlay finishes in Scene 1 to prevent visual collision
             if title:
-                series_banner = _create_series_banner(title, duration)
-                if series_banner:
-                    extra_overlays.append(series_banner)
+                if i == 0:
+                    rem_dur = duration - hook_duration
+                    if rem_dur > 0.8:
+                        series_banner = _create_series_banner(title, rem_dur)
+                        if series_banner:
+                            extra_overlays.append(series_banner.set_start(hook_duration))
+                else:
+                    series_banner = _create_series_banner(title, duration)
+                    if series_banner:
+                        extra_overlays.append(series_banner)
 
             # Flash transition between scenes (pattern interrupt at cut points)
             if i > 0:
@@ -1125,10 +1133,18 @@ def create_video(scenes, voiceovers, visuals, output_file, word_timeline=None, c
             extra_overlays.append(cta_overlay)
 
         # Dynamic header banner for series reels (legacy mode)
+        # Starts only after hook_overlay finishes in Scene 1 to prevent visual collision
         if title:
-            series_banner = _create_series_banner(title, duration)
-            if series_banner:
-                extra_overlays.append(series_banner)
+            if i == 0:
+                rem_dur = duration - hook_duration
+                if rem_dur > 0.8:
+                    series_banner = _create_series_banner(title, rem_dur)
+                    if series_banner:
+                        extra_overlays.append(series_banner.set_start(hook_duration))
+            else:
+                series_banner = _create_series_banner(title, duration)
+                if series_banner:
+                    extra_overlays.append(series_banner)
 
         video_scene = CompositeVideoClip([clip] + subtitle_layers + extra_overlays)
         clips.append(video_scene)
