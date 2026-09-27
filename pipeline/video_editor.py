@@ -479,6 +479,11 @@ def _create_hook_overlay(topic="", duration=2.0, size=(1080, 1920)):
 
 # ── CTA Overlay (Fixed Devanagari rendering) ────────────────────────
 
+def _get_insta_handle():
+    user = (os.getenv("INSTA_USERNAME") or "itsun.known6969").strip()
+    return f"@{user}" if not user.startswith("@") else user
+
+
 def _create_follow_cta(duration=2.5, size=(1080, 1920)):
     """Create a niche-specific 'Follow for more' CTA text overlay for the last seconds.
     
@@ -491,13 +496,13 @@ def _create_follow_cta(duration=2.5, size=(1080, 1920)):
 
     # Niche-specific CTAs — rotated for variety
     cta_options = [
-        "\u092b\u093c\u0949\u0932\u094b \u0915\u0930\u094b \u2014 \u0906\u0930 \u0938\u0940\u0915\u094d\u0930\u0947\u091f \u0906\u090f\u0902\u0917\u0947!",   # "फ़ॉलो करो — और सीक्रेट आएंगे!"
-        "\u0930\u094b\u091c \u0928\u092f\u0940 psychology \u2014 follow karo!",  # "रोज नयी psychology — follow karo!"
-        "\u0938\u0940\u0916\u094b psychology secrets \u2014 follow now!",
+        "फ़ॉलो करो — और सीक्रेट्स आएंगे!",
+        "रोज नयी psychology — follow karo!",
+        "सीखो psychology secrets — follow now!",
         "Part 2 chahiye? Follow kar lo!",
     ]
     cta_text = _strip_unsupported_chars(random.choice(cta_options))
-    handle_text = "@itsun.known6969"
+    handle_text = _get_insta_handle()
 
     # CTA line
     w = draw.textlength(cta_text, font=font)
@@ -896,7 +901,7 @@ def generate_thumbnail(title, output_path="output_thumbnail.jpg", size=(1080, 19
     draw.text(((size[0] - sub_w) / 2, start_y + 30), sub, font=font_small, fill=(0, 220, 120))
 
     # Bottom branding
-    brand = "@itsun.known6969"
+    brand = _get_insta_handle()
     brand_font = _load_caption_font(44)
     bw = draw.textlength(brand, font=brand_font)
     draw.text(((size[0] - bw) / 2, size[1] - 100), brand, font=brand_font, fill=(180, 180, 180))
