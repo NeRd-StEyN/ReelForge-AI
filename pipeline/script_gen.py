@@ -436,9 +436,10 @@ def generate_script(topic, analytics_data=None, feedback_summary=""):
     - Scene 3 (THE TACTICAL SHIFT — 6-8s, 16-22 words):
       Deliver a clear, actionable mindset shift or practical response. What should the viewer actually do or understand?
     
-    - Scene 4 (ENGAGEMENT & SHARE TRIGGER — 4-5s, 10-14 words):
-      End with a conversational question that naturally makes viewers want to share their opinion or experience in comments.
+    - Scene 4 (ENGAGEMENT, SHARE & INFINITE WATCH-LOOP — 4-5s, 10-14 words):
+      End with a conversational question that naturally makes viewers want to share their opinion in comments.
       Include a natural share trigger (e.g., "Send this to a friend who needs this reminder").
+      MANDATORY INFINITE WATCH-LOOP: The final 2-4 words of Scene 4 MUST be written so they seamlessly connect back into the beginning of Scene 1 when the video loops automatically (e.g. ending with "...और यही वजह है कि" or "...पर क्या तुम जानते हो कि", looping right into Scene 1). This tricks viewers into rewatching the hook and drives average watch time over 100%.
 
     RULES:
     1. Narration text (`text`) MUST be in fluent, natural Devanagari Hindi. Use conversational, punchy sentence rhythm.

@@ -35,6 +35,10 @@ def _get_tts_voice():
     return (os.getenv("TTS_VOICE") or "hi-IN-SwaraNeural").strip()
 
 
+def _get_tts_rate():
+    return (os.getenv("TTS_RATE") or "+12%").strip()
+
+
 def cleanup_generated_assets():
     """Remove old generated scene files so each run starts clean."""
     patterns = [
@@ -60,7 +64,8 @@ def cleanup_generated_assets():
 def main(topic, feedback_summary="", tts_voice_override=None, insta_client=None, analytics_data=None):
     print(f"Starting pipeline...")
     tts_voice = tts_voice_override or _get_tts_voice()
-    print(f"[Voice] TTS voice: {tts_voice}")
+    tts_rate = _get_tts_rate()
+    print(f"[Voice] TTS voice: {tts_voice} | Rate: {tts_rate}")
 
     if _env_flag("AUTO_CLEANUP_ASSETS", "true"):
         cleanup_generated_assets()
@@ -117,7 +122,7 @@ def main(topic, feedback_summary="", tts_voice_override=None, insta_client=None,
         if not use_single_narration:
             # Legacy mode: generate one voice clip per scene.
             vo_path = f"assets/audio/scene_{i+1}.mp3"
-            run_generate_voiceover(scene['text'], vo_path, voice=tts_voice)
+            run_generate_voiceover(scene['text'], vo_path, voice=tts_voice, rate=tts_rate)
             voiceover_paths.append(vo_path)
         
         # Get visual mood from scene data (new field from updated script_gen)
@@ -161,7 +166,7 @@ def main(topic, feedback_summary="", tts_voice_override=None, insta_client=None,
             full_narration_text,
             full_narration_path,
             voice=tts_voice,
-            rate="+0%",
+            rate=tts_rate,
         )
         voice_input = full_narration_path
     else:
