@@ -3,11 +3,6 @@ import random
 from pipeline.script_gen import _llm_prompt
 
 
-def _get_insta_handle():
-    user = (os.getenv("INSTA_USERNAME") or "itsun.known6969").strip()
-    return f"@{user}" if not user.startswith("@") else user
-
-
 def _generate_ai_caption(topic, script_data):
     """Use LLM to generate a short, engaging, topic-specific caption with a debate-starter CTA."""
     title = script_data.get("title", topic)
@@ -15,7 +10,6 @@ def _generate_ai_caption(topic, script_data):
     scene_texts = " | ".join(
         s.get("text", "")[:60] for s in script_data.get("scenes", [])
     )
-    handle = _get_insta_handle()
 
     # Extra instruction for test_format framework (our highest performer)
     test_format_tip = ""
@@ -42,7 +36,7 @@ Rules:
 - Line 3 (THE ENGAGEMENT TRIGGER): An authentic, provocative question that makes people want to write their own opinion or personal story in the comments. End with 👇.
   (Do NOT use rigid 'Comment 1 or 2' voting — ask for genuine thoughts, agreement/disagreement, or experiences).
 - Line 4 (VALUE/SAVE CTA): A natural reason to bookmark or share this reel (e.g., "Is insight ko save kar lo — real life mein kaam aayega 📌").
-- Line 5 (Exact handle CTA): "Follow {handle} for daily relationship psychology secrets 🔑"
+- Line 5 (Exact handle CTA): "Follow @itsun.known6969 for daily relationship psychology secrets 🔑"
 - Style: Fluent Hinglish (mix of Hindi & English) — natural Gen-Z / millennial Indian Instagram style.
 - Make it sound like a real person sharing an eye-opening observation, NOT an automated template.
 
@@ -261,8 +255,7 @@ def generate_seo_metadata(topic, script_data):
         caption_body = _generate_ai_caption(topic, script_data)
     except Exception as e:
         print(f"AI caption generation failed, using fallback: {e}")
-        handle = _get_insta_handle()
-        caption_body = f"🔥 {topic}\n\nSach hai ya alag soch hai? Apni ray comments mein share karo 👇\nIs insight ko save zaroor kar lena 📌\nFollow {handle} for daily psychology secrets 🔑"
+        caption_body = f"🔥 {topic}\n\nSach hai ya alag soch hai? Apni ray comments mein share karo 👇\nIs insight ko save zaroor kar lena 📌\nFollow @itsun.known6969 for daily psychology secrets 🔑"
 
     # AI-generated topic-specific hashtags
     try:
