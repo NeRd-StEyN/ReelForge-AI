@@ -33,8 +33,7 @@ Script preview: {scene_texts}
 Rules:
 - Line 1 (THE HOOK): Must be under 90 characters total (including emoji). Instagram cuts off before 'more'. Make it impossible not to tap 'more'.
 - Line 2 (THE CORE INSIGHT): 1-2 punchy sentences in conversational Hinglish expanding on the reel's psychological insight.
-- Line 3 (THE ENGAGEMENT TRIGGER): An authentic, provocative question that makes people want to write their own opinion or personal story in the comments. End with 👇.
-  (Do NOT use rigid 'Comment 1 or 2' voting — ask for genuine thoughts, agreement/disagreement, or experiences).
+- Line 3 (THE ENGAGEMENT TRIGGER): A sharp, low-friction poll/question ending with 👇 that makes commenting take 1 second. Example: "Aapke saath hua hai? Comment: 1 = Haan, 2 = Kabhi nahi 👇" or "Aapka kya answer hai? 1 = Haan, 2 = Nahi 👇". (Proven highest performer on this account).
 - Line 4 (VALUE/SAVE CTA): A natural reason to bookmark or share this reel (e.g., "Is insight ko save kar lo — real life mein kaam aayega 📌").
 - Line 5 (Exact handle CTA): "Follow @itsun.known6969 for daily relationship psychology secrets 🔑"
 - Style: Fluent Hinglish (mix of Hindi & English) — natural Gen-Z / millennial Indian Instagram style.

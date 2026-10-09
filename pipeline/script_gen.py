@@ -8,8 +8,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # ── Model configuration ──────────────────────────────────
-# 1. Google Gemini via Google AI Studio (100% Free: 1500 req/day, native JSON & Hindi)
-_GEMINI_MODELS = ["gemini-2.0-flash", "gemini-1.5-flash"]
+_GEMINI_MODELS = ["gemini-3.8-flash", "gemini-2.5-flash", "gemini-1.5-flash"]
 
 # 2. OpenRouter fallback models
 _OPENROUTER_PRIMARY_MODEL = os.getenv("OPENROUTER_MODEL", "google/gemini-2.0-flash")
@@ -36,26 +35,40 @@ _THINKING_PREAMBLE_PATTERNS = [
     "**analyze the request",
     "1.  **analyze",
     "1. **analyze",
+    "the hook framework is",
+    "special rule says",
+    "user safety: safe",
+    "sample title",
+    "sample story",
 ]
 
 
 def _strip_thinking_preamble(text: str) -> str:
-    """Remove chain-of-thought preamble from plain text responses."""
+    """Remove chain-of-thought preamble and meta-instructions from plain text responses."""
     lower = text.lower()
-    is_thinking = any(lower.startswith(p) or lower[:120].find(p) != -1
-                      for p in _THINKING_PREAMBLE_PATTERNS)
+    is_thinking = any(p in lower for p in _THINKING_PREAMBLE_PATTERNS)
     if not is_thinking:
         return text
 
-    print("[LLM] Detected thinking preamble in response — stripping chain-of-thought...")
+    print("[LLM] Detected thinking preamble/meta-text in response — stripping...")
 
     paragraphs = [p.strip() for p in text.split("\n\n") if p.strip()]
 
-    for para in reversed(paragraphs):
-        lines = para.splitlines()
-        first_line = lines[0].strip() if lines else ""
-        if first_line.startswith(("#", "**", "*", "-", "1.", "2.", "3.")):
+    clean_paras = []
+    for para in paragraphs:
+        lower_p = para.lower()
+        if any(p in lower_p for p in _THINKING_PREAMBLE_PATTERNS):
             continue
+        first_line = para.splitlines()[0].strip() if para.splitlines() else ""
+        if first_line.startswith(("#", "**", "*", "1.", "2.", "3.")):
+            continue
+        clean_paras.append(para)
+
+    if clean_paras:
+        return "\n\n".join(clean_paras)
+
+    # Fallback if all were matched
+    for para in reversed(paragraphs):
         lower_para = para.lower()
         if any(skip in lower_para for skip in (
             "here's the", "here is the", "final answer", "the comment is",
@@ -64,11 +77,10 @@ def _strip_thinking_preamble(text: str) -> str:
             after = para.split(":", 1)[-1].strip()
             if after:
                 return after
-            continue
-        if len(para) > 5:
+        if len(para) > 5 and not any(p in lower_para for p in _THINKING_PREAMBLE_PATTERNS):
             return para
 
-    lines = [l.strip() for l in text.splitlines() if l.strip()]
+    lines = [l.strip() for l in text.splitlines() if l.strip() and not any(p in l.lower() for p in _THINKING_PREAMBLE_PATTERNS)]
     return lines[-1] if lines else text
 
 
@@ -108,7 +120,7 @@ def _normalize_content(content, json_mode=False):
     return _strip_thinking_preamble(text)
 
 
-def _call_gemini_direct(prompt, model="gemini-2.0-flash", json_mode=False):
+def _call_gemini_direct(prompt, model="gemini-3.8-flash", json_mode=False):
     """Call Google Gemini API directly (100% Free via Google AI Studio).
     
     Provides best-in-class Hindi Devanagari generation and guaranteed JSON output.
