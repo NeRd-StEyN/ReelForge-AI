@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # ── Model configuration ──────────────────────────────────
-_GEMINI_MODELS = ["gemini-3.8-flash", "gemini-2.5-flash", "gemini-1.5-flash"]
+_GEMINI_MODELS = ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash"]
 
 # 2. OpenRouter fallback models
 _OPENROUTER_PRIMARY_MODEL = os.getenv("OPENROUTER_MODEL", "google/gemini-2.0-flash")
@@ -120,7 +120,7 @@ def _normalize_content(content, json_mode=False):
     return _strip_thinking_preamble(text)
 
 
-def _call_gemini_direct(prompt, model="gemini-3.8-flash", json_mode=False):
+def _call_gemini_direct(prompt, model="gemini-2.5-flash", json_mode=False):
     """Call Google Gemini API directly (100% Free via Google AI Studio).
     
     Provides best-in-class Hindi Devanagari generation and guaranteed JSON output.

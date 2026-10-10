@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""
+r"""
 Auto-Renewal Helper Script for Windows Task Scheduler
 Run this script daily - it will check if session needs renewal and attempt it
 

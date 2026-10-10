@@ -90,19 +90,27 @@ jobs:
         run: |
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
-          git add insta_session.json
+          git add -f insta_session.json
           git commit -m "🔄 Auto-renewed Instagram session on $(date +%Y-%m-%d)" || echo "No changes to commit"
           git push
-      
+
+      - name: Read renewed session content
+        if: success()
+        id: session_file
+        run: |
+          echo "payload<<EOF" >> $GITHUB_OUTPUT
+          cat insta_session.json >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
       - name: Update GitHub Secret with new session
         if: success()
         uses: gliech/create-github-secret-action@v1
         with:
           name: INSTA_SESSION
-          value: ${{ secrets.GH_TOKEN }}
+          value: ${{ steps.session_file.outputs.payload }}
           repository: ${{ github.repository }}
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.PAT_TOKEN || secrets.GITHUB_TOKEN }}
       
       - name: Alert on failure
         if: failure()
