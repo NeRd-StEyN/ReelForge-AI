@@ -8,11 +8,12 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # ── Model configuration ──────────────────────────────────
-_GEMINI_MODELS = ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash"]
+# 1. Google Gemini via Google AI Studio (100% Free: 1500 req/day)
+_GEMINI_MODELS = ["gemini-3.8-flash", "gemini-2.5-flash"]
 
-# 2. OpenRouter fallback models
-_OPENROUTER_PRIMARY_MODEL = os.getenv("OPENROUTER_MODEL", "google/gemini-2.0-flash")
-_fallback_env = os.getenv("OPENROUTER_FALLBACK_MODELS", "google/gemini-2.0-flash-exp:free,google/gemini-1.5-flash,openrouter/free")
+# 2. OpenRouter fallback models (100% Free models only)
+_OPENROUTER_PRIMARY_MODEL = os.getenv("OPENROUTER_MODEL", "openrouter/free")
+_fallback_env = os.getenv("OPENROUTER_FALLBACK_MODELS", "openrouter/free")
 _OPENROUTER_FALLBACK_MODELS = [m.strip() for m in _fallback_env.split(",") if m.strip()]
 _OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1/chat/completions"
 
@@ -120,7 +121,7 @@ def _normalize_content(content, json_mode=False):
     return _strip_thinking_preamble(text)
 
 
-def _call_gemini_direct(prompt, model="gemini-2.5-flash", json_mode=False):
+def _call_gemini_direct(prompt, model="gemini-3.8-flash", json_mode=False):
     """Call Google Gemini API directly (100% Free via Google AI Studio).
     
     Provides best-in-class Hindi Devanagari generation and guaranteed JSON output.
