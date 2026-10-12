@@ -51,7 +51,10 @@ def get_session_age():
         
         last_login = data.get("last_login")
         if not last_login:
-            return None
+            # Fallback to file modification time if last_login is null/missing
+            mtime = SESSION_FILE.stat().st_mtime
+            age_days = (datetime.now() - datetime.fromtimestamp(mtime)).days
+            return age_days
         
         # Parse ISO format timestamp
         created_time = datetime.fromisoformat(last_login.replace('Z', '+00:00'))

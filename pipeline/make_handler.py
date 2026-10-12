@@ -479,8 +479,6 @@ def _normalize_analytics(data: list) -> list:
             )
             if isinstance(caption, str):
                 caption = caption[:120].replace("\n", " ").strip()
-                # Strip non-ASCII chars to prevent Windows cp1252 encoding crashes
-                caption = caption.encode("ascii", errors="ignore").decode("ascii").strip()
 
             # Extract post_date from timestamp field
             post_date = ""
@@ -550,8 +548,6 @@ def _normalize_analytics(data: list) -> list:
             )
             if isinstance(caption, str):
                 caption = caption[:120].replace("\n", " ").strip()
-                # Strip non-ASCII chars to prevent Windows cp1252 encoding crashes
-                caption = caption.encode("ascii", errors="ignore").decode("ascii").strip()
             try:
                 posts[str(id(item))] = {
                     "topic_snippet": caption,

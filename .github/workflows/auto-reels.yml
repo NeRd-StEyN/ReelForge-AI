@@ -3,11 +3,11 @@ name: Auto Reels
 on:
   workflow_dispatch:
   schedule:
-    # 2 FIXED SLOTS PER DAY
-    # 11:00 IST = 05:30 UTC — Morning peak (fetch analytics ONCE here)
-    - cron: '30 5 * * *'
-    # 20:00 IST = 14:30 UTC — Evening peak (NO analytics fetch — already used today's credits)
-    - cron: '30 14 * * *'
+    # 2 FIXED SLOTS PER DAY (Proven peak slots for this account)
+    # 16:00 IST = 10:30 UTC — Afternoon peak (fetch analytics ONCE here)
+    - cron: '30 10 * * *'
+    # 19:00 IST = 13:30 UTC — Evening peak (NO analytics fetch — 0 credits used)
+    - cron: '30 13 * * *'
 
 jobs:
   generate-and-post:
@@ -16,9 +16,18 @@ jobs:
     env:
       GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
       OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+      OPENROUTER_MODEL: ${{ secrets.OPENROUTER_MODEL || 'google/gemini-2.0-flash-exp:free' }}
+      OPENROUTER_FALLBACK_MODELS: ${{ secrets.OPENROUTER_FALLBACK_MODELS || 'meta-llama/llama-3.3-70b-instruct:free,mistralai/mistral-7b-instruct:free' }}
       PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
       MAKE_WEBHOOK_URL: ${{ secrets.MAKE_WEBHOOK_URL }}
-      CONTENT_DOMAIN: ${{ secrets.CONTENT_DOMAIN }}
+      CONTENT_DOMAIN: ${{ secrets.CONTENT_DOMAIN || 'female psychology, attraction secrets, body language signals, eye contact secrets, and relationship dynamics' }}
+      CONTENT_LANGUAGE: ${{ secrets.CONTENT_LANGUAGE || 'hindi' }}
+      TTS_VOICE: ${{ secrets.TTS_VOICE || 'hi-IN-MadhurNeural' }}
+      TTS_RATE: ${{ secrets.TTS_RATE || '+12%' }}
+      SINGLE_NARRATION_MODE: 'true'
+      AUTO_POST_STORY: 'true'
+      AUTO_CLEANUP_ASSETS: 'true'
+      ENABLE_INSTAGRAM_ANALYTICS: 'true'
       INSTA_USERNAME: ${{ secrets.INSTA_USERNAME }}
       INSTA_PASSWORD: ${{ secrets.INSTA_PASSWORD }}
       CLOUDINARY_CLOUD_NAME: ${{ secrets.CLOUDINARY_CLOUD_NAME }}
@@ -27,7 +36,7 @@ jobs:
       # MAKE_ANALYTICS_WEBHOOK_URL is injected selectively per-step (see below).
       # Keeping it absent here ensures no step accidentally inherits the live key.
       INSTA_SESSION: ${{ secrets.INSTA_SESSION }}
-      # Raw secret stored separately — only the morning step will export it.
+      # Raw secret stored separately — only the first run step will export it.
       _MAKE_ANALYTICS_WEBHOOK_SECRET: ${{ secrets.MAKE_ANALYTICS_WEBHOOK_URL }}
     steps:
       - name: Checkout
@@ -72,21 +81,21 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Set analytics URL (morning run only)
+      - name: Set analytics URL (first daily run only)
         # Passes the real webhook URL only if:
-        #  a) this is the scheduled morning cron (05:30 UTC), OR
+        #  a) this is the scheduled first daily cron (10:30 UTC = 16:00 IST), OR
         #  b) this is a workflow_dispatch AND the current UTC hour is before noon.
         # In all other cases MAKE_ANALYTICS_WEBHOOK_URL stays empty — the Python
         # hard lock inside fetch_analytics_from_make is the final safety net.
         run: |
           HOUR=$(date -u +%H | sed 's/^0//')
           SCHEDULE="${{ github.event.schedule }}"
-          if [ "$SCHEDULE" = "30 5 * * *" ] || { [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "$HOUR" -lt 12 ]; }; then
+          if [ "$SCHEDULE" = "30 10 * * *" ] || [ "$SCHEDULE" = "30 5 * * *" ] || { [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "$HOUR" -lt 12 ]; }; then
             echo "MAKE_ANALYTICS_WEBHOOK_URL=$_MAKE_ANALYTICS_WEBHOOK_SECRET" >> $GITHUB_ENV
-            echo "[Analytics] Morning window detected — analytics URL exported."
+            echo "[Analytics] First run window detected — analytics URL exported."
           else
             echo "MAKE_ANALYTICS_WEBHOOK_URL=" >> $GITHUB_ENV
-            echo "[Analytics] Evening/non-morning run — analytics URL suppressed (0 Make credits)."
+            echo "[Analytics] Second/evening run — analytics URL suppressed (0 Make credits used)."
           fi
 
       - name: Generate and post one reel

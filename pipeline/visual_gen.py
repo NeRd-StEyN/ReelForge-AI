@@ -147,7 +147,7 @@ def _try_fetch_pexels_video(search_query, output_path, headers):
     for page in random.sample([1, 2, 3, 4, 5], 3):
         url = f"https://api.pexels.com/videos/search?query={search_query}&per_page=15&page={page}&orientation=portrait&size=large"
 
-        response = requests.get(url, headers=headers)
+        response = requests.get(url, headers=headers, timeout=25)
         if response.status_code != 200:
             continue
 
@@ -163,11 +163,15 @@ def _try_fetch_pexels_video(search_query, output_path, headers):
         if not video_files:
             continue
 
-        # Find the highest resolution video (often HD/4K)
-        best_video = max(video_files, key=lambda v: (v.get('width', 0) or 0) * (v.get('height', 0) or 0))
+        # Prioritize portrait/vertical videos (height >= width) first
+        portrait_files = [v for v in video_files if (v.get('height', 0) or 0) >= (v.get('width', 0) or 0)]
+        candidate_files = portrait_files if portrait_files else video_files
+
+        # Find the highest resolution video among candidates
+        best_video = max(candidate_files, key=lambda v: (v.get('width', 0) or 0) * (v.get('height', 0) or 0))
         video_url = best_video['link']
         # Download the video
-        video_data = requests.get(video_url).content
+        video_data = requests.get(video_url, timeout=60).content
         with open(output_path, 'wb') as f:
             f.write(video_data)
         return output_path
@@ -206,7 +210,7 @@ def _try_fetch_pexels_image(search_query, output_path, headers):
     for page in random.sample([1, 2, 3, 4, 5], 3):
         url = f"https://api.pexels.com/v1/search?query={search_query}&per_page=15&page={page}&orientation=portrait"
 
-        response = requests.get(url, headers=headers)
+        response = requests.get(url, headers=headers, timeout=25)
         if response.status_code != 200:
             continue
 
@@ -219,7 +223,7 @@ def _try_fetch_pexels_image(search_query, output_path, headers):
             continue
 
         image_url = picked_photo['src']['large']
-        image_data = requests.get(image_url).content
+        image_data = requests.get(image_url, timeout=30).content
         with open(output_path, 'wb') as f:
             f.write(image_data)
         return output_path

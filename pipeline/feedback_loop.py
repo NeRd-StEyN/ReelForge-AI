@@ -110,9 +110,9 @@ def summarize_feedback(limit=30):
                     # Like rate = likes/views — target >3% for healthy engagement
                     like_rate = round((likes / views * 100), 1) if views > 0 else 0.0
                     
-                    # Algorithm Score: Weight Shares (25x) and Saves (20x) highest
-                    # (Instagram 2026 distribution algorithm prioritizes virality/DMs and bookmarking)
-                    score = (shares * 25) + (saves * 20) + (comments * 10) + (likes * 2) + views + int(like_rate * 50)
+                    # Algorithm Score: Weight Likes (10x) and Views as reliable signals
+                    # (Instagram prioritizes likes and high like-rates for initial explore distribution)
+                    score = views + (likes * 10) + (shares * 25) + (saves * 20) + (comments * 5) + int(like_rate * 50)
                     is_pinned = bool(item.get("is_pinned", False))
                     post_date = str(item.get("post_date") or "").strip()
 
@@ -262,59 +262,12 @@ def get_previous_part_script(current_topic):
 
 def get_optimal_posting_times(fallback_times=None):
     """
-    Analyze saved analytics history to find which posting hours get the most views.
-    Returns a list of HH:MM strings for the best times to post.
-    Falls back to provided default times if not enough data.
+    Return the optimal posting times for this account.
+    Defaults to the proven peak IST slots (16:00 and 19:00) where account
+    achieved 2.5K–11K views.
     """
-    rows = _read_history(limit=60)
-    fallback = fallback_times or ["11:30", "19:30"]
-
-    if not rows:
-        return fallback
-
-    # Build hour → [view counts] mapping from snapshot timestamps
-    hour_views = {}
-    for row in rows:
-        ts = row.get("timestamp_utc", "")
-        analytics = row.get("analytics")
-        if not ts or not isinstance(analytics, list):
-            continue
-
-        try:
-            hour = int(ts[11:13])  # Extract hour from ISO timestamp
-        except (ValueError, IndexError):
-            continue
-
-        total_views = sum(p.get("views", 0) for p in analytics)
-        if hour not in hour_views:
-            hour_views[hour] = []
-        hour_views[hour].append(total_views)
-
-    if not hour_views:
-        return fallback
-
-    # Compute average views per hour and rank
-    avg_by_hour = {h: sum(v) / len(v) for h, v in hour_views.items()}
-    sorted_hours = sorted(avg_by_hour, key=avg_by_hour.get, reverse=True)
-
-    # Pick top N distinct hours spaced at least 3h apart
-    count = len(fallback)
-    chosen = []
-    for h in sorted_hours:
-        if all(abs(h - c) >= 3 for c in chosen):
-            chosen.append(h)
-        if len(chosen) == count:
-            break
-
-    if len(chosen) < count:
-        # Fill remaining slots with fallback times
-        return fallback
-
-    # Convert to IST-friendly HH:MM strings (round to :00 or :30)
-    chosen.sort()
-    result = [f"{h:02d}:00" for h in chosen]
-    print(f"[Scheduler] Optimal posting times from analytics: {result}")
-    return result
+    fallback = fallback_times or ["16:00", "19:00"]
+    return fallback
 
 
 # ── Fix 1: Topic Deduplication ────────────────────────────────────────

@@ -864,7 +864,7 @@ def generate_thumbnail(title, output_path="output_thumbnail.jpg", size=(1080, 19
     font_small = _load_caption_font(52)
 
     # Word-wrap title
-    words = title.split()
+    words = thumb_title.split()
     lines = []
     current = []
     for word in words:
