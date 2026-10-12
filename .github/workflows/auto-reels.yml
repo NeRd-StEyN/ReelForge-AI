@@ -16,14 +16,14 @@ jobs:
     env:
       GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
       OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
-      OPENROUTER_MODEL: ${{ secrets.OPENROUTER_MODEL || 'google/gemini-2.0-flash-exp:free' }}
-      OPENROUTER_FALLBACK_MODELS: ${{ secrets.OPENROUTER_FALLBACK_MODELS || 'meta-llama/llama-3.3-70b-instruct:free,mistralai/mistral-7b-instruct:free' }}
+      OPENROUTER_MODEL: ${{ secrets.OPENROUTER_MODEL }}
+      OPENROUTER_FALLBACK_MODELS: ${{ secrets.OPENROUTER_FALLBACK_MODELS }}
       PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
       MAKE_WEBHOOK_URL: ${{ secrets.MAKE_WEBHOOK_URL }}
-      CONTENT_DOMAIN: ${{ secrets.CONTENT_DOMAIN || 'female psychology, attraction secrets, body language signals, eye contact secrets, and relationship dynamics' }}
-      CONTENT_LANGUAGE: ${{ secrets.CONTENT_LANGUAGE || 'hindi' }}
-      TTS_VOICE: ${{ secrets.TTS_VOICE || 'hi-IN-MadhurNeural' }}
-      TTS_RATE: ${{ secrets.TTS_RATE || '+12%' }}
+      CONTENT_DOMAIN: ${{ secrets.CONTENT_DOMAIN }}
+      CONTENT_LANGUAGE: ${{ secrets.CONTENT_LANGUAGE }}
+      TTS_VOICE: ${{ secrets.TTS_VOICE }}
+      TTS_RATE: ${{ secrets.TTS_RATE }}
       SINGLE_NARRATION_MODE: 'true'
       AUTO_POST_STORY: 'true'
       AUTO_CLEANUP_ASSETS: 'true'
