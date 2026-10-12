@@ -19,6 +19,33 @@ from pipeline.insta_handler import get_insta_client, get_performance_data
 from pipeline.script_gen import generate_topic_from_domain
 
 
+# ── Niche guard: keywords that MUST appear in topics for this account ──
+_NICHE_KEYWORDS = [
+    "attract", "girl", "ladki", "psychology", "signal", "eye contact",
+    "mixed signal", "texting", "body language", "friendzone", "relationship",
+    "behavior", "chase", "interest", "test", "decode", "hide", "feelings",
+    "emotion", "dating", "conversation", "silence", "pull", "mirror",
+    "reply", "message", "baat", "pyar", "dost", "ignore", "like", "zone",
+]
+_OFF_NICHE_SIGNALS = [
+    "mountain", "himalay", "diwali", "deepawali", "monsoon", "barsaat",
+    "farmer", "kisan", "driving", "gaon", "village", "budhe", "purana",
+    "safar", "yatra journey", "subah ka sankalp", "rasika", "mumbai ka",
+    "panchayat", "bachche", "prakriti", "sanskritik",
+]
+
+
+def _is_on_niche(topic: str) -> bool:
+    """Return True only if the topic is clearly about attraction/psychology/relationships."""
+    t = topic.lower()
+    # Reject if off-niche signals dominate
+    off_hits = sum(1 for sig in _OFF_NICHE_SIGNALS if sig in t)
+    if off_hits >= 1:
+        return False
+    # Accept if any niche keyword is present
+    return any(kw in t for kw in _NICHE_KEYWORDS)
+
+
 load_dotenv()
 
 
@@ -276,6 +303,23 @@ def create_and_post_one_reel():
                     used_topics=used_topics,
                 )
             print(f"Selected topic: {topic}")
+
+            # ── Niche guard: re-generate topic if it drifted off-niche ───────
+            MAX_NICHE_RETRIES = 3
+            for niche_attempt in range(MAX_NICHE_RETRIES):
+                if _is_on_niche(topic):
+                    break
+                print(f"[NicheGuard] Topic '{topic}' appears off-niche (attempt {niche_attempt+1}/{MAX_NICHE_RETRIES}). Re-generating...")
+                topic = generate_topic_from_domain(
+                    domain=domain,
+                    analytics_data=analytics_data,
+                    feedback_summary=feedback_summary,
+                    used_topics=used_topics,
+                )
+                print(f"[NicheGuard] New topic: {topic}")
+            if not _is_on_niche(topic):
+                print(f"[NicheGuard] Could not get on-niche topic after {MAX_NICHE_RETRIES} tries. Using safe fallback.")
+                topic = "why girls always test the guy they like before trusting him"
 
             # Fix 4: Pick rotating TTS voice
             voice = _pick_next_voice()

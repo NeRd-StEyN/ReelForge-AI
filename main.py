@@ -245,6 +245,7 @@ if __name__ == "__main__":
     if len(sys.argv) > 1:
         topic = " ".join(sys.argv[1:])
     else:
-        # Instead of prompting, generate a generic topic to allow seamless headless cron execution
-        topic = "A shocking, unknown, and fascinating fact"
+        # On-niche fallback: always use an attraction/psychology topic
+        # so direct `python main.py` runs never generate off-niche content
+        topic = "why girls suddenly lose interest when you're always available"
     main(topic)

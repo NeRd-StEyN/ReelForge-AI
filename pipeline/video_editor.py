@@ -364,9 +364,10 @@ def _create_like_bait_overlay(duration=2.0, size=(1080, 1920)):
     font = _load_caption_font(52)
 
     like_options = [
-        _strip_unsupported_chars("Like karo agar ye sach hai"),
-        _strip_unsupported_chars("Relatable hai? Like karo"),
-        _strip_unsupported_chars("Agar ye tumhare saath bhi hua"),
+        _strip_unsupported_chars("pasand aaya? Like karo"),
+        _strip_unsupported_chars("sach lagaa? Like maaro"),
+        _strip_unsupported_chars("relatable hai? Like karo"),
+        _strip_unsupported_chars("ye dekho aur Like karo"),
     ]
     text = random.choice(like_options)
 

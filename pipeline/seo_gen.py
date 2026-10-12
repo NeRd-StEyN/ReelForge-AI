@@ -1,6 +1,6 @@
 import json
 import random
-from pipeline.script_gen import _llm_prompt
+from pipeline.script_gen import _llm_prompt, _strip_thinking_preamble
 
 
 def _generate_ai_caption(topic, script_data):
@@ -41,7 +41,17 @@ Rules:
 
 Return ONLY the 5-line caption text, no quotes, no markdown fences.
 """
-    raw = _llm_prompt(prompt).strip()
+    raw = _strip_thinking_preamble(_llm_prompt(prompt).strip())
+
+    # Secondary guard: if first line still looks like LLM meta-text, strip it
+    lines = raw.split("\n")
+    _META_STARTERS = (
+        "here", "let", "we need", "i need", "draft", "output",
+        "line 1", "line 2", "user safety", "note:", "rule",
+    )
+    while lines and lines[0].strip().lower().startswith(_META_STARTERS):
+        lines = lines[1:]
+    raw = "\n".join(lines).strip()
 
     # Guard: ensure first line fits before Instagram's 'more' cutoff
     lines = raw.split("\n")
@@ -78,7 +88,7 @@ Good examples of quality hashtags for this niche:
 
 Return ONLY the hashtags, nothing else.
 """
-    raw = _llm_prompt(prompt).strip()
+    raw = _strip_thinking_preamble(_llm_prompt(prompt).strip())
     # Parse hashtags from the response
     hashtags = [tag.strip() for tag in raw.replace("\n", " ").split() if tag.strip().startswith("#")]
     
@@ -135,7 +145,16 @@ Rules:
 Return ONLY the comment text, nothing else.
 """
     try:
-        result = _llm_prompt(prompt).strip()
+        result = _strip_thinking_preamble(_llm_prompt(prompt).strip())
+        # Secondary guard: strip lines that look like LLM meta-instructions
+        _META_STARTERS = (
+            "here", "let", "we need", "i need", "draft:", "output:",
+            "line 1", "user safety", "note:", "rule:",
+        )
+        lines = result.split("\n")
+        while lines and lines[0].strip().lower().startswith(_META_STARTERS):
+            lines = lines[1:]
+        result = "\n".join(lines).strip()
         # Validate: must be non-empty and contain real words (not just emoji/punctuation)
         import re as _re
         real_words = _re.sub(r'[^\w\s]', '', result, flags=_re.UNICODE).strip()
@@ -194,7 +213,7 @@ Part 3 could be: 'Part 3: The Secret Phrase That Reverses It'
 Return ONLY the {prefix} title, nothing else.
 """
     try:
-        result = _llm_prompt(prompt).strip()
+        result = _strip_thinking_preamble(_llm_prompt(prompt).strip())
         # Ensure it starts with the correct prefix
         if not result.lower().startswith(prefix.lower()):
             result = f"{prefix}: {result}"
@@ -226,7 +245,7 @@ QUESTION: [question text]
 OPTION_1: [yes option]
 OPTION_2: [no option]
 """
-        raw = _llm_prompt(prompt).strip()
+        raw = _strip_thinking_preamble(_llm_prompt(prompt).strip())
         lines = {}
         for line in raw.split("\n"):
             if ":" in line:

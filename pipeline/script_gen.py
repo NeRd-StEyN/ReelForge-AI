@@ -9,7 +9,7 @@ load_dotenv()
 
 # ── Model configuration ──────────────────────────────────
 # 1. Google Gemini via Google AI Studio (100% Free: 1500 req/day)
-_GEMINI_MODELS = ["gemini-3.8-flash", "gemini-2.5-flash"]
+_GEMINI_MODELS = ["gemini-2.5-flash", "gemini-2.0-flash"]
 
 # 2. OpenRouter fallback models (100% Free models only)
 _OPENROUTER_PRIMARY_MODEL = os.getenv("OPENROUTER_MODEL", "openrouter/free")
@@ -39,8 +39,35 @@ _THINKING_PREAMBLE_PATTERNS = [
     "the hook framework is",
     "special rule says",
     "user safety: safe",
+    "user safety:",
     "sample title",
     "sample story",
+    # Additional patterns observed leaking into live Instagram captions:
+    "we need to",
+    "let's draft",
+    "let's map out",
+    "let's refine",
+    "let's parse",
+    "i need to incorporate",
+    "but maybe simpler",
+    "let me draft",
+    "here's a draft",
+    "here is a draft",
+    "draft:",
+    "output:",
+    "line 1:",
+    "line 2:",
+    "line 3:",
+    "line 4:",
+    "line 5:",
+    "we need a caption",
+    "we need to write",
+    "we need to produce",
+    "i need to write",
+    "let's write",
+    "here is the caption",
+    "here's the caption",
+    "final caption:",
 ]
 
 
